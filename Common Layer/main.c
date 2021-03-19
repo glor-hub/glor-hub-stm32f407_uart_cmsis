@@ -9,6 +9,9 @@ using STM32F4DISCOVERY kit.
 //********************************************************************************
 
 #include "stm32f4xx.h"
+#include "init.h"
+#include "periph_test.h"
+
 
 //********************************************************************************
 //Macros
@@ -43,4 +46,5 @@ int main(void)
 {
     Init_Device();
     Peripherial_Test();
+    while(1);
 }

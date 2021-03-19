@@ -336,7 +336,7 @@
               <MiscControls></MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath></IncludePath>
+              <IncludePath>.\Common Layer;.\Business Logic Layer;.\Driver Layer;.\Middle Layer</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -525,6 +525,18 @@
               </Aads>
             </GroupArmAds>
           </GroupOption>
+          <Files>
+            <File>
+              <FileName>init.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Driver Layer\init.c</FilePath>
+            </File>
+            <File>
+              <FileName>led.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Driver Layer\led.c</FilePath>
+            </File>
+          </Files>
         </Group>
         <Group>
           <GroupName>Middle layer</GroupName>
@@ -596,6 +608,13 @@
               </Aads>
             </GroupArmAds>
           </GroupOption>
+          <Files>
+            <File>
+              <FileName>led_test.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Middle Layer\led_test.c</FilePath>
+            </File>
+          </Files>
         </Group>
         <Group>
           <GroupName>Business logic layer</GroupName>
@@ -667,6 +686,13 @@
               </Aads>
             </GroupArmAds>
           </GroupOption>
+          <Files>
+            <File>
+              <FileName>periph_test.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Business Logic Layer\periph_test.c</FilePath>
+            </File>
+          </Files>
         </Group>
         <Group>
           <GroupName>::CMSIS</GroupName>

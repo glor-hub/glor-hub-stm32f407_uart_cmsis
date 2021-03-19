@@ -1,0 +1,9 @@
+*.axf
+*.build_log.htm
+*.hex
+*.htm
+*.lnp
+*.dep
+*.crf
+*.d
+*.o
