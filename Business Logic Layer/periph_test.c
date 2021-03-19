@@ -36,6 +36,6 @@
 
 void Peripherial_Test(void)
 {
-    Led_Test();
+    LED_Test();
 }
 
