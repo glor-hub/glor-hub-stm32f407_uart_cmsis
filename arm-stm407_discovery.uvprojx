@@ -323,7 +323,7 @@
             <wLevel>2</wLevel>
             <uThumb>0</uThumb>
             <uSurpInc>0</uSurpInc>
-            <uC99>0</uC99>
+            <uC99>1</uC99>
             <useXO>0</useXO>
             <v6Lang>1</v6Lang>
             <v6LangP>1</v6LangP>
@@ -336,7 +336,7 @@
               <MiscControls></MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>.\Common Layer;.\Business Logic Layer;.\Driver Layer;.\Middle Layer</IncludePath>
+              <IncludePath>.\Middle;.\Driver;.\Common;.\Variation</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -378,7 +378,7 @@
       </TargetOption>
       <Groups>
         <Group>
-          <GroupName>Common Layer</GroupName>
+          <GroupName>Common</GroupName>
           <GroupOption>
             <CommonProperty>
               <UseCPPCompiler>0</UseCPPCompiler>
@@ -451,12 +451,12 @@
             <File>
               <FileName>main.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Common Layer\main.c</FilePath>
+              <FilePath>.\Common\main.c</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>Driver layer</GroupName>
+          <GroupName>Driver </GroupName>
           <GroupOption>
             <CommonProperty>
               <UseCPPCompiler>0</UseCPPCompiler>
@@ -529,17 +529,17 @@
             <File>
               <FileName>init.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Driver Layer\init.c</FilePath>
+              <FilePath>.\Driver\init.c</FilePath>
             </File>
             <File>
               <FileName>led.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Driver Layer\led.c</FilePath>
+              <FilePath>.\Driver\led.c</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>Middle layer</GroupName>
+          <GroupName>Middle</GroupName>
           <GroupOption>
             <CommonProperty>
               <UseCPPCompiler>0</UseCPPCompiler>
@@ -612,12 +612,12 @@
             <File>
               <FileName>led_test.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Middle Layer\led_test.c</FilePath>
+              <FilePath>.\Middle\led_test.c</FilePath>
             </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>Business logic layer</GroupName>
+          <GroupName>Variation</GroupName>
           <GroupOption>
             <CommonProperty>
               <UseCPPCompiler>0</UseCPPCompiler>
@@ -690,7 +690,7 @@
             <File>
               <FileName>periph_test.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Business Logic Layer\periph_test.c</FilePath>
+              <FilePath>.\Variation\periph_test.c</FilePath>
             </File>
           </Files>
         </Group>
