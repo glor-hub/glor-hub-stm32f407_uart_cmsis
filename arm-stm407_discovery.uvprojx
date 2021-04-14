@@ -426,14 +426,14 @@
               <FilePath>.\App\3_Driver\led.c</FilePath>
             </File>
             <File>
-              <FileName>clock.c</FileName>
+              <FileName>arm_clock.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\App\3_Driver\clock.c</FilePath>
+              <FilePath>.\App\3_Driver\arm_clock.c</FilePath>
             </File>
             <File>
-              <FileName>flash.c</FileName>
+              <FileName>arm_flash.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\App\3_Driver\flash.c</FilePath>
+              <FilePath>.\App\3_Driver\arm_flash.c</FilePath>
             </File>
           </Files>
         </Group>
