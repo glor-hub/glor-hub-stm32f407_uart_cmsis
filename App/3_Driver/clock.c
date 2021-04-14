@@ -19,9 +19,13 @@
 //********************************************************************************
 
 typedef enum {
+//high speed external clock signal
     RCC_HSI,
+//high speed internal clock signal
     RCC_HSE,
-    RCC_HSEBYP, //внешний генератор вместо кварцевого резонатора
+//external clock instead of  external crystal/ceramic resonator used
+    RCC_HSEBYP,
+
     RCC_PLL,
     NUM_CLOCK_SOURCES
 } RCC_ClockSources_enum;
@@ -35,9 +39,9 @@ typedef enum {
 } RCC_Status_enum;
 
 typedef enum {
-//Используется кварц 8 MHz, SYSCK = 168 MHz
-//Для кварца 20 MHz необходимо взять М=20
-//Для USB PLL48CK = 48 MHz
+//8 MHz crystal resonator, SYSCK = 168 MHz
+//for 20 MHz crystal resonator М=20 is used
+//for USB: PLL48CK = 48 MHz
 
     RCC_PLL_COEFF_M_8 = RCC_PLLCFGR_PLLM_3,
     RCC_PLL_COEFF_N_336 = (RCC_PLLCFGR_PLLN_4 | RCC_PLLCFGR_PLLN_6 |
@@ -86,18 +90,18 @@ void RCC_Reset(void)
 void RCC_SetSysClockTo168(void)
 {
     RCC_ClockSourceCmd(RCC_HSE, ENABLE_CMD);
-//Перед включением ФАБЧ (PLL) необходимо установить соответствующую латентность
-//для FLASH
+//the number of wait states (LATENCY) must be correctly programmed in the Flash according to HCLK
+//and the supply voltage of the device before starting phase locked loop (PLL)
     FLASH_Init();
-//Включаем детектор сигнала HSE. При отсутствии сигнала HSE будет сгенетировано немаскируемое
-//прерывание NMI
+//enable clock security system HSE. If the HSE clock happens to fail, the CSS generates an interrupt,
+//which causes the automatic generation of an NMI
     RCC_HSEClockDetectorCmd(ENABLE_CMD);
 //    RCC_ClockSourceCmd(RCC_HSI, DISABLE_CMD);
-//Конфигурируем PLL
+//configure PLL
     RCC_PLLConfig();
-//Запускаем PLL
+//start PLL
     RCC_ClockSourceCmd(RCC_PLL, ENABLE_CMD);
-//Выбираем в качестве тактового сигнала сигнал с PLL
+//select PLL as system clock
     RCC_SysClockSwitchCmd(RCC_PLL);
 }
 
@@ -110,9 +114,9 @@ static void RCC_ClockSourceCmd(RCC_ClockSources_enum source, PeriphCmd_enum cmd)
     switch(source) {
         case RCC_HSI: {
             if(cmd == ENABLE_CMD) {
-// Запускаем внутренний генератор HSI 16 МГц
+//start HSI 16 MHz
                 RCC->CR |= RCC_CR_HSION;
-//Ждем появления бита готовности HSI
+//waiting for HSI ready flag is set
                 while(((RCC->CR & RCC_CR_HSIRDY) == RESET) && (counter != RCC_STARTUP_TIMOUT)) {
                     counter++;
                 }
@@ -121,24 +125,24 @@ static void RCC_ClockSourceCmd(RCC_ClockSources_enum source, PeriphCmd_enum cmd)
 
                 } else {
                     RCCStatus &= ~RCC_STA_HSI_READY_ERR;
-//Сбросим калибровку HSI
+//reset HSI calibration
                     RCC->CR &= ~RCC_CR_HSITRIM;
-//Установим значение калибровки по умолчанию
+//set the default HSI calibration
                     RCC->CR |= (uint32_t)0x80;
                 }
             } else {
-//Выключаем HSI
+//stop HSI
                 RCC->CR &= ~RCC_CR_HSION;
-//Ждем сброса бита готовности HSI
+//waiting for HSI ready flag is cleared
                 while(RCC->CR & RCC_CR_HSIRDY);
             }
             break;
         }
         case RCC_HSE: {
             if(cmd == ENABLE_CMD) {
-// Запускаем внешний генератор HSE
+// start HSE
                 RCC->CR |= RCC_CR_HSEON;
-//Ждем появления бита готовности HSE
+//waiting for HSE ready flag is set
                 while(((RCC->CR & RCC_CR_HSERDY) == RESET) && (counter != RCC_STARTUP_TIMOUT)) {
                     counter++;
                 }
@@ -148,18 +152,18 @@ static void RCC_ClockSourceCmd(RCC_ClockSources_enum source, PeriphCmd_enum cmd)
                     RCCStatus &= ~RCC_STA_HSE_READY_ERR;
                 }
             } else {
-//Выключаем HSE
+//stop HSI
                 RCC->CR &= ~RCC_CR_HSEON;
-//Ждем сброса бита готовности HSE
+//waiting for HSE ready flag is cleared
                 while(RCC->CR & RCC_CR_HSERDY);
             }
             break;
         }
         case RCC_PLL: {
             if(cmd == ENABLE_CMD) {
-// Запускаем ФАБЧ PLL
+//start PLL
                 RCC->CR |= RCC_CR_PLLON;
-//Ждем появления бита готовности PLL
+//waiting for PLL ready flag is set
                 while(((RCC->CR & RCC_CR_PLLRDY) == RESET) && (counter != RCC_STARTUP_TIMOUT)) {
                     counter++;
                 }
@@ -169,19 +173,19 @@ static void RCC_ClockSourceCmd(RCC_ClockSources_enum source, PeriphCmd_enum cmd)
                     RCCStatus &= ~RCC_STA_PLL_READY_ERR;
                 }
             } else {
-//Выключаем PLL
+//stop PLL
                 RCC->CR &= ~RCC_CR_PLLON;
-//Ждем сброса бита готовности PLL
+//waiting for PLL ready flag is cleared
                 while(RCC->CR & RCC_CR_PLLRDY);
             }
             break;
         }
         case RCC_HSEBYP: {
             if(cmd == ENABLE_CMD) {
-//Установим бит, разрешающий использование внешнего генератора
+//enable HSE with external clock
                 RCC->CR |= RCC_CR_HSEBYP;
             } else {
-//Сбросим бит, разрешающий использование внешнего генератора
+//disable HSE with external clock
                 RCC->CR &= ~RCC_CR_HSEBYP;
             }
             break;
@@ -191,20 +195,19 @@ static void RCC_ClockSourceCmd(RCC_ClockSources_enum source, PeriphCmd_enum cmd)
 
 static void RCC_ConfigReset(void)
 {
-//Очищаем регистр конфигурации
+//сlear clock configuration register
     RCC->CFGR = (uint32_t)0x00;
-//Ждем очистку битов выбора источника системного тактирования
-//Необходимо убедиться, что ни один из источников не используется
+//waiting for none of the system clock sources will not be used
     while(RCC->CFGR & RCC_CFGR_SWS);
 }
 
 static void RCC_HSEClockDetectorCmd(PeriphCmd_enum cmd)
 {
     if(cmd == ENABLE_CMD) {
-//Включаем детектор сигнала HSE
+//enable CSS
         RCC->CR |= RCC_CR_CSSON;
     } else {
-//Отключаем детектор сигнала HSE
+//disable CSS
         RCC->CR &= ~RCC_CR_CSSON;
     }
 
@@ -213,10 +216,10 @@ static void RCC_HSEClockDetectorCmd(PeriphCmd_enum cmd)
 static void RCC_PLLConfig(void)
 {
     RCC->PLLCFGR = (uint32_t)0x00;
-//Настраиваем на максимальную частоту: SYSCK=f*N/(M*P)=8*336/(8*2)=168MHz
+//configurе for maximum frequency: SYSCK=f*N/(M*P)=8*336/(8*2)=168MHz
 //PLL48CK=f*N/(M*Q)=48MHZ
     RCC->PLLCFGR |= (RCC_PLL_COEFF_M_8 | RCC_PLL_COEFF_N_336 | RCC_PLL_COEFF_P_2 | RCC_PLL_COEFF_Q_7);
-//Источником сигнала для PLL выбираем HSE
+//select HSE as PLL source
     RCC->PLLCFGR |= RCC_PLLCFGR_PLLSRC_HSE;
 }
 
@@ -225,9 +228,9 @@ static void RCC_SysClockSwitchCmd(RCC_ClockSources_enum source)
     RCC->CFGR &= ~RCC_CFGR_SW;
     switch(source) {
         case RCC_HSI: {
-//Выбираем источник системной частоты
+//select system clock source
             RCC->CFGR |= RCC_CFGR_SW_HSI;
-//Убеждаемся, что источник выбран
+//make sure the source is selected
             while((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_HSI);
             break;
         }
