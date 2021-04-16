@@ -1,8 +1,9 @@
 //********************************************************************************
-//app_init.c
+//app_process.c
 //********************************************************************************
-#include "app_init.h"
+#include "app.h"
 #include "clock.h"
+#include "led.h"
 #include "gpio.h"
 
 //********************************************************************************
@@ -25,18 +26,48 @@
 //Prototypes
 //********************************************************************************
 
+static void App_PeripherialTest(void);
+static void App_CorePeripherialTest(void);
+static void App_IntPeripherialTest(void);
+static void App_ExtPeripherialTest(void);
 
 //================================================================================
 //Public
 //================================================================================
+void App_IdleTask(void)
+{
+    //Some IDLE task implemenation here. This is the lowest priority task
+}
+
 void App_Init(void)
 {
     CLOCK_Init();
 
     GPIO_Config();
+    
+    App_PeripherialTest();
 }
 
 //================================================================================
 //Private
 //================================================================================
+static void App_PeripherialTest(void)
+{
+    App_CorePeripherialTest();
+    App_IntPeripherialTest();
+    App_ExtPeripherialTest();
+}
+static void App_CorePeripherialTest(void)
+{
+    CLOCK_Test();
+}
 
+static void App_IntPeripherialTest(void)
+{
+    GPIO_Test();
+}
+
+static void App_ExtPeripherialTest(void)
+{
+    LED_Test();
+}
