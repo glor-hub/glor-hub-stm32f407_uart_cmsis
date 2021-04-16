@@ -1,6 +1,6 @@
-#ifndef _FLASH_H_
-#define _FLASH_H_
+#ifndef _ARM_FLASH_H_
+#define _ARM_FLASH_H_
 
-void FLASH_Init(void);
+void ARM_FLASH_Init(void);
 
-#endif //_FLASH_H_ 
+#endif //_ARM_FLASH_H_ 

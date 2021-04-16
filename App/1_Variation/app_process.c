@@ -1,8 +1,10 @@
 //********************************************************************************
-//.c
+//app_process.c
 //********************************************************************************
-#include "led_test.h"
+#include "app_process.h"
+#include "clock.h"
 #include "led.h"
+#include "gpio.h"
 
 //********************************************************************************
 //Macros
@@ -24,16 +26,40 @@
 //Prototypes
 //********************************************************************************
 
+static void App_PeripherialTest(void);
+static void App_CorePeripherialTest(void);
+static void App_IntPeripherialTest(void);
+static void App_ExtPeripherialTest(void);
+
 //================================================================================
 //Public
 //================================================================================
-
+void App_Main(void)
+{
+    App_PeripherialTest();
+    while(1);
+}
 
 //================================================================================
 //Private
 //================================================================================
-void LED_Test(void)
+static void App_PeripherialTest(void)
 {
-    led_off();
-    led_on();
+    App_CorePeripherialTest();
+    App_IntPeripherialTest();
+    App_ExtPeripherialTest();
+}
+static void App_CorePeripherialTest(void)
+{
+    CLOCK_Test();
+}
+
+static void App_IntPeripherialTest(void)
+{
+    GPIO_Test();
+}
+
+static void App_ExtPeripherialTest(void)
+{
+    LED_Test();
 }
