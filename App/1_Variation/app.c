@@ -41,10 +41,10 @@ void App_IdleTask(void)
 
 void App_Init(void)
 {
-    CLOCK_Init();
+    Clock_Init();
 
     GPIO_Config();
-    
+
     App_PeripherialTest();
 }
 
@@ -59,7 +59,7 @@ static void App_PeripherialTest(void)
 }
 static void App_CorePeripherialTest(void)
 {
-    CLOCK_Test();
+    Clock_Test();
 }
 
 static void App_IntPeripherialTest(void)

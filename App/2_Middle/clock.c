@@ -31,14 +31,14 @@
 //Public
 //================================================================================
 
-void CLOCK_Init(void)
+void Clock_Init(void)
 {
     ARM_RCC_Reset();
     ARM_RCC_SetSysClockTo168();
     SystemCoreClockUpdate();
 }
 
-void CLOCK_Test(void)
+void Clock_Test(void)
 {
 
 }

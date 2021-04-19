@@ -396,14 +396,9 @@
           <GroupName>1_Variation</GroupName>
           <Files>
             <File>
-              <FileName>app_init.c</FileName>
+              <FileName>app.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\App\1_Variation\app_init.c</FilePath>
-            </File>
-            <File>
-              <FileName>app_process.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\App\1_Variation\app_process.c</FilePath>
+              <FilePath>.\App\1_Variation\app.c</FilePath>
             </File>
           </Files>
         </Group>
