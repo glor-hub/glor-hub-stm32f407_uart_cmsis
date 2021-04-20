@@ -4,5 +4,6 @@
 void ARM_RCC_Reset(void);
 void ARM_RCC_SetSysClockTo168(void);
 uint32_t *ARM_RCC_GetStatus(void);
+void ARM_RCC_OutputSysClocktoMCO2(void);
 
 #endif //_ARM_CLOCK_H_

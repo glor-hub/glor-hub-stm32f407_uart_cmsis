@@ -59,7 +59,9 @@ static void App_PeripherialTest(void)
 }
 static void App_CorePeripherialTest(void)
 {
+#ifdef HARDWARE_TESTING_MODE
     Clock_Test();
+#endif//HARDWARE_TESTING_MODE
 }
 
 static void App_IntPeripherialTest(void)

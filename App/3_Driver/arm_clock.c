@@ -65,6 +65,7 @@ static void ARM_RCC_SysClockSwitchCmd(ARM_RCC_ClockSources_enum source);
 static void ARM_RCC_PLLConfig(void);
 static void ARM_RCC_ClearResetFlags(void);
 static void ARM_RCC_InteruptDisable(void);
+static void ARM_RCC_ConfigMCO2(void);
 
 //================================================================================
 //Public
@@ -83,6 +84,10 @@ void ARM_RCC_Reset(void)
     ARM_RCC_ClockSourceCmd(ARM_RCC_HSE, DISABLE_CMD);
     ARM_RCC_HSEClockDetectorCmd(DISABLE_CMD);
     ARM_RCC_ClockSourceCmd(ARM_RCC_HSEBYP, DISABLE_CMD);
+#ifdef HARDWARE_TESTING_MODE
+//configure for output System clock divided by 5 (168/5=33,6 MHz) to MCO2 pin
+    ARM_RCC_ConfigMCO2();
+#endif//HARDWARE_TESTING_MODE
     ARM_RCC_ClearResetFlags();
     ARM_RCC_InteruptDisable();
 }
@@ -103,6 +108,11 @@ void ARM_RCC_SetSysClockTo168(void)
     ARM_RCC_ClockSourceCmd(ARM_RCC_PLL, ENABLE_CMD);
 //select PLL as system clock
     ARM_RCC_SysClockSwitchCmd(ARM_RCC_PLL);
+}
+
+void NMI_Handler(void)
+{
+    ARM_RCCStatus |= ARM_RCC_STA_HSE_READY_ERR;
 }
 
 //================================================================================
@@ -258,7 +268,11 @@ static void ARM_RCC_SysClockSwitchCmd(ARM_RCC_ClockSources_enum source)
     }
 }
 
-void NMI_Handler(void)
+static void ARM_RCC_ConfigMCO2(void)
 {
-    ARM_RCCStatus |= ARM_RCC_STA_HSE_READY_ERR;
+//select prescaler 5
+    RCC->CFGR |= RCC_CFGR_MCO2PRE_Msk;
+//select SYSCLOCK (default value)
+    RCC->CFGR &= ~RCC_CFGR_MCO2_Msk;
+
 }
