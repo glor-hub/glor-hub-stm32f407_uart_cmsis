@@ -435,6 +435,11 @@
               <FileType>1</FileType>
               <FilePath>.\App\3_Driver\arm_flash.c</FilePath>
             </File>
+            <File>
+              <FileName>arm_gpio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\App\3_Driver\arm_gpio.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

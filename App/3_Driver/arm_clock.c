@@ -2,8 +2,9 @@
 //arm_clock.c
 //********************************************************************************
 #include "stm32f4xx.h"
-#include "arm_clock.h"
 #include "discovery-kit.h"
+#include "gpio.h"
+#include "arm_clock.h"
 #include "arm_flash.h"
 
 //********************************************************************************
@@ -38,11 +39,11 @@ typedef enum {
     ARM_RCC_STA_PLL_CLOCK_SWITCH_ERR = (uint32_t)0x00000008
 } ARM_RCC_Status_enum;
 
-typedef enum {
 //8 MHz crystal resonator, SYSCK = 168 MHz
 //for 20 MHz crystal resonator Ì=20 is used
 //for USB: PLL48CK = 48 MHz
 
+typedef enum {
     ARM_RCC_PLL_COEFF_M_8 = RCC_PLLCFGR_PLLM_3,
     ARM_RCC_PLL_COEFF_N_336 = (RCC_PLLCFGR_PLLN_4 | RCC_PLLCFGR_PLLN_6 |
                                RCC_PLLCFGR_PLLN_8),
@@ -65,7 +66,6 @@ static void ARM_RCC_SysClockSwitchCmd(ARM_RCC_ClockSources_enum source);
 static void ARM_RCC_PLLConfig(void);
 static void ARM_RCC_ClearResetFlags(void);
 static void ARM_RCC_InteruptDisable(void);
-static void ARM_RCC_ConfigMCO2(void);
 
 //================================================================================
 //Public
@@ -84,10 +84,6 @@ void ARM_RCC_Reset(void)
     ARM_RCC_ClockSourceCmd(ARM_RCC_HSE, DISABLE_CMD);
     ARM_RCC_HSEClockDetectorCmd(DISABLE_CMD);
     ARM_RCC_ClockSourceCmd(ARM_RCC_HSEBYP, DISABLE_CMD);
-#ifdef HARDWARE_TESTING_MODE
-//configure for output System clock divided by 5 (168/5=33,6 MHz) to MCO2 pin
-    ARM_RCC_ConfigMCO2();
-#endif//HARDWARE_TESTING_MODE
     ARM_RCC_ClearResetFlags();
     ARM_RCC_InteruptDisable();
 }
@@ -113,6 +109,94 @@ void ARM_RCC_SetSysClockTo168(void)
 void NMI_Handler(void)
 {
     ARM_RCCStatus |= ARM_RCC_STA_HSE_READY_ERR;
+}
+
+void ARM_RCC_GPIO_ClockCmd(GPIO_PortNames_enum port_name, PeriphCmd_enum cmd)
+{
+    switch(port_name) {
+        case GPIO_PORT_A: {
+            RCC->AHB1ENR &= ~RCC_AHB1ENR_GPIOAEN_Msk;
+            if(cmd == ENABLE_CMD) {
+//enable GPIOA clock
+                RCC->CR |= RCC_AHB1ENR_GPIOAEN;
+            } else {
+//disable GPIOA clock
+                RCC->CR &= ~RCC_AHB1ENR_GPIOAEN;
+            }
+        }
+        case GPIO_PORT_B: {
+            RCC->AHB1ENR &= ~RCC_AHB1ENR_GPIOBEN_Msk;
+            if(cmd == ENABLE_CMD) {
+                RCC->CR |= RCC_AHB1ENR_GPIOBEN;
+            } else {
+                RCC->CR &= ~RCC_AHB1ENR_GPIOBEN;
+            }
+        }
+        case GPIO_PORT_C: {
+            RCC->AHB1ENR &= ~RCC_AHB1ENR_GPIOCEN_Msk;
+            if(cmd == ENABLE_CMD) {
+                RCC->CR |= RCC_AHB1ENR_GPIOCEN;
+            } else {
+                RCC->CR &= ~RCC_AHB1ENR_GPIOCEN;
+            }
+        }
+        case GPIO_PORT_D: {
+            RCC->AHB1ENR &= ~RCC_AHB1ENR_GPIODEN_Msk;
+            if(cmd == ENABLE_CMD) {
+                RCC->CR |= RCC_AHB1ENR_GPIODEN;
+            } else {
+                RCC->CR &= ~RCC_AHB1ENR_GPIODEN;
+            }
+        }
+        case GPIO_PORT_E: {
+            RCC->AHB1ENR &= ~RCC_AHB1ENR_GPIOEEN_Msk;
+            if(cmd == ENABLE_CMD) {
+                RCC->CR |= RCC_AHB1ENR_GPIOEEN;
+            } else {
+                RCC->CR &= ~RCC_AHB1ENR_GPIOEEN;
+            }
+        }
+        case GPIO_PORT_F: {
+            RCC->AHB1ENR &= ~RCC_AHB1ENR_GPIOFEN_Msk;
+            if(cmd == ENABLE_CMD) {
+                RCC->CR |= RCC_AHB1ENR_GPIOFEN;
+            } else {
+                RCC->CR &= ~RCC_AHB1ENR_GPIOFEN;
+            }
+        }
+        case GPIO_PORT_G: {
+            RCC->AHB1ENR &= ~RCC_AHB1ENR_GPIOFEN_Msk;
+            if(cmd == ENABLE_CMD) {
+                RCC->CR |= RCC_AHB1ENR_GPIOGEN;
+            } else {
+                RCC->CR &= ~RCC_AHB1ENR_GPIOGEN;
+            }
+        }
+        case GPIO_PORT_H: {
+            RCC->AHB1ENR &= ~RCC_AHB1ENR_GPIOFEN_Msk;
+            if(cmd == ENABLE_CMD) {
+                RCC->CR |= RCC_AHB1ENR_GPIOHEN;
+            } else {
+                RCC->CR &= ~RCC_AHB1ENR_GPIOHEN;
+            }
+        }
+        case GPIO_PORT_I: {
+            RCC->AHB1ENR &= ~RCC_AHB1ENR_GPIOFEN_Msk;
+            if(cmd == ENABLE_CMD) {
+                RCC->CR |= RCC_AHB1ENR_GPIOIEN;
+            } else {
+                RCC->CR &= ~RCC_AHB1ENR_GPIOIEN;
+            }
+        }
+    }
+}
+
+void ARM_RCC_ConfigMCO2(void)
+{
+//select prescaler 5
+    RCC->CFGR |= RCC_CFGR_MCO2PRE_Msk;
+//select SYSCLOCK (default value)
+    RCC->CFGR &= ~RCC_CFGR_MCO2_Msk;
 }
 
 //================================================================================
@@ -266,13 +350,4 @@ static void ARM_RCC_SysClockSwitchCmd(ARM_RCC_ClockSources_enum source)
             break;
         }
     }
-}
-
-static void ARM_RCC_ConfigMCO2(void)
-{
-//select prescaler 5
-    RCC->CFGR |= RCC_CFGR_MCO2PRE_Msk;
-//select SYSCLOCK (default value)
-    RCC->CFGR &= ~RCC_CFGR_MCO2_Msk;
-
 }

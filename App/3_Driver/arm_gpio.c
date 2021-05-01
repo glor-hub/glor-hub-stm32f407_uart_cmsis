@@ -1,11 +1,9 @@
 //********************************************************************************
-//app_process.c
+//gpio.c
 //********************************************************************************
 #include "stm32f4xx.h"
-#include "app.h"
-#include "clock.h"
-#include "led.h"
 #include "gpio.h"
+#include "arm_gpio.h"
 
 //********************************************************************************
 //Macros
@@ -27,51 +25,26 @@
 //Prototypes
 //********************************************************************************
 
-static void App_PeripherialTest(void);
-static void App_CorePeripherialTest(void);
-static void App_IntPeripherialTest(void);
-static void App_ExtPeripherialTest(void);
 
 //================================================================================
 //Public
 //================================================================================
-void App_IdleTask(void)
+void ARM_GPIO_Config(void)
 {
-    //Some IDLE task implemenation here. This is the lowest priority task
+    uint32_t position;
+    GPIO_Cfg_struct *pCfgstruct = GPIO_GetConfig();
+    position = pCfgstruct->Pin;
+    (pCfgstruct->pReg)->MODER &= ~GPIO_MODER_MODER0;
+    (pCfgstruct->pReg)->MODER |= pCfgstruct->Mode << (position * 2U);
+    (pCfgstruct->pReg)->OTYPER &= ~GPIO_OTYPER_OT0_Msk;
+    (pCfgstruct->pReg)->OTYPER |= pCfgstruct->Type << position;
+    (pCfgstruct->pReg)->PUPDR &= ~GPIO_PUPDR_PUPD0_Msk;
+    (pCfgstruct->pReg)->PUPDR |= pCfgstruct->Pull << (position * 2U);
+    (pCfgstruct->pReg)->OSPEEDR &= ~GPIO_OSPEEDR_OSPEED0_Msk;
+    (pCfgstruct->pReg)->OSPEEDR |= pCfgstruct->Speed << (position * 2U);
 }
-
-void App_Init(void)
-{
-    Clock_Init();
-
-    GPIO_Init();
-
-    App_PeripherialTest();
-}
-
 //================================================================================
 //Private
 //================================================================================
-static void App_PeripherialTest(void)
-{
-    App_CorePeripherialTest();
-    App_IntPeripherialTest();
-    App_ExtPeripherialTest();
-}
-static void App_CorePeripherialTest(void)
-{
-#ifdef HARDWARE_TESTING_MODE
-//SYSCLOCK testing
-    Clock_Test();
-#endif//HARDWARE_TESTING_MODE
-}
 
-static void App_IntPeripherialTest(void)
-{
-    GPIO_Test();
-}
 
-static void App_ExtPeripherialTest(void)
-{
-    LED_Test();
-}

@@ -2,9 +2,11 @@
 //clock.c
 //********************************************************************************
 #include "stm32f4xx.h"
+#include "discovery-kit.h"
 #include "clock.h"
+#include "gpio.h"
 #include "arm_clock.h"
-
+#include "arm_gpio.h"
 
 //********************************************************************************
 //Macros
@@ -40,7 +42,13 @@ void Clock_Init(void)
 
 void Clock_Test(void)
 {
-
+//configure for output System clock divided by 5 (168/5=33,6 MHz) on MCO2 pin
+    ARM_RCC_ConfigMCO2();
+//configure MCO2 pin for SYSCLOCK testing
+    GPIO_SetCfg(GPIOC, GPIO_IO_9, GPIO_IO_MODE_ALT_FUNC, GPIO_IO_TYPE_OPEN_DRAIN, GPIO_IO_PULL_UP,
+                GPIO_IO_SPEED_FREQ_HIGH);
+    ARM_GPIO_Config();
+    ARM_RCC_GPIO_ClockCmd(GPIO_PORT_C, ENABLE_CMD);
 }
 
 //================================================================================
