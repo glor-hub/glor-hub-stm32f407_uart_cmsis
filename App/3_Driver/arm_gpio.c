@@ -33,7 +33,7 @@ void ARM_GPIO_Config(void)
 {
     uint32_t position;
     GPIO_TypeDef *p_reg;
-    GPIO_Cfg_struct *pCfgstruct = GPIO_GetConfig();
+    GPIO_Cfg_t *pCfgstruct = GPIO_GetConfig();
     p_reg = pCfgstruct->pReg;
     position = pCfgstruct->Pin;
     p_reg->MODER &= ~(GPIO_MODER_MODER0 << (position * 2U));

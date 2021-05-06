@@ -7,6 +7,6 @@ typedef enum {
     ENABLE_CMD,
     DISABLE_CMD,
     NUM_PERIPH_STATES
-} PeriphCmd_enum;
+} ePeriphCmd;
 
 #endif //_DISCOVERY_KIT_H_

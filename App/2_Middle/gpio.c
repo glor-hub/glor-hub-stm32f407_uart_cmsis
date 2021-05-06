@@ -23,7 +23,7 @@
 //********************************************************************************
 //Variables
 //********************************************************************************
-static GPIO_Cfg_struct GPIO_Config;
+static GPIO_Cfg_t GPIO_Config;
 
 
 //********************************************************************************
@@ -34,8 +34,8 @@ static GPIO_Cfg_struct GPIO_Config;
 //Public
 //================================================================================
 
-void GPIO_SetCfg(GPIO_TypeDef *GPIOx, GPIO_IONumbers_enum io_num, GPIO_IOModes_enum io_mode, GPIO_IOTypes_enum io_type,
-                 GPIO_IOPulls_enum io_pull, GPIO_IOSpeedValues_enum io_speed)
+void GPIO_SetCfg(GPIO_TypeDef *GPIOx, eGPIO_IONumbers io_num, uint32_t io_mode, uint32_t io_type,
+                 uint32_t io_pull, uint32_t io_speed)
 
 {
 
@@ -52,7 +52,7 @@ void GPIO_Init(void)
 
 }
 
-GPIO_Cfg_struct *GPIO_GetConfig(void)
+GPIO_Cfg_t *GPIO_GetConfig(void)
 {
     return &GPIO_Config;
 }

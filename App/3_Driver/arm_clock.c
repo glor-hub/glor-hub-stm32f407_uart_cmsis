@@ -40,13 +40,10 @@ typedef enum {
 //for 20 MHz crystal resonator Ì=20 is used
 //for USB: PLL48CK = 48 MHz
 
-typedef enum {
-    ARM_RCC_PLL_COEFF_M_8 = RCC_PLLCFGR_PLLM_3,
-    ARM_RCC_PLL_COEFF_N_336 = (RCC_PLLCFGR_PLLN_4 | RCC_PLLCFGR_PLLN_6 |
-                               RCC_PLLCFGR_PLLN_8),
-    ARM_RCC_PLL_COEFF_P_2 = (uint32_t)0x00,
-    ARM_RCC_PLL_COEFF_Q_7 = (RCC_PLLCFGR_PLLQ_0 | RCC_PLLCFGR_PLLQ_1 | RCC_PLLCFGR_PLLQ_2)
-} ARM_RCC_PLL_Param_enum;
+#define ARM_RCC_PLL_COEFF_M_8 RCC_PLLCFGR_PLLM_3
+#define ARM_RCC_PLL_COEFF_N_336 (RCC_PLLCFGR_PLLN_4 | RCC_PLLCFGR_PLLN_6 | RCC_PLLCFGR_PLLN_8)
+#define ARM_RCC_PLL_COEFF_P_2 ((uint32_t)0x00)
+#define ARM_RCC_PLL_COEFF_Q_7 (RCC_PLLCFGR_PLLQ_0 | RCC_PLLCFGR_PLLQ_1 | RCC_PLLCFGR_PLLQ_2)
 
 //********************************************************************************
 //Variables
@@ -57,9 +54,9 @@ static uint32_t ARM_RCCStatus = (uint32_t)0x00;;
 //********************************************************************************
 
 static void ARM_RCC_ConfigReset(void);
-static void ARM_RCC_ClockSourceCmd(ARM_RCC_ClockSources_enum source, PeriphCmd_enum cmd);
-static void ARM_RCC_HSEClockDetectorCmd(PeriphCmd_enum cmd);
-static void ARM_RCC_SysClockSwitchCmd(ARM_RCC_ClockSources_enum source);
+static void ARM_RCC_ClockSourceCmd(eARM_RCC_ClockSources source, ePeriphCmd cmd);
+static void ARM_RCC_HSEClockDetectorCmd(ePeriphCmd cmd);
+static void ARM_RCC_SysClockSwitchCmd(eARM_RCC_ClockSources source);
 static void ARM_RCC_PLLConfig(void);
 static void ARM_RCC_ClearResetFlags(void);
 static void ARM_RCC_InteruptDisable(void);
@@ -108,7 +105,7 @@ void NMI_Handler(void)
     ARM_RCCStatus |= ARM_RCC_STA_HSE_READY_ERR;
 }
 
-void ARM_RCC_GPIO_ClockCmd(GPIO_PortNames_enum port_name, PeriphCmd_enum cmd)
+void ARM_RCC_GPIO_ClockCmd(eGPIO_PortNames port_name, ePeriphCmd cmd)
 {
     switch(port_name) {
         case GPIO_PORT_A: {
@@ -200,7 +197,7 @@ void ARM_RCC_ConfigMCO2(void)
 //Private
 //================================================================================
 
-static void ARM_RCC_ClockSourceCmd(ARM_RCC_ClockSources_enum source, PeriphCmd_enum cmd)
+static void ARM_RCC_ClockSourceCmd(eARM_RCC_ClockSources source, ePeriphCmd cmd)
 {
     uint32_t counter;
     switch(source) {
@@ -303,7 +300,7 @@ static void ARM_RCC_ConfigReset(void)
     while(RCC->CFGR & RCC_CFGR_SWS);
 }
 
-static void ARM_RCC_HSEClockDetectorCmd(PeriphCmd_enum cmd)
+static void ARM_RCC_HSEClockDetectorCmd(ePeriphCmd cmd)
 {
     if(cmd == ENABLE_CMD) {
 //enable CSS
@@ -325,7 +322,7 @@ static void ARM_RCC_PLLConfig(void)
     RCC->PLLCFGR |= RCC_PLLCFGR_PLLSRC_HSE;
 }
 
-static void ARM_RCC_SysClockSwitchCmd(ARM_RCC_ClockSources_enum source)
+static void ARM_RCC_SysClockSwitchCmd(eARM_RCC_ClockSources source)
 {
     RCC->CFGR &= ~RCC_CFGR_SW;
     switch(source) {
