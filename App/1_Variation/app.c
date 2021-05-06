@@ -3,6 +3,7 @@
 //********************************************************************************
 #include "stm32f4xx.h"
 #include "app.h"
+#include "discovery-kit.h"
 #include "clock.h"
 #include "led.h"
 #include "gpio.h"

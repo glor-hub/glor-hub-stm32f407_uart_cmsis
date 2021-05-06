@@ -40,8 +40,8 @@ typedef enum {
 typedef enum {
     GPIO_IO_MODE_OUTPUT = (uint32_t)0x01,
     GPIO_IO_MODE_INPUT = (uint32_t)0x00,
-    GPIO_IO_MODE_ANALOG = (uint32_t)0x11, // for DAC/ADC
-    GPIO_IO_MODE_ALT_FUNC = (uint32_t)0x10,
+    GPIO_IO_MODE_ANALOG = (uint32_t)0x03, // for DAC/ADC
+    GPIO_IO_MODE_ALT_FUNC = (uint32_t)0x02,
 } GPIO_IOModes_enum;
 
 typedef enum {
@@ -53,15 +53,15 @@ typedef enum {
 typedef enum {
     GPIO_IO_HI_Z = (uint32_t)0x00,
     GPIO_IO_PULL_UP = (uint32_t)0x01,
-    GPIO_IO_PULL_DOWN = (uint32_t)0x10
+    GPIO_IO_PULL_DOWN = (uint32_t)0x02
 } GPIO_IOPulls_enum;
 
 
 typedef enum {
     GPIO_IO_SPEED_FREQ_LOW = (uint32_t)0x00,
     GPIO_IO_SPEED_FREQ_MEDIUM = (uint32_t)0x01,
-    GPIO_IO_SPEED_FREQ_HIGH = (uint32_t)0x10,
-    GPIO_IO_SPEED_FREQ_VERY_HIGH = (uint32_t)0x11
+    GPIO_IO_SPEED_FREQ_HIGH = (uint32_t)0x02,
+    GPIO_IO_SPEED_FREQ_VERY_HIGH = (uint32_t)0x03
 } GPIO_IOSpeedValues_enum;
 
 typedef struct {

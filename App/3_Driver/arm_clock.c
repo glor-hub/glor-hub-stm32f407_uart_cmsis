@@ -10,7 +10,7 @@
 //********************************************************************************
 //Macros
 //********************************************************************************
-#define RCC_STARTUP_TIMOUT 2000
+#define RCC_STARTUP_TIMOUT 5000
 //********************************************************************************
 //Enums
 //********************************************************************************
@@ -115,78 +115,78 @@ void ARM_RCC_GPIO_ClockCmd(GPIO_PortNames_enum port_name, PeriphCmd_enum cmd)
 {
     switch(port_name) {
         case GPIO_PORT_A: {
-            RCC->AHB1ENR &= ~RCC_AHB1ENR_GPIOAEN_Msk;
             if(cmd == ENABLE_CMD) {
 //enable GPIOA clock
-                RCC->CR |= RCC_AHB1ENR_GPIOAEN;
+                RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
             } else {
 //disable GPIOA clock
-                RCC->CR &= ~RCC_AHB1ENR_GPIOAEN;
+                RCC->AHB1ENR &= ~RCC_AHB1ENR_GPIOAEN;
             }
+
         }
         case GPIO_PORT_B: {
-            RCC->AHB1ENR &= ~RCC_AHB1ENR_GPIOBEN_Msk;
             if(cmd == ENABLE_CMD) {
-                RCC->CR |= RCC_AHB1ENR_GPIOBEN;
+                RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN;
             } else {
-                RCC->CR &= ~RCC_AHB1ENR_GPIOBEN;
+                RCC->AHB1ENR &= ~RCC_AHB1ENR_GPIOBEN;
             }
+            break;
         }
         case GPIO_PORT_C: {
-            RCC->AHB1ENR &= ~RCC_AHB1ENR_GPIOCEN_Msk;
             if(cmd == ENABLE_CMD) {
-                RCC->CR |= RCC_AHB1ENR_GPIOCEN;
+                RCC->AHB1ENR |= RCC_AHB1ENR_GPIOCEN;
             } else {
-                RCC->CR &= ~RCC_AHB1ENR_GPIOCEN;
+                RCC->AHB1ENR &= ~RCC_AHB1ENR_GPIOCEN;
             }
+            break;
         }
         case GPIO_PORT_D: {
-            RCC->AHB1ENR &= ~RCC_AHB1ENR_GPIODEN_Msk;
             if(cmd == ENABLE_CMD) {
-                RCC->CR |= RCC_AHB1ENR_GPIODEN;
+                RCC->AHB1ENR |= RCC_AHB1ENR_GPIODEN;
             } else {
-                RCC->CR &= ~RCC_AHB1ENR_GPIODEN;
+                RCC->AHB1ENR &= ~RCC_AHB1ENR_GPIODEN;
             }
+            break;
         }
         case GPIO_PORT_E: {
-            RCC->AHB1ENR &= ~RCC_AHB1ENR_GPIOEEN_Msk;
             if(cmd == ENABLE_CMD) {
-                RCC->CR |= RCC_AHB1ENR_GPIOEEN;
+                RCC->AHB1ENR |= RCC_AHB1ENR_GPIOEEN;
             } else {
-                RCC->CR &= ~RCC_AHB1ENR_GPIOEEN;
+                RCC->AHB1ENR &= ~RCC_AHB1ENR_GPIOEEN;
             }
+            break;
         }
         case GPIO_PORT_F: {
-            RCC->AHB1ENR &= ~RCC_AHB1ENR_GPIOFEN_Msk;
             if(cmd == ENABLE_CMD) {
-                RCC->CR |= RCC_AHB1ENR_GPIOFEN;
+                RCC->AHB1ENR |= RCC_AHB1ENR_GPIOFEN;
             } else {
-                RCC->CR &= ~RCC_AHB1ENR_GPIOFEN;
+                RCC->AHB1ENR &= ~RCC_AHB1ENR_GPIOFEN;
             }
+            break;
         }
         case GPIO_PORT_G: {
-            RCC->AHB1ENR &= ~RCC_AHB1ENR_GPIOFEN_Msk;
             if(cmd == ENABLE_CMD) {
-                RCC->CR |= RCC_AHB1ENR_GPIOGEN;
+                RCC->AHB1ENR |= RCC_AHB1ENR_GPIOGEN;
             } else {
-                RCC->CR &= ~RCC_AHB1ENR_GPIOGEN;
+                RCC->AHB1ENR &= ~RCC_AHB1ENR_GPIOGEN;
             }
+            break;
         }
         case GPIO_PORT_H: {
-            RCC->AHB1ENR &= ~RCC_AHB1ENR_GPIOFEN_Msk;
             if(cmd == ENABLE_CMD) {
-                RCC->CR |= RCC_AHB1ENR_GPIOHEN;
+                RCC->AHB1ENR |= RCC_AHB1ENR_GPIOHEN;
             } else {
-                RCC->CR &= ~RCC_AHB1ENR_GPIOHEN;
+                RCC->AHB1ENR &= ~RCC_AHB1ENR_GPIOHEN;
             }
+            break;
         }
         case GPIO_PORT_I: {
-            RCC->AHB1ENR &= ~RCC_AHB1ENR_GPIOFEN_Msk;
             if(cmd == ENABLE_CMD) {
-                RCC->CR |= RCC_AHB1ENR_GPIOIEN;
+                RCC->AHB1ENR |= RCC_AHB1ENR_GPIOIEN;
             } else {
-                RCC->CR &= ~RCC_AHB1ENR_GPIOIEN;
+                RCC->AHB1ENR &= ~RCC_AHB1ENR_GPIOIEN;
             }
+            break;
         }
     }
 }

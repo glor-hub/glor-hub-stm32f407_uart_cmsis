@@ -32,16 +32,18 @@
 void ARM_GPIO_Config(void)
 {
     uint32_t position;
+    GPIO_TypeDef *p_reg;
     GPIO_Cfg_struct *pCfgstruct = GPIO_GetConfig();
+    p_reg = pCfgstruct->pReg;
     position = pCfgstruct->Pin;
-    (pCfgstruct->pReg)->MODER &= ~GPIO_MODER_MODER0;
-    (pCfgstruct->pReg)->MODER |= pCfgstruct->Mode << (position * 2U);
-    (pCfgstruct->pReg)->OTYPER &= ~GPIO_OTYPER_OT0_Msk;
-    (pCfgstruct->pReg)->OTYPER |= pCfgstruct->Type << position;
-    (pCfgstruct->pReg)->PUPDR &= ~GPIO_PUPDR_PUPD0_Msk;
-    (pCfgstruct->pReg)->PUPDR |= pCfgstruct->Pull << (position * 2U);
-    (pCfgstruct->pReg)->OSPEEDR &= ~GPIO_OSPEEDR_OSPEED0_Msk;
-    (pCfgstruct->pReg)->OSPEEDR |= pCfgstruct->Speed << (position * 2U);
+    p_reg->MODER &= ~(GPIO_MODER_MODER0 << (position * 2U));
+    p_reg->MODER |= pCfgstruct->Mode << (position * 2U);
+    p_reg->OTYPER &= ~GPIO_OTYPER_OT0_Msk;
+    p_reg->OTYPER |= pCfgstruct->Type << position;
+    p_reg->PUPDR &= ~GPIO_PUPDR_PUPD0_Msk;
+    p_reg->PUPDR |= pCfgstruct->Pull << (position * 2U);
+    p_reg->OSPEEDR &= ~GPIO_OSPEEDR_OSPEED0_Msk;
+    p_reg->OSPEEDR |= pCfgstruct->Speed << (position * 2U);
 }
 //================================================================================
 //Private
