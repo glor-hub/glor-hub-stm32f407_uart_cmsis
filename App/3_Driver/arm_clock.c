@@ -21,23 +21,20 @@
 
 typedef enum {
 //high speed external clock signal
-    ARM_RCC_HSI,
+    ARM_RCC_HSI = 0,
 //high speed internal clock signal
     ARM_RCC_HSE,
 //external clock instead of  external crystal/ceramic resonator used
     ARM_RCC_HSEBYP,
-
     ARM_RCC_PLL,
     NUM_CLOCK_SOURCES
-} ARM_RCC_ClockSources_enum;
+} eARM_RCC_ClockSources;
 
-typedef enum {
-    ARM_RCC_STA_READY = (uint32_t)0x00000000,
-    ARM_RCC_STA_HSE_READY_ERR = (uint32_t)0x00000001,
-    ARM_RCC_STA_HSI_READY_ERR = (uint32_t)0x00000002,
-    ARM_RCC_STA_PLL_READY_ERR = (uint32_t)0x00000004,
-    ARM_RCC_STA_PLL_CLOCK_SWITCH_ERR = (uint32_t)0x00000008
-} ARM_RCC_Status_enum;
+#define ARM_RCC_STA_READY ((uint32_t)0x00000000)
+#define ARM_RCC_STA_HSE_READY_ERR ((uint32_t)0x00000001)
+#define ARM_RCC_STA_HSI_READY_ERR ((uint32_t)0x00000002)
+#define ARM_RCC_STA_PLL_READY_ERR ((uint32_t)0x00000004)
+#define ARM_RCC_STA_PLL_CLOCK_SWITCH_ERR ((uint32_t)0x00000008)
 
 //8 MHz crystal resonator, SYSCK = 168 MHz
 //for 20 MHz crystal resonator Ì=20 is used
