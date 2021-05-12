@@ -56,11 +56,25 @@ typedef enum {
 } eGPIO_IOAltFunc;
 
 
-typedef enum {
-    GPIO_IO_RESET = 0,
-    GPIO_IO_SET
-} eGPIO_IOState;
+#define GPIO_IO_RESET  ((uint32_t)0x00)
+#define GPIO_IO_SET  ((uint32_t)0x01)
 
+#define GPIO_IO_0_MASK  ((uint32_t)0x00000001)
+#define GPIO_IO_1_MASK  ((uint32_t)0x00000002)
+#define GPIO_IO_2_MASK  ((uint32_t)0x00000004)
+#define GPIO_IO_3_MASK  ((uint32_t)0x00000008)
+#define GPIO_IO_4_MASK  ((uint32_t)0x00000010)
+#define GPIO_IO_5_MASK  ((uint32_t)0x00000020)
+#define GPIO_IO_6_MASK  ((uint32_t)0x00000040)
+#define GPIO_IO_7_MASK  ((uint32_t)0x00000080)
+#define GPIO_IO_8_MASK  ((uint32_t)0x00000100)
+#define GPIO_IO_9_MASK  ((uint32_t)0x00000200)
+#define GPIO_IO_10_MASK  ((uint32_t)0x00000400)
+#define GPIO_IO_11_MASK  ((uint32_t)0x00000800)
+#define GPIO_IO_12_MASK  ((uint32_t)0x00001000)
+#define GPIO_IO_13_MASK  ((uint32_t)0x00002000)
+#define GPIO_IO_14_MASK  ((uint32_t)0x00004000)
+#define GPIO_IO_15_MASK  ((uint32_t)0x00008000)
 
 //during and just after reset the IOs configuration is input floating (Hi-Z Input).
 
