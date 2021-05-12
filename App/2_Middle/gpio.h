@@ -35,6 +35,33 @@ typedef enum {
     NUM_GPIO_IO
 } eGPIO_IONumbers;
 
+typedef enum {
+    GPIO_IO_AF_0 = 0,
+    GPIO_IO_AF_1,
+    GPIO_IO_AF_2,
+    GPIO_IO_AF_3,
+    GPIO_IO_AF_4,
+    GPIO_IO_AF_5,
+    GPIO_IO_AF_6,
+    GPIO_IO_AF_7,
+    GPIO_IO_AF_8,
+    GPIO_IO_AF_9,
+    GPIO_IO_AF_10,
+    GPIO_IO_AF_11,
+    GPIO_IO_AF_12,
+    GPIO_IO_AF_13,
+    GPIO_IO_AF_14,
+    GPIO_IO_AF_15,
+    NUM_GPIO_IO_AF
+} eGPIO_IOAltFunc;
+
+
+typedef enum {
+    GPIO_IO_RESET = 0,
+    GPIO_IO_SET
+} eGPIO_IOState;
+
+
 //during and just after reset the IOs configuration is input floating (Hi-Z Input).
 
 #define GPIO_IO_MODE_OUTPUT  ((uint32_t)0x01)
@@ -62,11 +89,12 @@ typedef struct {
     uint32_t Type;
     uint32_t Pull;
     uint32_t Speed; //use for output and alt_func IOs
+    uint32_t AltFunc;
 } GPIO_Cfg_t;
 
 GPIO_Cfg_t *GPIO_GetConfig(void);
 void GPIO_SetCfg(GPIO_TypeDef *GPIOx, eGPIO_IONumbers io_num, uint32_t io_mode, uint32_t io_type,
-                 uint32_t io_pull, uint32_t io_speed);
+                 uint32_t io_pull, uint32_t io_speed, uint32_t io_alt);
 
 void GPIO_Init(void);
 void GPIO_Test(void);

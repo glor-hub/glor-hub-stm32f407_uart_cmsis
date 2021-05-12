@@ -31,7 +31,7 @@
 //================================================================================
 void ARM_GPIO_Config(void)
 {
-    uint32_t position;
+    uint32_t position, tmp;
     GPIO_TypeDef *p_reg;
     GPIO_Cfg_t *pCfgstruct = GPIO_GetConfig();
     p_reg = pCfgstruct->pReg;
@@ -44,7 +44,14 @@ void ARM_GPIO_Config(void)
     p_reg->PUPDR |= pCfgstruct->Pull << (position * 2U);
     p_reg->OSPEEDR &= ~GPIO_OSPEEDR_OSPEED0_Msk;
     p_reg->OSPEEDR |= pCfgstruct->Speed << (position * 2U);
+    if(pCfgstruct->Mode == GPIO_IO_MODE_ALT_FUNC) {
+        tmp = p_reg->AFR[position >> 3U];
+        tmp &= ~(GPIO_AFRL_AFSEL0_Msk << ((position & 0x07U) * 4U));
+        tmp |= pCfgstruct->AltFunc << ((position & 0x07U) * 4U);
+        p_reg->AFR[position >> 3U] = tmp;
+    }
 }
+
 //================================================================================
 //Private
 //================================================================================
