@@ -33,21 +33,21 @@ void ARM_GPIO_Config(void)
 {
     uint32_t position, tmp;
     GPIO_TypeDef *p_reg;
-    GPIO_Cfg_t *pCfgstruct = GPIO_GetConfig();
-    p_reg = pCfgstruct->pReg;
-    position = pCfgstruct->Pin;
+    GPIO_Cfg_t *pGPIO_Cfg = GPIO_GetConfig();
+    p_reg = pGPIO_Cfg->pReg;
+    position = pGPIO_Cfg->Pin;
     p_reg->MODER &= ~(GPIO_MODER_MODER0 << (position * 2U));
-    p_reg->MODER |= pCfgstruct->Mode << (position * 2U);
+    p_reg->MODER |= pGPIO_Cfg->Mode << (position * 2U);
     p_reg->OTYPER &= ~GPIO_OTYPER_OT0_Msk;
-    p_reg->OTYPER |= pCfgstruct->Type << position;
+    p_reg->OTYPER |= pGPIO_Cfg->Type << position;
     p_reg->PUPDR &= ~GPIO_PUPDR_PUPD0_Msk;
-    p_reg->PUPDR |= pCfgstruct->Pull << (position * 2U);
+    p_reg->PUPDR |= pGPIO_Cfg->Pull << (position * 2U);
     p_reg->OSPEEDR &= ~GPIO_OSPEEDR_OSPEED0_Msk;
-    p_reg->OSPEEDR |= pCfgstruct->Speed << (position * 2U);
-    if(pCfgstruct->Mode == GPIO_IO_MODE_ALT_FUNC) {
+    p_reg->OSPEEDR |= pGPIO_Cfg->Speed << (position * 2U);
+    if(pGPIO_Cfg->Mode == GPIO_IO_MODE_ALT_FUNC) {
         tmp = p_reg->AFR[position >> 3U];
         tmp &= ~(GPIO_AFRL_AFSEL0_Msk << ((position & 0x07U) * 4U));
-        tmp |= pCfgstruct->AltFunc << ((position & 0x07U) * 4U);
+        tmp |= pGPIO_Cfg->AltFunc << ((position & 0x07U) * 4U);
         p_reg->AFR[position >> 3U] = tmp;
     }
 }
