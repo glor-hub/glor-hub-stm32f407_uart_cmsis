@@ -2,8 +2,5 @@
 #define _LED_H_
 
 void LED_Test(void);
-void led_off(void);
-void led_on(void);
-
-
+void LED_Init(void);
 #endif //_LED_H_

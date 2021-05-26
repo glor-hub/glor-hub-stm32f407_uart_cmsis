@@ -30,7 +30,6 @@
 
 static void App_PeripherialTest(void);
 static void App_CorePeripherialTest(void);
-static void App_IntPeripherialTest(void);
 static void App_ExtPeripherialTest(void);
 
 //================================================================================
@@ -47,6 +46,8 @@ void App_Init(void)
 
     GPIO_Init();
 
+    LED_Init();
+
     App_PeripherialTest();
 }
 
@@ -56,7 +57,6 @@ void App_Init(void)
 static void App_PeripherialTest(void)
 {
     App_CorePeripherialTest();
-    App_IntPeripherialTest();
     App_ExtPeripherialTest();
 }
 static void App_CorePeripherialTest(void)
@@ -65,11 +65,6 @@ static void App_CorePeripherialTest(void)
 //SYSCLOCK testing
     Clock_Test();
 #endif//HARDWARE_TESTING_MODE
-}
-
-static void App_IntPeripherialTest(void)
-{
-    GPIO_Test();
 }
 
 static void App_ExtPeripherialTest(void)
