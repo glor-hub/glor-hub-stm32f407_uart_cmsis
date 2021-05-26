@@ -20,30 +20,30 @@
 //Typedefs
 //********************************************************************************
 typedef enum {
-    LED_ORANGE = 0,
-    LED_RED,
-    LED_BLUE,
-    LED_GREEN,
-    MAX_LEDS
-} eLED_Types;
+    ORANGE = 0,
+    RED,
+    BLUE,
+    GREEN,
+    MAX_LED_COLORS
+} eLED_Colors;
 
 typedef struct {
-    eLED_Types color;
+    eLED_Colors color;
     GPIO_TypeDef *GPIOx;
     eGPIO_PortNames port;
     eGPIO_IONumbers pin;
     uint32_t pin_mask;
     uint32_t pin_active_state;
-} LED_Cfg_t;
+} LED_Data_t;
 
 //********************************************************************************
 //Variables
 //********************************************************************************
-static LED_Cfg_t LED_Cfg[MAX_LEDS];
+static LED_Data_t LED_Data[MAX_LED_COLORS];
 //********************************************************************************
 //Prototypes
 //********************************************************************************
-static void LED_Set(eLED_Types led, uint32_t state);
+static void LED_Set(eLED_Colors led_color, uint32_t state);
 static void LED_Set_Cfg(void);
 static void Delay(uint32_t tick);
 //================================================================================
@@ -51,16 +51,16 @@ static void Delay(uint32_t tick);
 //================================================================================
 void LED_Test(void)
 {
-    eLED_Types led;
-    for(led = LED_ORANGE; led < MAX_LEDS; led++) {
+    eLED_Colors led_color;
+    for(led_color = ORANGE; led_color < MAX_LED_COLORS; led_color++) {
         LED_Set(led, TRUE);
     }
     Delay(32000000);
-    for(led = LED_ORANGE; led < MAX_LEDS; led++) {
+    for(led_color = ORANGE; led_color < MAX_LED_COLORS; led_color++) {
         LED_Set(led, FALSE);
     }
     Delay(32000000);
-    for(led = LED_ORANGE; led < MAX_LEDS; led++) {
+    for(led_color = ORANGE; led_color < MAX_LED_COLORS; led_color++) {
         LED_Set(led, TRUE);
         Delay(32000000);
         LED_Set(led, FALSE);
@@ -71,15 +71,15 @@ void LED_Test(void)
 void LED_Init(void)
 {
 
-    eLED_Types led;
+    eLED_Colors led_color;
     eGPIO_PortNames port;
     eGPIO_IONumbers pin;
     GPIO_TypeDef *preg;
     LED_Set_Cfg();
-    for(led = LED_ORANGE; led < MAX_LEDS; led++) {
-        port = LED_Cfg[led].port;
-        preg = LED_Cfg[led].GPIOx;
-        pin = LED_Cfg[led].pin;
+    for(led_color = ORANGE; led_color < MAX_LED_COLORS; led_color++) {
+        port = LED_Data[led_color].port;
+        preg = LED_Data[led_color].GPIOx;
+        pin = LED_Data[led_color].pin;
         ARM_RCC_GPIO_ClockCmd(port, ENABLE_CMD);
         GPIO_SetCfg(preg, pin, GPIO_IO_MODE_OUTPUT, GPIO_IO_TYPE_PUSH_PULL, GPIO_IO_HI_Z,
                     GPIO_IO_SPEED_FREQ_LOW, GPIO_IO_AF_0);
@@ -92,48 +92,50 @@ void LED_Init(void)
 //================================================================================
 static void LED_Set_Cfg(void)
 {
-    LED_Cfg[LED_ORANGE].color = LED_ORANGE;
-    LED_Cfg[LED_ORANGE].GPIOx = GPIOD;
-    LED_Cfg[LED_ORANGE].port = GPIO_PORT_D;
-    LED_Cfg[LED_ORANGE].pin = GPIO_IO_13;
-    LED_Cfg[LED_ORANGE].pin_mask = GPIO_IO_13_MASK;
-    LED_Cfg[LED_ORANGE].pin_active_state = GPIO_IO_SET;
-    LED_Cfg[LED_RED].color = LED_RED;
-    LED_Cfg[LED_RED].GPIOx = GPIOD;
-    LED_Cfg[LED_RED].port = GPIO_PORT_D;
-    LED_Cfg[LED_RED].pin = GPIO_IO_14;
-    LED_Cfg[LED_RED].pin_mask = GPIO_IO_14_MASK;
-    LED_Cfg[LED_RED].pin_active_state = GPIO_IO_SET;
-    LED_Cfg[LED_BLUE].color = LED_BLUE;
-    LED_Cfg[LED_BLUE].GPIOx = GPIOD;
-    LED_Cfg[LED_BLUE].port = GPIO_PORT_D;
-    LED_Cfg[LED_BLUE].pin = GPIO_IO_15;
-    LED_Cfg[LED_BLUE].pin_mask = GPIO_IO_15_MASK;
-    LED_Cfg[LED_BLUE].pin_active_state = GPIO_IO_SET;
-    LED_Cfg[LED_GREEN].color = LED_GREEN;
-    LED_Cfg[LED_GREEN].GPIOx = GPIOD;
-    LED_Cfg[LED_GREEN].port = GPIO_PORT_D;
-    LED_Cfg[LED_GREEN].pin = GPIO_IO_12;
-    LED_Cfg[LED_GREEN].pin_mask = GPIO_IO_12_MASK;
-    LED_Cfg[LED_GREEN].pin_active_state = GPIO_IO_SET;
+    LED_Data[ORANGE].color = ORANGE;
+    LED_Data[ORANGE].GPIOx = GPIOD;
+    LED_Data[ORANGE].port = GPIO_PORT_D;
+    LED_Data[ORANGE].pin = GPIO_IO_13;
+    LED_Data[ORANGE].pin_mask = GPIO_IO_13_MASK;
+    LED_Data[ORANGE].pin_active_state = GPIO_IO_SET;
+
+    LED_Data[RED].color = RED;
+    LED_Data[RED].GPIOx = GPIOD;
+    LED_Data[RED].port = GPIO_PORT_D;
+    LED_Data[RED].pin = GPIO_IO_14;
+    LED_Data[RED].pin_mask = GPIO_IO_14_MASK;
+    LED_Data[RED].pin_active_state = GPIO_IO_SET;
+
+    LED_Data[BLUE].color = BLUE;
+    LED_Data[BLUE].GPIOx = GPIOD;
+    LED_Data[BLUE].port = GPIO_PORT_D;
+    LED_Data[BLUE].pin = GPIO_IO_15;
+    LED_Data[BLUE].pin_mask = GPIO_IO_15_MASK;
+    LED_Data[BLUE].pin_active_state = GPIO_IO_SET;
+
+    LED_Data[GREEN].color = GREEN;
+    LED_Data[GREEN].GPIOx = GPIOD;
+    LED_Data[GREEN].port = GPIO_PORT_D;
+    LED_Data[GREEN].pin = GPIO_IO_12;
+    LED_Data[GREEN].pin_mask = GPIO_IO_12_MASK;
+    LED_Data[GREEN].pin_active_state = GPIO_IO_SET;
 }
 
-static void LED_Set(eLED_Types led, uint32_t state)
+static void LED_Set(eLED_Colors led_color, uint32_t state)
 {
 
     if(state) {
-        if(LED_Cfg[led].pin_active_state == GPIO_IO_SET) {
-            ARM_GPIO_SetIO(LED_Cfg[led].GPIOx, LED_Cfg[led].pin_mask);
+        if(LED_Data[led_color].pin_active_state == GPIO_IO_SET) {
+            ARM_GPIO_SetIO(LED_Data[led_color].GPIOx, LED_Data[led_color].pin_mask);
         } else {
-            ARM_GPIO_ResetIO(LED_Cfg[led].GPIOx, LED_Cfg[led].pin_mask);
+            ARM_GPIO_ResetIO(LED_Data[led_color].GPIOx, LED_Data[led_color].pin_mask);
         }
     } else {
-        if(LED_Cfg[led].pin_active_state == GPIO_IO_SET) {
-            ARM_GPIO_ResetIO(LED_Cfg[led].GPIOx, LED_Cfg[led].pin_mask);
+        if(LED_Data[led_color].pin_active_state == GPIO_IO_SET) {
+            ARM_GPIO_ResetIO(LED_Data[led_color].GPIOx, LED_Data[led_color].pin_mask);
         } else {
-            ARM_GPIO_SetIO(LED_Cfg[led].GPIOx, LED_Cfg[led].pin_mask);
+            ARM_GPIO_SetIO(LED_Data[led_color].GPIOx, LED_Data[led_color].pin_mask);
         }
-
     }
 }
 
