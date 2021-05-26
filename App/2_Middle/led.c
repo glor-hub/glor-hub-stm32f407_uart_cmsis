@@ -51,16 +51,17 @@ static void Delay(uint32_t tick);
 //================================================================================
 void LED_Test(void)
 {
-    eLED_Colors led_color;
-    for(led_color = ORANGE; led_color < MAX_LED_COLORS; led_color++) {
+    for(eLED_Colors led_color = ORANGE; led_color < MAX_LED_COLORS; led_color++) {
         LED_Set(led, TRUE);
     }
     Delay(32000000);
-    for(led_color = ORANGE; led_color < MAX_LED_COLORS; led_color++) {
+
+    for(eLED_Colors led_color = ORANGE; led_color < MAX_LED_COLORS; led_color++) {
         LED_Set(led, FALSE);
     }
     Delay(32000000);
-    for(led_color = ORANGE; led_color < MAX_LED_COLORS; led_color++) {
+
+    for(eLED_Colors led_color = ORANGE; led_color < MAX_LED_COLORS; led_color++) {
         LED_Set(led, TRUE);
         Delay(32000000);
         LED_Set(led, FALSE);
@@ -70,19 +71,11 @@ void LED_Test(void)
 
 void LED_Init(void)
 {
-
-    eLED_Colors led_color;
-    eGPIO_PortNames port;
-    eGPIO_IONumbers pin;
-    GPIO_TypeDef *preg;
     LED_Set_Cfg();
-    for(led_color = ORANGE; led_color < MAX_LED_COLORS; led_color++) {
-        port = LED_Data[led_color].port;
-        preg = LED_Data[led_color].GPIOx;
-        pin = LED_Data[led_color].pin;
-        ARM_RCC_GPIO_ClockCmd(port, ENABLE_CMD);
-        GPIO_SetCfg(preg, pin, GPIO_IO_MODE_OUTPUT, GPIO_IO_TYPE_PUSH_PULL, GPIO_IO_HI_Z,
-                    GPIO_IO_SPEED_FREQ_LOW, GPIO_IO_AF_0);
+    for(eLED_Colors led_color = ORANGE; led_color < MAX_LED_COLORS; led_color++) {
+        ARM_RCC_GPIO_ClockCmd(LED_Data[led_color].port, ENABLE_CMD);
+        GPIO_SetCfg(LED_Data[led_color].GPIOx, LED_Data[led_color].pin,
+                    GPIO_IO_MODE_OUTPUT, GPIO_IO_TYPE_PUSH_PULL, GPIO_IO_HI_Z, GPIO_IO_SPEED_FREQ_LOW, GPIO_IO_AF_0);
         ARM_GPIO_Config();
     }
 }
@@ -123,7 +116,6 @@ static void LED_Set_Cfg(void)
 
 static void LED_Set(eLED_Colors led_color, uint32_t state)
 {
-
     if(state) {
         if(LED_Data[led_color].pin_active_state == GPIO_IO_SET) {
             ARM_GPIO_SetIO(LED_Data[led_color].GPIOx, LED_Data[led_color].pin_mask);
