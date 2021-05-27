@@ -44,7 +44,7 @@ static LED_Data_t LED_Data[MAX_LED_COLORS];
 //Prototypes
 //********************************************************************************
 static void LED_Set(eLED_Colors led_color, uint32_t state);
-static void LED_Set_Cfg(void);
+static void LED_Set_Data(void);
 static void Delay(uint32_t tick);
 //================================================================================
 //Public
@@ -52,26 +52,26 @@ static void Delay(uint32_t tick);
 void LED_Test(void)
 {
     for(eLED_Colors led_color = ORANGE; led_color < MAX_LED_COLORS; led_color++) {
-        LED_Set(led, TRUE);
+        LED_Set(led_color, TRUE);
     }
     Delay(32000000);
 
     for(eLED_Colors led_color = ORANGE; led_color < MAX_LED_COLORS; led_color++) {
-        LED_Set(led, FALSE);
+        LED_Set(led_color, FALSE);
     }
     Delay(32000000);
 
     for(eLED_Colors led_color = ORANGE; led_color < MAX_LED_COLORS; led_color++) {
-        LED_Set(led, TRUE);
+        LED_Set(led_color, TRUE);
         Delay(32000000);
-        LED_Set(led, FALSE);
+        LED_Set(led_color, FALSE);
         Delay(32000000);
     }
 }
 
 void LED_Init(void)
 {
-    LED_Set_Cfg();
+    LED_Set_Data();
     for(eLED_Colors led_color = ORANGE; led_color < MAX_LED_COLORS; led_color++) {
         ARM_RCC_GPIO_ClockCmd(LED_Data[led_color].port, ENABLE_CMD);
         GPIO_SetCfg(LED_Data[led_color].GPIOx, LED_Data[led_color].pin,
@@ -83,7 +83,7 @@ void LED_Init(void)
 //================================================================================
 //Private
 //================================================================================
-static void LED_Set_Cfg(void)
+static void LED_Set_Data(void)
 {
     LED_Data[ORANGE].color = ORANGE;
     LED_Data[ORANGE].GPIOx = GPIOD;
