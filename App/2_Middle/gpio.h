@@ -111,6 +111,5 @@ void GPIO_SetCfg(GPIO_TypeDef *GPIOx, eGPIO_IONumbers io_num, uint32_t io_mode, 
                  uint32_t io_pull, uint32_t io_speed, uint32_t io_alt);
 
 void GPIO_Init(void);
-void GPIO_Test(void);
 
 #endif //_GPIO_H_ 

@@ -48,7 +48,7 @@ typedef enum {
 //********************************************************************************
 //Variables
 //********************************************************************************
-static uint32_t ARM_RCCStatus = (uint32_t)0x00;;
+static uint32_t ARM_RCCStatus;
 //********************************************************************************
 //Prototypes
 //********************************************************************************
@@ -72,6 +72,7 @@ uint32_t *ARM_RCC_GetStatus(void)
 
 void ARM_RCC_Reset(void)
 {
+    ARM_RCCStatus = ARM_RCC_STA_READY;
     ARM_RCC_ClockSourceCmd(ARM_RCC_HSI, ENABLE_CMD);
     ARM_RCC_ConfigReset();
     ARM_RCC_ClockSourceCmd(ARM_RCC_PLL, DISABLE_CMD);

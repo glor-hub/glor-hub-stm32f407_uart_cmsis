@@ -7,6 +7,7 @@
 #include "gpio.h"
 #include "arm_gpio.h"
 #include "arm_clock.h"
+#include "timer.h"
 
 //********************************************************************************
 //Macros
@@ -46,7 +47,6 @@ static LED_Data_t LED_Data[MAX_LED_COLORS];
 //********************************************************************************
 static void LED_Set(eLED_Colors led_color, uint32_t state);
 static void LED_SetData(void);
-static void Delay(uint32_t tick);
 //================================================================================
 //Public
 //================================================================================
@@ -55,18 +55,18 @@ void LED_Test(void)
     for(eLED_Colors led_color = ORANGE; led_color < MAX_LED_COLORS; led_color++) {
         LED_Set(led_color, TRUE);
     }
-    Delay(32000000);
+    Delay(2 * ONE_SECOND);
 
     for(eLED_Colors led_color = ORANGE; led_color < MAX_LED_COLORS; led_color++) {
         LED_Set(led_color, FALSE);
     }
-    Delay(32000000);
+    Delay(2 * ONE_SECOND);
 
     for(eLED_Colors led_color = ORANGE; led_color < MAX_LED_COLORS; led_color++) {
         LED_Set(led_color, TRUE);
-        Delay(32000000);
+        Delay(2 * ONE_SECOND);
         LED_Set(led_color, FALSE);
-        Delay(32000000);
+        Delay(2 * ONE_SECOND);
     }
 }
 
@@ -130,10 +130,4 @@ static void LED_Set(eLED_Colors led_color, uint32_t state)
             ARM_GPIO_SetIO(LED_Data[led_color].GPIOx, LED_Data[led_color].pin_mask);
         }
     }
-}
-
-static void Delay(uint32_t tick)
-{
-    while(tick--);
-    return;
 }

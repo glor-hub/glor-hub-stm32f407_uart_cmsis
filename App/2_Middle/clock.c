@@ -33,11 +33,13 @@
 //Public
 //================================================================================
 
-void Clock_Init(void)
+uint32_t Clock_Init(void)
 {
     ARM_RCC_Reset();
     ARM_RCC_SetSysClockTo168();
     SystemCoreClockUpdate();
+    return *ARM_RCC_GetStatus();
+
 }
 
 void Clock_Test(void)
