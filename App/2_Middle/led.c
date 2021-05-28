@@ -19,6 +19,7 @@
 //********************************************************************************
 //Typedefs
 //********************************************************************************
+
 typedef enum {
     ORANGE = 0,
     RED,
@@ -44,7 +45,7 @@ static LED_Data_t LED_Data[MAX_LED_COLORS];
 //Prototypes
 //********************************************************************************
 static void LED_Set(eLED_Colors led_color, uint32_t state);
-static void LED_Set_Data(void);
+static void LED_SetData(void);
 static void Delay(uint32_t tick);
 //================================================================================
 //Public
@@ -71,7 +72,7 @@ void LED_Test(void)
 
 void LED_Init(void)
 {
-    LED_Set_Data();
+    LED_SetData();
     for(eLED_Colors led_color = ORANGE; led_color < MAX_LED_COLORS; led_color++) {
         ARM_RCC_GPIO_ClockCmd(LED_Data[led_color].port, ENABLE_CMD);
         GPIO_SetCfg(LED_Data[led_color].GPIOx, LED_Data[led_color].pin,
@@ -83,7 +84,7 @@ void LED_Init(void)
 //================================================================================
 //Private
 //================================================================================
-static void LED_Set_Data(void)
+static void LED_SetData(void)
 {
     LED_Data[ORANGE].color = ORANGE;
     LED_Data[ORANGE].GPIOx = GPIOD;
