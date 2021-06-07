@@ -40,6 +40,7 @@ static void App_ExtPeripherialTest(void);
 void App_IdleTask(void)
 {
     //Some IDLE task implemenation here. This is the lowest priority task
+    Button_Test();
 }
 
 void App_Init(void)
@@ -49,6 +50,7 @@ void App_Init(void)
     GPIO_Init();
     Sys_Status |= Timer_Init();
     LED_Init();
+    Button_Init();
     App_PeripherialTest();
 }
 
@@ -71,5 +73,4 @@ static void App_CorePeripherialTest(void)
 static void App_ExtPeripherialTest(void)
 {
     LED_Test();
-    Button_Test();
 }

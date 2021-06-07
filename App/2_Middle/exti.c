@@ -23,7 +23,7 @@
 //********************************************************************************
 //Variables
 //********************************************************************************
-
+static uint8_t ARM_EXTI_Flag;
 //********************************************************************************
 //Prototypes
 //********************************************************************************
@@ -34,8 +34,9 @@
 
 void EXTI_Init(void)
 {
-    ARM_EXTI_SetPinCfg(GPIO_PORT_A, GPIO_IO_0, EXTI_FALLING_TRIGGER_MODE);
+    ARM_EXTI_SetPinCfg(GPIO_PORT_A, GPIO_IO_0, EXTI_FALLING_RISING_TRIGGER_MODE);
     ARM_EXTI_ClearPendingIRQ(GPIO_IO_0);
+    ARM_EXTI_Flag = FALSE;
     ARM_EXTI_IRQEnable(GPIO_IO_0, ENABLE_CMD);
     NVIC_EnableIRQ(EXTI0_IRQn);//EXTI Line0 Interrupt for pin 0
 }
@@ -43,9 +44,20 @@ void EXTI_Init(void)
 void EXTI0_IRQHandler(void)
 {
     ARM_EXTI_ClearPendingIRQ(GPIO_IO_0);
-    Button_CB();
+    ARM_EXTI_Flag = TRUE;
 
 }
+
+uint8_t EXTI_GetFlag(void)
+{
+    return ARM_EXTI_Flag;
+}
+
+void EXTI_ClearFlag(void)
+{
+    ARM_EXTI_Flag = FALSE;
+}
+
 //================================================================================
 //Private
 //================================================================================

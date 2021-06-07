@@ -29,30 +29,32 @@
 //********************************************************************************
 //Prototypes
 //********************************************************************************
-static void Button_Init(void);
+
 //================================================================================
 //Public
 //================================================================================
 
 void Button_Test(void)
 {
-    Button_Init();
+    uint8_t flag;
+    flag = EXTI_GetFlag();
+    if(flag) {
+        LED_Test();
+        EXTI_ClearFlag();
+    }
 }
 
-void Button_CB(void)
+void Button_Init(void)
 {
-    LED_Test();
+    ARM_RCC_GPIO_ClockCmd(GPIO_PORT_A, ENABLE_CMD);
+    GPIO_SetCfg(GPIOA, GPIO_IO_0, GPIO_IO_MODE_INPUT, GPIO_IO_TYPE_NO,
+                GPIO_IO_HI_Z, GPIO_IO_SPEED_FREQ_LOW, GPIO_IO_AF_0);
+    ARM_GPIO_Config();
+    EXTI_Init();
 }
 
 //================================================================================
 //Private
 //================================================================================
 
-void Button_Init(void)
-{
-    ARM_RCC_GPIO_ClockCmd(GPIO_PORT_A, ENABLE_CMD);
-    GPIO_SetCfg(GPIOA, GPIO_IO_0, GPIO_IO_MODE_INPUT, GPIO_IO_TYPE_NO,
-                GPIO_IO_PULL_UP, GPIO_IO_SPEED_FREQ_LOW, GPIO_IO_AF_0);
-    ARM_GPIO_Config();
-    EXTI_Init();
-}
+
