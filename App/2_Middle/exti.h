@@ -1,9 +1,14 @@
 #ifndef _EXTI_H_
 #define _EXTI_H_
 
-#define EXTI_FALLING_TRIGGER_MODE  ((uint8_t)0x01)
-#define EXTI_RISING_TRIGGER_MODE  ((uint8_t)0x02)
-#define EXTI_FALLING_RISING_TRIGGER_MODE  ((uint8_t)0x03)
+typedef enum {
+    EXTI_NO_TRIGGER_MODE = 0,
+    EXTI_FALLING_TRIGGER_MODE,
+    EXTI_RISING_TRIGGER_MODE,
+    EXTI_FALLING_RISING_TRIGGER_MODE,
+    NUM_EXTI_TRIGGER_MODE
+} eEXTI_TriggerModes;
+
 uint8_t EXTI_GetFlag(void);
 void EXTI_ClearFlag(void);
 void EXTI_Init(void);

@@ -4,8 +4,9 @@
 #include "stm32f4xx.h"
 #include "discovery-kit.h"
 #include "gpio.h"
-#include "arm_exti.h"
 #include "exti.h"
+#include "arm_exti.h"
+
 
 //********************************************************************************
 //Macros
@@ -31,7 +32,7 @@
 //Public
 //================================================================================
 void ARM_EXTI_SetPinCfg(eGPIO_PortNames port_name, eGPIO_IONumbers pin_num,
-                        uint8_t trigger_mode)
+                        eEXTI_TriggerModes trigger_mode)
 {
     SYSCFG_TypeDef *p_cfgReg = SYSCFG;
     EXTI_TypeDef *p_reg = EXTI;
