@@ -1,14 +1,14 @@
 //********************************************************************************
-//app_process.c
+//button.c
 //********************************************************************************
 #include "stm32f4xx.h"
-#include "app.h"
-#include "discovery-kit.h"
-#include "clock.h"
-#include "led.h"
-#include "gpio.h"
-#include "timer.h"
 #include "button.h"
+#include "discovery-kit.h"
+#include "gpio.h"
+#include "arm_gpio.h"
+#include "arm_clock.h"
+#include "exti.h"
+#include "led.h"
 
 //********************************************************************************
 //Macros
@@ -25,51 +25,34 @@
 //********************************************************************************
 //Variables
 //********************************************************************************
-static uint32_t Sys_Status;
+
 //********************************************************************************
 //Prototypes
 //********************************************************************************
-
-static void App_PeripherialTest(void);
-static void App_CorePeripherialTest(void);
-static void App_ExtPeripherialTest(void);
-
+static void Button_Init(void);
 //================================================================================
 //Public
 //================================================================================
-void App_IdleTask(void)
+
+void Button_Test(void)
 {
-    //Some IDLE task implemenation here. This is the lowest priority task
+    Button_Init();
 }
 
-void App_Init(void)
+void Button_CB(void)
 {
-    Sys_Status = SYS_STA_READY;
-    Sys_Status |= Clock_Init();
-    GPIO_Init();
-    Sys_Status |= Timer_Init();
-    LED_Init();
-    App_PeripherialTest();
+    LED_Test();
 }
 
 //================================================================================
 //Private
 //================================================================================
-static void App_PeripherialTest(void)
-{
-    App_CorePeripherialTest();
-    App_ExtPeripherialTest();
-}
-static void App_CorePeripherialTest(void)
-{
-#ifdef HARDWARE_TESTING_MODE
-//SYSCLOCK testing
-    Clock_Test();
-#endif//HARDWARE_TESTING_MODE
-}
 
-static void App_ExtPeripherialTest(void)
+void Button_Init(void)
 {
-    LED_Test();
-    Button_Test();
+    ARM_RCC_GPIO_ClockCmd(GPIO_PORT_A, ENABLE_CMD);
+    GPIO_SetCfg(GPIOA, GPIO_IO_0, GPIO_IO_MODE_INPUT, GPIO_IO_TYPE_NO,
+                GPIO_IO_PULL_UP, GPIO_IO_SPEED_FREQ_LOW, GPIO_IO_AF_0);
+    ARM_GPIO_Config();
+    EXTI_Init();
 }

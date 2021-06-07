@@ -46,7 +46,7 @@ void GPIO_SetCfg(GPIO_TypeDef *GPIOx, eGPIO_IONumbers io_num, uint32_t io_mode, 
     GPIO_Config.Type = io_type;
     GPIO_Config.Pull = io_pull;
     GPIO_Config.Speed = io_speed;
-    GPIO_Config.AltFunc = io_alt; //only for alternate mode
+    GPIO_Config.AltFunc = io_alt; //used only for alternate mode
 }
 
 void GPIO_Init(void)

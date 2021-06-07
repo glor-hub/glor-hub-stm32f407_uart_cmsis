@@ -11,7 +11,7 @@
 #define SYS_SYS_TICK_STA_ERR ((uint32_t)0x00000002)
 
 typedef enum {
-    ENABLE_CMD,
+    ENABLE_CMD = 0,
     DISABLE_CMD,
     NUM_PERIPH_STATES
 } ePeriphCmd;
