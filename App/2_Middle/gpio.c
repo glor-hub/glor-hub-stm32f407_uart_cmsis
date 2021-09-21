@@ -4,6 +4,8 @@
 #include "stm32f4xx.h"
 #include "discovery-kit.h"
 #include "gpio.h"
+#include "Driver_USART.h"
+#include "usart.h"
 #include "arm_gpio.h"
 #include "arm_clock.h"
 

@@ -5,6 +5,8 @@
 #include "discovery-kit.h"
 #include "clock.h"
 #include "gpio.h"
+#include "Driver_USART.h"
+#include "usart.h"
 #include "arm_clock.h"
 #include "arm_gpio.h"
 

@@ -91,10 +91,10 @@ typedef enum {
 #define GPIO_IO_PULL_UP ((uint32_t)0x01)
 #define GPIO_IO_PULL_DOWN ((uint32_t)0x02)
 
-#define GPIO_IO_SPEED_FREQ_LOW ((uint32_t)0x00)
-#define GPIO_IO_SPEED_FREQ_MEDIUM ((uint32_t)0x01)
-#define GPIO_IO_SPEED_FREQ_HIGH ((uint32_t)0x02)
-#define GPIO_IO_SPEED_FREQ_VERY_HIGH ((uint32_t)0x03)
+#define GPIO_IO_SPEED_FREQ_LOW ((uint32_t)0x00) // max 8 MHz depending on load
+#define GPIO_IO_SPEED_FREQ_MEDIUM ((uint32_t)0x01) // max 25-50 MHz
+#define GPIO_IO_SPEED_FREQ_HIGH ((uint32_t)0x02) // max 50-100 MHz
+#define GPIO_IO_SPEED_FREQ_VERY_HIGH ((uint32_t)0x03) // max 100-180 MHz
 
 typedef struct {
     GPIO_TypeDef *pReg;
@@ -103,7 +103,7 @@ typedef struct {
     uint32_t Type;
     uint32_t Pull;
     uint32_t Speed; //use for output and alt_func IOs
-    uint32_t AltFunc;
+    uint32_t AltFunc; // GPIO_IO_AF_0 after reset
 } GPIO_Cfg_t;
 
 GPIO_Cfg_t *GPIO_GetConfig(void);

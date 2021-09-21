@@ -4,8 +4,11 @@
 #include "stm32f4xx.h"
 #include "discovery-kit.h"
 #include "gpio.h"
+#include "Driver_USART.h"
+#include "usart.h"
 #include "arm_clock.h"
 #include "arm_flash.h"
+
 
 //********************************************************************************
 //Macros
@@ -104,6 +107,114 @@ void ARM_RCC_SetSysClockTo168(void)
 void NMI_Handler(void)
 {
     ARM_RCCStatus |= ARM_RCC_STA_HSE_READY_ERR;
+}
+
+void ARM_RCC_USART_ClockCmd(eUSART_InterfaceNames usart, ePeriphCmd cmd)
+{
+    switch(usart) {
+        case USART_1: {
+            if(cmd == ENABLE_CMD) {
+                RCC->APB2ENR |= RCC_APB2ENR_USART1EN;
+            } else {
+                RCC->APB2ENR &= ~RCC_APB2ENR_USART1EN;
+            }
+            break;
+        }
+        case USART_2: {
+            if(cmd == ENABLE_CMD) {
+                RCC->APB1ENR |= RCC_APB1ENR_USART2EN;
+            } else {
+                RCC->APB1ENR &= ~RCC_APB1ENR_USART2EN;
+            }
+            break;
+        }
+        case USART_3: {
+            if(cmd == ENABLE_CMD) {
+                RCC->APB1ENR |= RCC_APB1ENR_USART3EN;
+            } else {
+                RCC->APB1ENR &= ~RCC_APB1ENR_USART3EN;
+            }
+            break;
+        }
+        case UART_4: {
+            if(cmd == ENABLE_CMD) {
+                RCC->APB1ENR |= RCC_APB1ENR_UART4EN;
+            } else {
+                RCC->APB1ENR &= ~RCC_APB1ENR_UART4EN;
+            }
+            break;
+        }
+        case UART_5: {
+            if(cmd == ENABLE_CMD) {
+                RCC->APB1ENR |= RCC_APB1ENR_UART5EN;
+            } else {
+                RCC->APB1ENR &= ~RCC_APB1ENR_UART5EN;
+            }
+            break;
+        }
+        case USART_6: {
+            if(cmd == ENABLE_CMD) {
+                RCC->APB2ENR |= RCC_APB2ENR_USART6EN;
+            } else {
+                RCC->APB2ENR &= ~RCC_APB2ENR_USART6EN;
+            }
+            break;
+        }
+    }
+}
+
+void ARM_RCC_USART_ResetCmd(eUSART_InterfaceNames usart, ePeriphCmd cmd)
+{
+    switch(usart) {
+        case USART_1: {
+            if(cmd == ENABLE_CMD) {
+                RCC->APB2RSTR |= RCC_APB2RSTR_USART1RST;
+            } else {
+                RCC->APB2RSTR &= ~RCC_APB2RSTR_USART1RST;
+            }
+            break;
+        }
+        case USART_2: {
+            if(cmd == ENABLE_CMD) {
+                RCC->APB1RSTR |= RCC_APB1RSTR_USART2RST;
+            } else {
+                RCC->APB1RSTR &= ~RCC_APB1RSTR_USART2RST;
+            }
+            break;
+        }
+        case USART_3: {
+            if(cmd == ENABLE_CMD) {
+                RCC->APB1RSTR |= RCC_APB1RSTR_USART3RST;
+            } else {
+                RCC->APB1RSTR &= ~RCC_APB1RSTR_USART3RST;
+            }
+            break;
+        }
+        case UART_4: {
+            if(cmd == ENABLE_CMD) {
+                RCC->APB1RSTR |= RCC_APB1RSTR_UART4RST;
+            } else {
+                RCC->APB1RSTR &= ~RCC_APB1RSTR_UART4RST;
+            }
+            break;
+        }
+        case UART_5: {
+            if(cmd == ENABLE_CMD) {
+                RCC->APB1RSTR |= RCC_APB1RSTR_UART5RST;
+            } else {
+                RCC->APB1RSTR &= ~RCC_APB1RSTR_UART5RST;
+            }
+            break;
+        }
+        case USART_6: {
+            if(cmd == ENABLE_CMD) {
+                RCC->APB2RSTR |= RCC_APB2RSTR_USART6RST;
+            } else {
+                RCC->APB2RSTR &= ~RCC_APB2RSTR_USART6RST;
+            }
+            break;
+        }
+    }
 }
 
 void ARM_RCC_GPIO_ClockCmd(eGPIO_PortNames port_name, ePeriphCmd cmd)

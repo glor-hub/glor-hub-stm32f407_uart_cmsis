@@ -9,6 +9,8 @@
 #include "gpio.h"
 #include "timer.h"
 #include "button.h"
+#include "Driver_USART.h"
+#include "usart.h"
 
 //********************************************************************************
 //Macros
