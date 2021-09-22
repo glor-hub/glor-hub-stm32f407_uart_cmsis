@@ -199,7 +199,7 @@ static int32_t ARM_USART_PowerControl(ARM_POWER_STATE  state,
                                       ARM_USART_RESOURCES *usart)
 {
     switch(state) {
-        case ARM_POWER_OFF:
+        case ARM_POWER_OFF: {
             // Disable USART IRQ
             NVIC_DisableIRQ(usart->irq_num);
 
@@ -223,11 +223,11 @@ static int32_t ARM_USART_PowerControl(ARM_POWER_STATE  state,
 
             usart->p_info->flags &= ~ARM_USART_FLAG_POWERED;
             break;
-
-        case ARM_POWER_LOW:
+        }
+        case ARM_POWER_LOW: {
             return ARM_DRIVER_ERROR_UNSUPPORTED;
-
-        case ARM_POWER_FULL:
+        }
+        case ARM_POWER_FULL: {
             if((usart->p_info->flags & ARM_USART_FLAG_INITIALIZED) == 0U) {
                 return ARM_DRIVER_ERROR;
             }
@@ -262,11 +262,11 @@ static int32_t ARM_USART_PowerControl(ARM_POWER_STATE  state,
             // Clear and Enable USART IRQ
             NVIC_ClearPendingIRQ(usart->irq_num);
             NVIC_EnableIRQ(usart->irq_num);
-
             break;
-
-        default:
+        }
+        default: {
             return ARM_DRIVER_ERROR_UNSUPPORTED;
+        }
     }
     return ARM_DRIVER_OK;
 }
@@ -316,7 +316,7 @@ static int32_t ARM_USART_Control(uint32_t control, uint32_t arg,
     }
     switch(control & ARM_USART_CONTROL_Msk) {
         // Control TX
-        case  ARM_USART_CONTROL_TX:
+        case  ARM_USART_CONTROL_TX: {
             //Check if pin configure available
             if(usart->p_pin == NULL) {
                 return ARM_DRIVER_ERROR;
@@ -342,6 +342,7 @@ static int32_t ARM_USART_Control(uint32_t control, uint32_t arg,
                 usart->p_info->flags &= ~ARM_USART_FLAG_TX_ENABLED;
 
             }
+        }
     }
     //to do
     return ARM_DRIVER_OK;

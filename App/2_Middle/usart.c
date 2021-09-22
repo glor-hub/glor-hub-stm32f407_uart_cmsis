@@ -110,7 +110,9 @@ USART_PinCfg_t *USART_GetPinConfig(eUSART_InterfaceNames usart_name)
             return UART6_PinConfig;
         }
 #endif //UART6_ENABLE
-
+        default: {
+            return NULL;
+        }
     }
 }
 
@@ -418,4 +420,3 @@ static void USART_SetPinConfig(void)
 
 #endif //USART6_ENABLE
 }
-
