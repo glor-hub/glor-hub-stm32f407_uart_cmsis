@@ -74,46 +74,52 @@ void USART_Init(void)
 
 USART_PinCfg_t *USART_GetPinConfig(eUSART_InterfaceNames usart_name)
 {
+    USART_PinCfg_t *pUSART_PinCfg = NULL;
+
     switch(usart_name) {
 #ifdef USART1_ENABLE
         case USART_1: {
-            return USART1_PinConfig;
+            pUSART_PinCfg = USART1_PinConfig;
         }
 #endif //USART1_ENABLE
 
 #ifdef USART2_ENABLE
         case USART_2: {
-            return USART2_PinConfig;
+            pUSART_PinCfg = USART2_PinConfig;
         }
 #endif //USART2_ENABLE
 
 #ifdef USART3_ENABLE
         case USART_3: {
-            return USART3_PinConfig;
+            pUSART_PinCfg = USART3_PinConfig;
         }
 #endif //USART3_ENABLE
 
 #ifdef UART4_ENABLE
         case UART_4: {
-            return UART4_PinConfig;
+            pUSART_PinCfg = UART4_PinConfig;
         }
 #endif //UART4_ENABLE
 
 #ifdef USART5_ENABLE
         case UART_5: {
-            return USART5_PinConfig;
+            pUSART_PinCfg = USART5_PinConfig;
         }
 #endif //USART5_ENABLE
 
 #ifdef UART6_ENABLE
         case USART_6: {
-            return UART6_PinConfig;
+            pUSART_PinCfg = UART6_PinConfig;
         }
 #endif //UART6_ENABLE
+
         default: {
-            return NULL;
+            break;
         }
+
     }
+
+    return pUSART_PinCfg;
 }
 
 #ifdef USART1_ENABLE
