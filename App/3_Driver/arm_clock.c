@@ -68,6 +68,11 @@ static void ARM_RCC_InteruptDisable(void);
 //Public
 //================================================================================
 
+bool ARM_RCC_isReady(void)
+{
+    return (ARM_RCCStatus == ARM_RCC_STA_READY);
+}
+
 uint32_t *ARM_RCC_GetStatus(void)
 {
     return &ARM_RCCStatus;

@@ -2,6 +2,7 @@
 //app_process.c
 //********************************************************************************
 #include "stm32f4xx.h"
+#include "common.h"
 #include "app.h"
 #include "discovery-kit.h"
 #include "clock.h"
@@ -27,7 +28,7 @@
 //********************************************************************************
 //Variables
 //********************************************************************************
-static uint32_t Sys_Status;
+
 //********************************************************************************
 //Prototypes
 //********************************************************************************
@@ -45,16 +46,19 @@ void App_IdleTask(void)
     Button_Test();
 }
 
-void App_Init(void)
+uint32_t App_Init(void)
 {
-    Sys_Status = SYS_STA_READY;
-    Sys_Status |= Clock_Init();
+    uint32_t init_result = PASSED;
+
+    init_result |= Clock_Init();
     GPIO_Init();
-    Sys_Status |= Timer_Init();
+    //Sys_Status |= Timer_Init();
     LED_Init();
     Button_Init();
     USART_Init();
     App_PeripherialTest();
+
+    return init_result;
 }
 
 //================================================================================

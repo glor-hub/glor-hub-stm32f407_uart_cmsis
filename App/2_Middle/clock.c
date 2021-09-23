@@ -3,6 +3,7 @@
 //********************************************************************************
 #include "stm32f4xx.h"
 #include "discovery-kit.h"
+#include "common.h"
 #include "clock.h"
 #include "gpio.h"
 #include "Driver_USART.h"
@@ -40,8 +41,7 @@ uint32_t Clock_Init(void)
     ARM_RCC_Reset();
     ARM_RCC_SetSysClockTo168();
     SystemCoreClockUpdate();
-    return *ARM_RCC_GetStatus();
-
+    return ARM_RCC_isReady() ? PASSED : FAILED;
 }
 
 void Clock_Test(void)

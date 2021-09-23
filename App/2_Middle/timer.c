@@ -2,6 +2,7 @@
 //timer.c
 //********************************************************************************
 #include "stm32f4xx.h"
+#include "common.h"
 #include "timer.h"
 #include "discovery-kit.h"
 #include <string.h>
@@ -9,6 +10,8 @@
 //********************************************************************************
 //Macros
 //********************************************************************************
+#define TIMER_STA_READY ((uint32_t)0x00000000)
+#define TIMER_STA_INIT_ERR ((uint32_t)0x00000001)
 
 //********************************************************************************
 //Enums
@@ -33,6 +36,8 @@ typedef struct {
 
 static Timer_Data_t Timer_Data[NUM_TIMERS];
 
+static uint32_t Timer_Status;
+
 
 //********************************************************************************
 //Prototypes
@@ -56,12 +61,12 @@ void SysTick_Handler(void)
 
 uint32_t Timer_Init(void)
 {
+    Timer_Status = TIMER_STA_READY;
     memset(&Timer_Data, 0, sizeof(Timer_Data_t) * NUM_TIMERS);
     if(SysTick_Config(SystemCoreClock / 1000 - 1)) {
-        return SYS_SYS_TICK_STA_ERR;
-    } else {
-        return (0UL);
+        Timer_Status = TIMER_STA_INIT_ERR;
     }
+    return (Timer_Status == TIMER_STA_READY) ? PASSED : FAILED;
 }
 
 void Timer_Enable(eTimer_Types timer, uint32_t time)

@@ -9,6 +9,7 @@ using STM32F4DISCOVERY kit.
 //********************************************************************************
 
 #include "stm32f4xx.h"
+#include "common.h"
 #include "app.h"
 
 
@@ -43,8 +44,13 @@ using STM32F4DISCOVERY kit.
 
 int main(void)
 {
-    App_Init();
-    
+    uint32_t app_init_result = App_Init();
+
+    if(app_init_result != PASSED) {
+        //Error handle here
+        while(1);
+    }
+
     while(1) {
         App_IdleTask();
     }

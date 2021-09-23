@@ -2,6 +2,7 @@
 //exti.c
 //********************************************************************************
 #include "stm32f4xx.h"
+#include "common.h"
 #include "discovery-kit.h"
 #include "exti.h"
 #include "gpio.h"
