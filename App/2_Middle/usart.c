@@ -2,6 +2,7 @@
 //usart.c
 //********************************************************************************
 #include "stm32f4xx.h"
+#include "RTE_Device.h"
 #include "Driver_USART.h"
 #include "gpio.h"
 #include "usart.h"
@@ -31,29 +32,29 @@ typedef enum {
 //Variables
 //********************************************************************************
 
-#ifdef USART1_ENABLE
+#if (RTE_USART1==1)
 static USART_PinCfg_t USART1_PinConfig[MAX_USART_PIN_NAMES];
-#endif //USART1_ENABLE
+#endif //(RTE_USART1==1)
 
-#ifdef USART2_ENABLE
+#if (RTE_USART2==1)
 static USART_PinCfg_t USART2_PinConfig[MAX_USART_PIN_NAMES];
-#endif //USART2_ENABLE
+#endif //(RTE_USART2==1)
 
-#ifdef USART3_ENABLE
+#if (RTE_USART3==1)
 static USART_PinCfg_t USART3_PinConfig[MAX_USART_PIN_NAMES];
-#endif //USART3_ENABLE
+#endif //(RTE_USART3==1)
 
-#ifdef UART4_ENABLE
+#if (RTE_UART4==1)
 static USART_PinCfg_t UART4_PinConfig[MAX_USART_PIN_NAMES];
-#endif //UART4_ENABLE
+#endif //(RTE_UART4==1)
 
-#ifdef UART5_ENABLE
+#if (RTE_UART5==1)
 static USART_PinCfg_t UART5_PinConfig[MAX_USART_PIN_NAMES];
-#endif //UART5_ENABLE
+#endif //(RTE_UART5==1)
 
-#ifdef USART6_ENABLE
+#if (RTE_USART6==1)
 static USART_PinCfg_t USART6_PinConfig[MAX_UART_PIN_NAMES];
-#endif //USART6_ENABLE
+#endif //(RTE_USART6==1)
 
 //********************************************************************************
 //Prototypes
@@ -77,29 +78,29 @@ USART_PinCfg_t *USART_GetPinConfig(eUSART_InterfaceNames usart_name)
     USART_PinCfg_t *pUSART_PinCfg = NULL;
 
     switch(usart_name) {
-#ifdef USART1_ENABLE
+#if (RTE_USART1==1)
         case USART_1: {
             pUSART_PinCfg = USART1_PinConfig;
         }
-#endif //USART1_ENABLE
+#endif //(RTE_USART1==1)
 
-#ifdef USART2_ENABLE
+#if (RTE_USART2==1)
         case USART_2: {
             pUSART_PinCfg = USART2_PinConfig;
         }
-#endif //USART2_ENABLE
+#endif //(RTE_USART2==1)
 
-#ifdef USART3_ENABLE
+#if (RTE_USART3==1)
         case USART_3: {
             pUSART_PinCfg = USART3_PinConfig;
         }
-#endif //USART3_ENABLE
+#endif //(RTE_USART3==1)
 
-#ifdef UART4_ENABLE
+#if (RTE_UART4==1)
         case UART_4: {
             pUSART_PinCfg = UART4_PinConfig;
         }
-#endif //UART4_ENABLE
+#endif //(RTE_UART4==1)
 
 #ifdef USART5_ENABLE
         case UART_5: {
@@ -122,7 +123,7 @@ USART_PinCfg_t *USART_GetPinConfig(eUSART_InterfaceNames usart_name)
     return pUSART_PinCfg;
 }
 
-#ifdef USART1_ENABLE
+#if (RTE_USART1==1)
 void USART1_IRQHandler(void)
 {
 //    USART_IRQHandler(&USART1_Resources);
@@ -131,9 +132,9 @@ void USART1_cb(uint32_t event)
 {
 
 }
-#endif //USART1_ENABLE
+#endif //(RTE_USART1==1)
 
-#ifdef UART4_ENABLE
+#if (RTE_UART4==1)
 void UART4_IRQHandler(void)
 {
 //    USART_IRQHandler(&UART4_Resources);
@@ -142,7 +143,7 @@ void UART4_cb(uint32_t event)
 {
 
 }
-#endif //UART4_ENABLE
+#endif //(RTE_UART4==1)
 
 //================================================================================
 //Private
@@ -150,279 +151,434 @@ void UART4_cb(uint32_t event)
 
 static void USART_SetPinConfig(void)
 {
-#ifdef USART1_ENABLE
+#if (RTE_USART1==1)
 
-#if (USART1_PIN_ID == USART_PIN_ID0)
-    USART1_PinConfig[TX_PIN].GPIOx = GPIOA;
+#if (RTE_USART1_TX_ID == 0)
+#error "The USART1_TX Pin Configuration not used"
+#elif (RTE_USART1_TX_ID == 1)
+    USART1_PinConfig[TX_PIN].GPIOx = RTE_USART1_TX_PORT;
     USART1_PinConfig[TX_PIN].port = GPIO_PORT_A;
-    USART1_PinConfig[TX_PIN].pin = GPIO_IO_9;
+    USART1_PinConfig[TX_PIN].pin = RTE_USART1_TX_BIT;
     USART1_PinConfig[TX_PIN].alt_func = GPIO_IO_AF_7;
-    USART1_PinConfig[RX_PIN].GPIOx = GPIOA;
-    USART1_PinConfig[RX_PIN].port = GPIO_PORT_A;
-    USART1_PinConfig[RX_PIN].pin = GPIO_IO_10;
-    USART1_PinConfig[RX_PIN].alt_func = GPIO_IO_AF_7;
-#ifdef USART1_SCLK_PIN_ENABLE
-    USART1_PinConfig[SCLK_PIN].GPIOx = GPIOA;
-    USART1_PinConfig[SCLK_PIN].port = GPIO_PORT_A;
-    USART1_PinConfig[SCLK_PIN].pin = GPIO_IO_8;
-    USART1_PinConfig[SCLK_PIN].alt_func = GPIO_IO_AF_7;
-#endif //USART1_SCLK_PIN_ENABLE
-#ifdef USART1_CTS_PIN_ENABLE
-    USART1_PinConfig[CTS_PIN].GPIOx = GPIOA;
-    USART1_PinConfig[CTS_PIN].port = GPIO_PORT_A;
-    USART1_PinConfig[CTS_PIN].pin = GPIO_IO_11;
-    USART1_PinConfig[CTS_PIN].alt_func = GPIO_IO_AF_7;
-#endif //USART1_CTS_PIN_ENABLE
-#ifdef USART1_RTS_PIN_ENABLE
-    USART1_PinConfig[RTS_PIN].GPIOx = GPIOA;
-    USART1_PinConfig[RTS_PIN].port = GPIO_PORT_A;
-    USART1_PinConfig[RTS_PIN].pin = GPIO_IO_12;
-    USART1_PinConfig[RTS_PIN].alt_func = GPIO_IO_AF_7;
-#endif //USART1_RTS_PIN_ENABLE
-#else
-    USART1_PinConfig[TX_PIN].GPIOx = GPIOB;
+#elif (RTE_USART1_TX_ID == 2)
+#error "The USART1_TX Pin Configuration not used"
+#elif (RTE_USART1_TX_ID == 3)
+    USART1_PinConfig[TX_PIN].GPIOx = RTE_USART1_TX_PORT;
     USART1_PinConfig[TX_PIN].port = GPIO_PORT_B;
-    USART1_PinConfig[TX_PIN].pin = GPIO_IO_6;
+    USART1_PinConfig[TX_PIN].pin = RTE_USART1_TX_BIT;
     USART1_PinConfig[TX_PIN].alt_func = GPIO_IO_AF_7;
-    USART1_PinConfig[RX_PIN].GPIOx = GPIOB;
-    USART1_PinConfig[RX_PIN].port = GPIO_PORT_B;
-    USART1_PinConfig[RX_PIN].pin = GPIO_IO_7;
+#else
+#error "Invalid USART1_TX Pin Configuration"
+#endif //(RTE_USART1_TX_ID == 0)
+
+#if (RTE_USART1_RX_ID == 0)
+#error "The USART1_RX Pin Configuration not used"
+#elif (RTE_USART1_RX_ID == 1)
+    USART1_PinConfig[RX_PIN].GPIOx = RTE_USART1_RX_PORT;
+    USART1_PinConfig[RX_PIN].port = GPIO_PORT_A;
+    USART1_PinConfig[RX_PIN].pin = RTE_USART1_RX_BIT;
     USART1_PinConfig[RX_PIN].alt_func = GPIO_IO_AF_7;
-#endif //(USART1_PIN_ID == USART_PIN_ID0)
+#elif (RTE_USART1_RX_ID == 2)
+#error "The USART1_RX Pin Configuration not used"
+#elif (RTE_USART1_RX_ID == 3)
+    USART1_PinConfig[RX_PIN].GPIOx = RTE_USART1_RX_PORT;
+    USART1_PinConfig[RX_PIN].port = GPIO_PORT_B;
+    USART1_PinConfig[RX_PIN].pin = RTE_USART1_RX_BIT;
+    USART1_PinConfig[RX_PIN].alt_func = GPIO_IO_AF_7;
+#else
+#error "Invalid USART1_RX Pin Configuration"
+#endif //(RTE_USART1_RX_ID == 0)
 
-#endif //USART1_ENABLE
+#if (RTE_USART1_CK_ID == 0)
+#error "The USART1_CK Pin Configuration not used"
+#elif (RTE_USART1_CK_ID == 1)
+    USART1_PinConfig[CK_PIN].GPIOx = RTE_USART1_CK_PORT;
+    USART1_PinConfig[CK_PIN].port = GPIO_PORT_A;
+    USART1_PinConfig[CK_PIN].pin = RTE_USART1_CK_BIT;
+    USART1_PinConfig[CK_PIN].alt_func = GPIO_IO_AF_7;
+#else
+#error "Invalid USART1_CK Pin Configuration"
+#endif //(RTE_USART1_CK_ID == 0)
 
-#ifdef USART2_ENABLE
+#if (RTE_USART1_CTS_ID == 0)
+#error "The USART1_CTS Pin Configuration not used"
+#elif (RTE_USART1_CTS_ID == 1)
+    USART1_PinConfig[CTS_PIN].GPIOx = RTE_USART1_CTS_PORT;
+    USART1_PinConfig[CTS_PIN].port = GPIO_PORT_A;
+    USART1_PinConfig[CTS_PIN].pin = RTE_USART1_CTS_BIT;
+    USART1_PinConfig[CTS_PIN].alt_func = GPIO_IO_AF_7;
+#else
+#error "Invalid USART1_CTS Pin Configuration"
+#endif //(RTE_USART1_CTS_ID == 0)
 
-#if (USART2_PIN_ID == USART_PIN_ID0)
-    USART2_PinConfig[TX_PIN].GPIOx = GPIOA;
+#if (RTE_USART1_RTS_ID == 0)
+#error "The USART1_RTS Pin Configuration not used"
+#elif (RTE_USART1_RTS_ID == 1)
+    USART1_PinConfig[RTS_PIN].GPIOx = RTE_USART1_RTS_PORT;
+    USART1_PinConfig[RTS_PIN].port = GPIO_PORT_A;
+    USART1_PinConfig[RTS_PIN].pin = RTE_USART1_RTS_BIT;
+    USART1_PinConfig[RTS_PIN].alt_func = GPIO_IO_AF_7;
+#else
+#error "Invalid USART1_RTS Pin Configuration"
+#endif //(RTE_USART1_RTS_ID == 0)
+
+#endif //(RTE_USART1 == 1)
+
+#if (RTE_USART2 == 1)
+
+#if (RTE_USART2_TX_ID == 0)
+#error "The USART2_TX Pin Configuration not used"
+#elif (RTE_USART2_TX_ID == 1)
+    USART2_PinConfig[TX_PIN].GPIOx = RTE_USART2_TX_PORT;
     USART2_PinConfig[TX_PIN].port = GPIO_PORT_A;
-    USART2_PinConfig[TX_PIN].pin = GPIO_IO_2;
+    USART2_PinConfig[TX_PIN].pin = RTE_USART2_TX_BIT;
     USART2_PinConfig[TX_PIN].alt_func = GPIO_IO_AF_7;
-    USART2_PinConfig[RX_PIN].GPIOx = GPIOA;
+#elif (RTE_USART2_TX_ID == 2)
+    USART2_PinConfig[TX_PIN].GPIOx = RTE_USART2_TX_PORT;
+    USART2_PinConfig[TX_PIN].port = GPIO_PORT_B;
+    USART2_PinConfig[TX_PIN].pin = RTE_USART2_TX_BIT;
+    USART2_PinConfig[TX_PIN].alt_func = GPIO_IO_AF_7;
+#else
+#error "Invalid USART2_TX Pin Configuration"
+#endif //(RTE_USART2_TX_ID == 0)
+
+#if (RTE_USART2_RX_ID == 0)
+#error "The USART2_RX Pin Configuration not used"
+#elif (RTE_USART2_RX_ID == 1)
+    USART2_PinConfig[RX_PIN].GPIOx = RTE_USART2_RX_PORT;
     USART2_PinConfig[RX_PIN].port = GPIO_PORT_A;
-    USART2_PinConfig[RX_PIN].pin = GPIO_IO_3;
+    USART2_PinConfig[RX_PIN].pin = RTE_USART2_RX_BIT;
     USART2_PinConfig[RX_PIN].alt_func = GPIO_IO_AF_7;
-#ifdef USART2_SCLK_PIN_ENABLE
-    USART2_PinConfig[SCLK_PIN].GPIOx = GPIOA;
-    USART2_PinConfig[SCLK_PIN].port = GPIO_PORT_A;
-    USART2_PinConfig[SCLK_PIN].pin = GPIO_IO_4;
-    USART2_PinConfig[SCLK_PIN].alt_func = GPIO_IO_AF_7;
-#endif //USART2_SCLK_PIN_ENABLE
-#ifdef USART2_CTS_PIN_ENABLE
-    USART2_PinConfig[CTS_PIN].GPIOx = GPIOA;
+#elif (RTE_USART2_RX_ID == 2)
+    USART2_PinConfig[RX_PIN].GPIOx = RTE_USART2_RX_PORT;
+    USART2_PinConfig[RX_PIN].port = GPIO_PORT_B;
+    USART2_PinConfig[RX_PIN].pin = RTE_USART2_RX_BIT;
+    USART2_PinConfig[RX_PIN].alt_func = GPIO_IO_AF_7;
+#else
+#error "Invalid USART2_RX Pin Configuration"
+#endif //(RTE_USART2_RX_ID == 0)
+
+#if (RTE_USART2_CK_ID == 0)
+#error "The USART2_CK Pin Configuration not used"
+#elif (RTE_USART2_CK_ID == 1)
+    USART2_PinConfig[CK_PIN].GPIOx = RTE_USART2_CK_PORT;
+    USART2_PinConfig[CK_PIN].port = GPIO_PORT_A;
+    USART2_PinConfig[CK_PIN].pin = RTE_USART2_CK_BIT;
+    USART2_PinConfig[CK_PIN].alt_func = GPIO_IO_AF_7;
+#elif (RTE_USART2_CK_ID == 2)
+    USART2_PinConfig[CK_PIN].GPIOx = RTE_USART2_CK_PORT;
+    USART2_PinConfig[CK_PIN].port = GPIO_PORT_D;
+    USART2_PinConfig[CK_PIN].pin = RTE_USART2_CK_BIT;
+    USART2_PinConfig[CK_PIN].alt_func = GPIO_IO_AF_7;
+#else
+#error "Invalid USART2_CK Pin Configuration"
+#endif //(RTE_USART2_CK_ID == 0)
+
+#if (RTE_USART2_CTS_ID == 0)
+#error "The USART2_CTS Pin Configuration not used"
+#elif (RTE_USART2_CTS_ID == 1)
+    USART2_PinConfig[CTS_PIN].GPIOx = RTE_USART2_CTS_PORT;
     USART2_PinConfig[CTS_PIN].port = GPIO_PORT_A;
-    USART2_PinConfig[CTS_PIN].pin = GPIO_IO_0;
+    USART2_PinConfig[CTS_PIN].pin = RTE_USART2_CTS_BIT;
     USART2_PinConfig[CTS_PIN].alt_func = GPIO_IO_AF_7;
-#endif //USART2_CTS_PIN_ENABLE
-#ifdef USART2_RTS_PIN_ENABLE
-    USART2_PinConfig[RTS_PIN].GPIOx = GPIOA;
-    USART2_PinConfig[RTS_PIN].port = GPIO_PORT_A;
-    USART2_PinConfig[RTS_PIN].pin = GPIO_IO_1;
-    USART2_PinConfig[RTS_PIN].alt_func = GPIO_IO_AF_7;
-#endif //USART2_RTS_PIN_ENABLE
-#else
-    USART2_PinConfig[TX_PIN].GPIOx = GPIOD;
-    USART2_PinConfig[TX_PIN].port = GPIO_PORT_D;
-    USART2_PinConfig[TX_PIN].pin = GPIO_IO_5;
-    USART2_PinConfig[TX_PIN].alt_func = GPIO_IO_AF_7;
-    USART2_PinConfig[RX_PIN].GPIOx = GPIOD;
-    USART2_PinConfig[RX_PIN].port = GPIO_PORT_D;
-    USART2_PinConfig[RX_PIN].pin = GPIO_IO_6;
-    USART2_PinConfig[RX_PIN].alt_func = GPIO_IO_AF_7;
-#ifdef USART2_SCLK_PIN_ENABLE
-    USART2_PinConfig[SCLK_PIN].GPIOx = GPIOD;
-    USART2_PinConfig[SCLK_PIN].port = GPIO_PORT_D;
-    USART2_PinConfig[SCLK_PIN].pin = GPIO_IO_7;
-    USART2_PinConfig[SCLK_PIN].alt_func = GPIO_IO_AF_7;
-#endif //USART2_SCLK_PIN_ENABLE
-#ifdef USART2_CTS_PIN_ENABLE
-    USART2_PinConfig[CTS_PIN].GPIOx = GPIOD;
+#elif (RTE_USART2_CTS_ID == 2)
+    USART2_PinConfig[CTS_PIN].GPIOx = RTE_USART2_CTS_PORT;
     USART2_PinConfig[CTS_PIN].port = GPIO_PORT_D;
-    USART2_PinConfig[CTS_PIN].pin = GPIO_IO_3;
+    USART2_PinConfig[CTS_PIN].pin = RTE_USART2_CTS_BIT;
     USART2_PinConfig[CTS_PIN].alt_func = GPIO_IO_AF_7;
-#endif //USART2_CTS_PIN_ENABLE
-#ifdef USART2_RTS_PIN_ENABLE
-    USART2_PinConfig[RTS_PIN].GPIOx = GPIOD;
-    USART2_PinConfig[RTS_PIN].port = GPIO_PORT_D;
-    USART2_PinConfig[RTS_PIN].pin = GPIO_IO_4;
+#else
+#error "Invalid USART2_CTS Pin Configuration"
+#endif //(RTE_USART2_CTS_ID == 0)
+
+#if (RTE_USART2_RTS_ID == 0)
+#error "The USART2_RTS Pin Configuration not used"
+#elif (RTE_USART2_RTS_ID == 1)
+    USART2_PinConfig[RTS_PIN].GPIOx = RTE_USART2_RTS_PORT;
+    USART2_PinConfig[RTS_PIN].port = GPIO_PORT_A;
+    USART2_PinConfig[RTS_PIN].pin = RTE_USART2_RTS_BIT;
     USART2_PinConfig[RTS_PIN].alt_func = GPIO_IO_AF_7;
-#endif //USART2_RTS_PIN_ENABLE
-#endif //(USART2_PIN_ID == USART_PIN_ID0)
+#elif (RTE_USART2_RTS_ID == 2)
+    USART2_PinConfig[RTS_PIN].GPIOx = RTE_USART2_RTS_PORT;
+    USART2_PinConfig[RTS_PIN].port = GPIO_PORT_D;
+    USART2_PinConfig[RTS_PIN].pin = RTE_USART2_RTS_BIT;
+    USART2_PinConfig[RTS_PIN].alt_func = GPIO_IO_AF_7;
+#else
+#error "Invalid USART2_RTS Pin Configuration"
+#endif //(RTE_USART2_RTS_ID == 0)
 
-#endif //USART2_ENABLE
+#endif //(RTE_USART2==1)
 
-#ifdef USART3_ENABLE
+#if (RTE_USART3 == 1)
 
-#if (USART3_PIN_ID == USART_PIN_ID0)
-    USART3_PinConfig[TX_PIN].GPIOx = GPIOB;
-    USART3_PinConfig[TX_PIN].port = GPIO_PORT_B;
-    USART3_PinConfig[TX_PIN].pin = GPIO_IO_10;
+#if (RTE_USART3_TX_ID == 0)
+#error "The USART3_TX Pin Configuration not used"
+#elif (RTE_USART3_TX_ID == 1)
+    USART3_PinConfig[TX_PIN].GPIOx = RTE_USART3_TX_PORT;
+    USART3_PinConfig[TX_PIN].port = GPIO_PORT_A;
+    USART3_PinConfig[TX_PIN].pin = RTE_USART3_TX_BIT;
     USART3_PinConfig[TX_PIN].alt_func = GPIO_IO_AF_7;
-    USART3_PinConfig[RX_PIN].GPIOx = GPIOB;
-    USART3_PinConfig[RX_PIN].port = GPIO_PORT_B;
-    USART3_PinConfig[RX_PIN].pin = GPIO_IO_11;
-    USART3_PinConfig[RX_PIN].alt_func = GPIO_IO_AF_7;
-#ifdef USART3_SCLK_PIN_ENABLE
-    USART3_PinConfig[SCLK_PIN].GPIOx = GPIOB;
-    USART3_PinConfig[SCLK_PIN].port = GPIO_PORT_B;
-    USART3_PinConfig[SCLK_PIN].pin = GPIO_IO_12;
-    USART3_PinConfig[SCLK_PIN].alt_func = GPIO_IO_AF_7;
-#endif //USART3_SCLK_PIN_ENABLE
-#ifdef USART3_CTS_PIN_ENABLE
-    USART3_PinConfig[CTS_PIN].GPIOx = GPIOB;
-    USART3_PinConfig[CTS_PIN].port = GPIO_PORT_B;
-    USART3_PinConfig[CTS_PIN].pin = GPIO_IO_13;
-    USART3_PinConfig[CTS_PIN].alt_func = GPIO_IO_AF_7;
-#endif //USART3_CTS_PIN_ENABLE
-#ifdef USART3_RTS_PIN_ENABLE
-    USART3_PinConfig[RTS_PIN].GPIOx = GPIOB;
-    USART3_PinConfig[RTS_PIN].port = GPIO_PORT_B;
-    USART3_PinConfig[RTS_PIN].pin = GPIO_IO_14;
-    USART3_PinConfig[RTS_PIN].alt_func = GPIO_IO_AF_7;
-#endif //USART3_RTS_PIN_ENABLE
-#elif (USART3_PIN_ID == USART_PIN_ID1)
-    USART3_PinConfig[TX_PIN].GPIOx = GPIOC;
+#elif (RTE_USART3_TX_ID == 2)
+    USART3_PinConfig[TX_PIN].GPIOx = RTE_USART3_TX_PORT;
     USART3_PinConfig[TX_PIN].port = GPIO_PORT_C;
-    USART3_PinConfig[TX_PIN].pin = GPIO_IO_10;
+    USART3_PinConfig[TX_PIN].pin = RTE_USART3_TX_BIT;
     USART3_PinConfig[TX_PIN].alt_func = GPIO_IO_AF_7;
-    USART3_PinConfig[RX_PIN].GPIOx = GPIOC;
-    USART3_PinConfig[RX_PIN].port = GPIO_PORT_C;
-    USART3_PinConfig[RX_PIN].pin = GPIO_IO_11;
-    USART3_PinConfig[RX_PIN].alt_func = GPIO_IO_AF_7;
-#ifdef USART3_SCLK_PIN_ENABLE
-    USART3_PinConfig[SCLK_PIN].GPIOx = GPIOC;
-    USART3_PinConfig[SCLK_PIN].port = GPIO_PORT_C;
-    USART3_PinConfig[SCLK_PIN].pin = GPIO_IO_12;
-    USART3_PinConfig[SCLK_PIN].alt_func = GPIO_IO_AF_7;
-#endif //USART3_SCLK_PIN_ENABLE
-#else
-    USART3_PinConfig[TX_PIN].GPIOx = GPIOD;
+#elif (RTE_USART3_TX_ID == 3)
+    USART3_PinConfig[TX_PIN].GPIOx = RTE_USART3_TX_PORT;
     USART3_PinConfig[TX_PIN].port = GPIO_PORT_D;
-    USART3_PinConfig[TX_PIN].pin = GPIO_IO_8;
+    USART3_PinConfig[TX_PIN].pin = RTE_USART3_TX_BIT;
     USART3_PinConfig[TX_PIN].alt_func = GPIO_IO_AF_7;
-    USART3_PinConfig[RX_PIN].GPIOx = GPIOD;
-    USART3_PinConfig[RX_PIN].port = GPIO_PORT_D;
-    USART3_PinConfig[RX_PIN].pin = GPIO_IO_9;
+#else
+#error "Invalid USART3_TX Pin Configuration"
+#endif //(RTE_USART3_TX_ID == 0)
+
+#if (RTE_USART3_RX_ID == 0)
+#error "The USART3_RX Pin Configuration not used"
+#elif (RTE_USART3_RX_ID == 1)
+    USART3_PinConfig[RX_PIN].GPIOx = RTE_USART3_RX_PORT;
+    USART3_PinConfig[RX_PIN].port = GPIO_PORT_B;
+    USART3_PinConfig[RX_PIN].pin = RTE_USART3_RX_BIT;
     USART3_PinConfig[RX_PIN].alt_func = GPIO_IO_AF_7;
-#ifdef USART3_SCLK_PIN_ENABLE
-    USART3_PinConfig[SCLK_PIN].GPIOx = GPIOD;
-    USART3_PinConfig[SCLK_PIN].port = GPIO_PORT_D;
-    USART3_PinConfig[SCLK_PIN].pin = GPIO_IO_10;
-    USART3_PinConfig[SCLK_PIN].alt_func = GPIO_IO_AF_7;
-#endif //USART3_SCLK_PIN_ENABLE
-#ifdef USART3_CTS_PIN_ENABLE
-    USART3_PinConfig[CTS_PIN].GPIOx = GPIOD;
-    USART3_PinConfig[CTS_PIN].port = GPIO_PORT_D;
-    USART3_PinConfig[CTS_PIN].pin = GPIO_IO_11;
+#elif (RTE_USART3_RX_ID == 2)
+    USART3_PinConfig[RX_PIN].GPIOx = RTE_USART3_RX_PORT;
+    USART3_PinConfig[RX_PIN].port = GPIO_PORT_C;
+    USART3_PinConfig[RX_PIN].pin = RTE_USART3_RX_BIT;
+    USART3_PinConfig[RX_PIN].alt_func = GPIO_IO_AF_7;
+#elif (RTE_USART3_RX_ID == 3)
+    USART3_PinConfig[RX_PIN].GPIOx = RTE_USART3_RX_PORT;
+    USART3_PinConfig[RX_PIN].port = GPIO_PORT_D;
+    USART3_PinConfig[RX_PIN].pin = RTE_USART3_RX_BIT;
+    USART3_PinConfig[RX_PIN].alt_func = GPIO_IO_AF_7;
+#elif (RTE_USART3_RX_ID == 4)
+#error "The USART3_RX Pin Configuration not used"
+#else
+#error "Invalid USART3_RX Pin Configuration"
+#endif // (RTE_USART3_RX_ID == 0)
+
+#if (RTE_USART3_CK_ID == 0)
+#error "The USART3_CK Pin Configuration not used"
+#elif (RTE_USART3_CK_ID == 1)
+    USART3_PinConfig[CK_PIN].GPIOx = RTE_USART3_CK_PORT;
+    USART3_PinConfig[CK_PIN].port = GPIO_PORT_B;
+    USART3_PinConfig[CK_PIN].pin = RTE_USART3_CK_BIT;
+    USART3_PinConfig[CK_PIN].alt_func = GPIO_IO_AF_7;
+#elif (RTE_USART3_CK_ID == 2)
+    USART3_PinConfig[CK_PIN].GPIOx = RTE_USART3_CK_PORT;
+    USART3_PinConfig[CK_PIN].port = GPIO_PORT_C;
+    USART3_PinConfig[CK_PIN].pin = RTE_USART3_CK_BIT;
+    USART3_PinConfig[CK_PIN].alt_func = GPIO_IO_AF_7;
+#elif (RTE_USART3_CK_ID == 3)
+    USART3_PinConfig[CK_PIN].GPIOx = RTE_USART3_CK_PORT;
+    USART3_PinConfig[CK_PIN].port = GPIO_PORT_D;
+    USART3_PinConfig[CK_PIN].pin = RTE_USART3_CK_BIT;
+    USART3_PinConfig[CK_PIN].alt_func = GPIO_IO_AF_7;
+#else
+#error "Invalid USART3_CK Pin Configuration"
+#endif //(RTE_USART3_CK_ID == 0)
+
+#if (RTE_USART3_CTS_ID == 0)
+#error "The USART3_CTS Pin Configuration not used"
+#elif (RTE_USART3_CTS_ID == 1)
+    USART3_PinConfig[CTS_PIN].GPIOx = RTE_USART3_CTS_PORT;
+    USART3_PinConfig[CTS_PIN].port = GPIO_PORT_B;
+    USART3_PinConfig[CTS_PIN].pin = RTE_USART3_CTS_BIT;
     USART3_PinConfig[CTS_PIN].alt_func = GPIO_IO_AF_7;
-#endif //USART3_CTS_PIN_ENABLE
-#ifdef USART3_RTS_PIN_ENABLE
-    USART3_PinConfig[RTS_PIN].GPIOx = GPIOD;
-    USART3_PinConfig[RTS_PIN].port = GPIO_PORT_D;
-    USART3_PinConfig[RTS_PIN].pin = GPIO_IO_12;
+#elif (RTE_USART3_CTS_ID == 2)
+    USART3_PinConfig[CTS_PIN].GPIOx = RTE_USART3_CTS_PORT;
+    USART3_PinConfig[CTS_PIN].port = GPIO_PORT_D;
+    USART3_PinConfig[CTS_PIN].pin = RTE_USART3_CTS_BIT;
+    USART3_PinConfig[CTS_PIN].alt_func = GPIO_IO_AF_7;
+#else
+#error "Invalid USART3_CTS Pin Configuration"
+#endif //(RTE_USART3_CTS_ID == 0)
+
+#if (RTE_USART3_RTS_ID == 0)
+#error "The USART3_RTS Pin Configuration not used"
+#elif (RTE_USART3_RTS_ID == 1)
+    USART3_PinConfig[RTS_PIN].GPIOx = RTE_USART3_RTS_PORT;
+    USART3_PinConfig[RTS_PIN].port = GPIO_PORT_B;
+    USART3_PinConfig[RTS_PIN].pin = RTE_USART3_RTS_BIT;
     USART3_PinConfig[RTS_PIN].alt_func = GPIO_IO_AF_7;
-#endif //USART3_RTS_PIN_ENABLE
-#endif //(USART3_PIN_ID == USART_PIN_ID0)
+#elif (RTE_USART3_RTS_ID == 2)
+    USART3_PinConfig[RTS_PIN].GPIOx = RTE_USART3_RTS_PORT;
+    USART3_PinConfig[RTS_PIN].port = GPIO_PORT_D;
+    USART3_PinConfig[RTS_PIN].pin = RTE_USART3_RTS_BIT;
+    USART3_PinConfig[RTS_PIN].alt_func = GPIO_IO_AF_7;
+#else
+#error "Invalid USART3_RTS Pin Configuration"
+#endif //(RTE_USART3_RTS_ID == 0)
 
-#endif //USART3_ENABLE
+#endif //(RTE_USART3==1)
 
-#ifdef UART4_ENABLE
+#if (RTE_UART4==1)
 
-#if (UART4_PIN_ID == USART_PIN_ID0)
-    UART4_PinConfig[TX_PIN].GPIOx = GPIOA;
+#if (RTE_UART4_TX_ID == 0)
+#error "The UART4_TX Pin Configuration not used"
+#elif (RTE_UART4_TX_ID == 1)
+    UART4_PinConfig[TX_PIN].GPIOx = RTE_UART4_TX_PORT;
     UART4_PinConfig[TX_PIN].port = GPIO_PORT_A;
-    UART4_PinConfig[TX_PIN].pin = GPIO_IO_0;
-    UART4_PinConfig[TX_PIN].alt_func = GPIO_IO_AF_8;
-    UART4_PinConfig[RX_PIN].GPIOx = GPIOA;
-    UART4_PinConfig[RX_PIN].port = GPIO_PORT_A;
-    UART4_PinConfig[RX_PIN].pin = GPIO_IO_1;
-    UART4_PinConfig[RX_PIN].alt_func = GPIO_IO_AF_8;
-#else
-    UART4_PinConfig[TX_PIN].GPIOx = GPIOC;
+    UART4_PinConfig[TX_PIN].pin = RTE_UART4_TX_BIT;
+    UART4_PinConfig[TX_PIN].alt_func = GPIO_IO_AF_7;
+#elif (RTE_UART4_TX_ID == 2)
+    UART4_PinConfig[TX_PIN].GPIOx = RTE_UART4_TX_PORT;
     UART4_PinConfig[TX_PIN].port = GPIO_PORT_C;
-    UART4_PinConfig[TX_PIN].pin = GPIO_IO_10;
-    UART4_PinConfig[TX_PIN].alt_func = GPIO_IO_AF_8;
-    UART4_PinConfig[RX_PIN].GPIOx = GPIOC;
-    UART4_PinConfig[RX_PIN].port = GPIO_PORT_C;
-    UART4_PinConfig[RX_PIN].pin = GPIO_IO_11;
-    UART4_PinConfig[RX_PIN].alt_func = GPIO_IO_AF_8;
-#endif //(UART4_PIN_ID == USART_PIN_ID0)
-
-#endif //UART4_ENABLE
-
-#ifdef UART5_ENABLE
-
-#if (UART5_PIN_ID == USART_PIN_ID0)
-    UART5_PinConfig[TX_PIN].GPIOx = GPIOC;
-    UART5_PinConfig[TX_PIN].port = GPIO_PORT_C;
-    UART5_PinConfig[TX_PIN].pin = GPIO_IO_12;
-    UART5_PinConfig[TX_PIN].alt_func = GPIO_IO_AF_8;
-    UART5_PinConfig[RX_PIN].GPIOx = GPIOD;
-    UART5_PinConfig[RX_PIN].port = GPIO_PORT_D;
-    UART5_PinConfig[RX_PIN].pin = GPIO_IO_2;
-    UART5_PinConfig[RX_PIN].alt_func = GPIO_IO_AF_8;
-#endif //(UART5_PIN_ID == USART_PIN_ID0)
-
-#endif //UART5_ENABLE
-
-#ifdef USART6_ENABLE
-
-#if (USART6_PIN_ID == USART_PIN_ID0)
-    USART6_PinConfig[TX_PIN].GPIOx = GPIOC;
-    USART6_PinConfig[TX_PIN].port = GPIO_PORT_C;
-    USART6_PinConfig[TX_PIN].pin = GPIO_IO_6;
-    USART6_PinConfig[TX_PIN].alt_func = GPIO_IO_AF_8;
-    USART6_PinConfig[RX_PIN].GPIOx = GPIOC;
-    USART6_PinConfig[RX_PIN].port = GPIO_PORT_C;
-    USART6_PinConfig[RX_PIN].pin = GPIO_IO_7;
-    USART6_PinConfig[RX_PIN].alt_func = GPIO_IO_AF_8;
-#ifdef USART6_SCLK_PIN_ENABLE
-    USART6_PinConfig[SCLK_PIN].GPIOx = GPIOC;
-    USART6_PinConfig[SCLK_PIN].port = GPIO_PORT_C;
-    USART6_PinConfig[SCLK_PIN].pin = GPIO_IO_8;
-    USART6_PinConfig[SCLK_PIN].alt_func = GPIO_IO_AF_8;
-#endif //USART6_SCLK_PIN_ENABLE
-#ifdef USART6_CTS_PIN_ENABLE
-    USART6_PinConfig[CTS_PIN].GPIOx = GPIOG;
-    USART6_PinConfig[CTS_PIN].port = GPIO_PORT_G;
-    USART6_PinConfig[CTS_PIN].pin = GPIO_IO_13;
-    USART6_PinConfig[CTS_PIN].alt_func = GPIO_IO_AF_8;
-#endif //USART6_CTS_PIN_ENABLE
-#ifdef USART6_RTS_PIN_ENABLE
-    USART6_PinConfig[RTS_PIN].GPIOx = GPIOG;
-    USART6_PinConfig[RTS_PIN].port = GPIO_PORT_G;
-    USART6_PinConfig[RTS_PIN].pin = GPIO_IO_8;
-    USART6_PinConfig[RTS_PIN].alt_func = GPIO_IO_AF_8;
-#endif //USART6_RTS_PIN_ENABLE
+    UART4_PinConfig[TX_PIN].pin = RTE_UART4_TX_BIT;
+    UART4_PinConfig[TX_PIN].alt_func = GPIO_IO_AF_7;
+#elif (RTE_UART4_TX_ID == 3)
+#error "The UART4_TX Pin Configuration not used"
+#elif (RTE_UART4_TX_ID == 4)
+#error "The UART4_TX Pin Configuration not used"
+#elif (RTE_UART4_TX_ID == 5)
+#error "The UART4_TX Pin Configuration not used"
 #else
-    USART6_PinConfig[TX_PIN].GPIOx = GPIOG;
-    USART6_PinConfig[TX_PIN].port = GPIO_PORT_G;
-    USART6_PinConfig[TX_PIN].pin = GPIO_IO_14;
-    USART6_PinConfig[TX_PIN].alt_func = GPIO_IO_AF_8;
-    USART6_PinConfig[RX_PIN].GPIOx = GPIOG;
-    USART6_PinConfig[RX_PIN].port = GPIO_PORT_G;
-    USART6_PinConfig[RX_PIN].pin = GPIO_IO_9;
-    USART6_PinConfig[RX_PIN].alt_func = GPIO_IO_AF_8;
-#ifdef USART6_SCLK_PIN_ENABLE
-    USART6_PinConfig[SCLK_PIN].GPIOx = GPIOG;
-    USART6_PinConfig[SCLK_PIN].port = GPIO_PORT_G;
-    USART6_PinConfig[SCLK_PIN].pin = GPIO_IO_7;
-    USART6_PinConfig[SCLK_PIN].alt_func = GPIO_IO_AF_8;
-#endif //USART6_SCLK_PIN_ENABLE
-#ifdef USART6_CTS_PIN_ENABLE
-    USART6_PinConfig[CTS_PIN].GPIOx = GPIOG;
-    USART6_PinConfig[CTS_PIN].port = GPIO_PORT_G;
-    USART6_PinConfig[CTS_PIN].pin = GPIO_IO_15;
-    USART6_PinConfig[CTS_PIN].alt_func = GPIO_IO_AF_8;
-#endif //USART6_CTS_PIN_ENABLE
-#ifdef USART6_RTS_PIN_ENABLE
-    USART6_PinConfig[RTS_PIN].GPIOx = GPIOG;
-    USART6_PinConfig[RTS_PIN].port = GPIO_PORT_G;
-    USART6_PinConfig[RTS_PIN].pin = GPIO_IO_12;
-    USART6_PinConfig[RTS_PIN].alt_func = GPIO_IO_AF_8;
-#endif //USART6_RTS_PIN_ENABLE
-#endif //(USART6_PIN_ID == USART_PIN_ID0)
+#error "Invalid UART4_TX Pin Configuration"
+#endif //(RTE_UART4_TX_ID == 0)
 
-#endif //USART6_ENABLE
+#if (RTE_UART4_RX_ID == 0)
+#error "The UART4_RX Pin Configuration not used"
+#elif (RTE_UART4_RX_ID == 1)
+    UART4_PinConfig[RX_PIN].GPIOx = RTE_UART4_RX_PORT;
+    UART4_PinConfig[RX_PIN].port = GPIO_PORT_A;
+    UART4_PinConfig[RX_PIN].pin = RTE_UART4_RX_BIT;
+    UART4_PinConfig[RX_PIN].alt_func = GPIO_IO_AF_7;
+#elif (RTE_UART4_RX_ID == 2)
+    UART4_PinConfig[RX_PIN].GPIOx = RTE_UART4_RX_PORT;
+    UART4_PinConfig[RX_PIN].port = GPIO_PORT_C;
+    UART4_PinConfig[RX_PIN].pin = RTE_UART4_RX_BIT;
+    UART4_PinConfig[RX_PIN].alt_func = GPIO_IO_AF_7;
+#elif (RTE_UART4_RX_ID == 3)
+#error "The UART4_RX Pin Configuration not used"
+#elif (RTE_UART4_RX_ID == 4)
+#error "The UART4_RX Pin Configuration not used"
+#else
+#error "Invalid UART4_RX Pin Configuration"
+#endif //(RTE_UART4_RX_ID == 0)
+
+#endif //(RTE_UART4==1)
+
+#if (RTE_UART5==1)
+
+#if (RTE_UART5_TX_ID == 0)
+#error "The UART5_TX Pin Configuration not used"
+#elif (RTE_UART5_TX_ID == 1)
+    UART5_PinConfig[TX_PIN].GPIOx = RTE_UART5_TX_PORT;
+    UART5_PinConfig[TX_PIN].port = GPIO_PORT_C;
+    UART5_PinConfig[TX_PIN].pin = RTE_UART5_TX_BIT;
+    UART5_PinConfig[TX_PIN].alt_func = GPIO_IO_AF_7;
+#elif (RTE_UART5_TX_ID == 2)
+#error "The UART5_TX Pin Configuration not used"
+#elif (RTE_UART5_TX_ID == 3)
+#error "The UART5_TX Pin Configuration not used"
+#elif (RTE_UART5_TX_ID == 4)
+#error "The UART5_TX Pin Configuration not used"
+#else
+#error "Invalid UART5_TX Pin Configuration"
+#endif // (RTE_UART5_TX_ID == 0)
+
+#if (RTE_UART5_RX_ID == 0)
+#error "The UART5_RX Pin Configuration not used"
+#elif (RTE_UART5_RX_ID == 1)
+    UART5_PinConfig[RX_PIN].GPIOx = RTE_UART5_RX_PORT;
+    UART5_PinConfig[RX_PIN].port = GPIO_PORT_D;
+    UART5_PinConfig[RX_PIN].pin = RTE_UART5_RX_BIT;
+    UART5_PinConfig[RX_PIN].alt_func = GPIO_IO_AF_7;
+#elif (RTE_UART5_RX_ID == 2)
+#error "The UART5_RX Pin Configuration not used"
+#elif (RTE_UART5_RX_ID == 3)
+#error "The UART5_RX Pin Configuration not used"
+#elif (RTE_UART5_RX_ID == 4)
+#error "The UART5_RX Pin Configuration not used"
+#else
+#error "Invalid UART5_RX Pin Configuration"
+#endif // (RTE_UART5_RX_ID == 0)
+
+#endif //(RTE_UART5==1)
+
+#if (RTE_USART6 == 1)
+
+#if (RTE_USART6_TX_ID == 0)
+#error "The USART6_TX Pin Configuration not used"
+#elif (RTE_USART6_TX_ID == 1)
+#error "The USART6_TX Pin Configuration not used"
+#elif (RTE_USART6_TX_ID == 2)
+    USART6_PinConfig[TX_PIN].GPIOx = RTE_USART6_TX_PORT;
+    USART6_PinConfig[TX_PIN].port = GPIO_PORT_C;
+    USART6_PinConfig[TX_PIN].pin = RTE_USART6_TX_BIT;
+    USART6_PinConfig[TX_PIN].alt_func = GPIO_IO_AF_7;
+#elif (RTE_USART6_TX_ID == 3)
+    USART6_PinConfig[TX_PIN].GPIOx = RTE_USART6_TX_PORT;
+    USART6_PinConfig[TX_PIN].port = GPIO_PORT_G;
+    USART6_PinConfig[TX_PIN].pin = RTE_USART6_TX_BIT;
+    USART6_PinConfig[TX_PIN].alt_func = GPIO_IO_AF_7;
+#else
+#error "Invalid USART6_TX Pin Configuration"
+#endif //(RTE_USART6_TX_ID == 0)
+
+#if (RTE_USART6_RX_ID == 0)
+#error "The USART6_RX Pin Configuration not used"
+#elif (RTE_USART6_RX_ID == 1)
+#error "The USART6_RX Pin Configuration not used"
+#elif (RTE_USART6_RX_ID == 2)
+    USART6_PinConfig[RX_PIN].GPIOx = RTE_USART6_RX_PORT;
+    USART6_PinConfig[RX_PIN].port = GPIO_PORT_C;
+    USART6_PinConfig[RX_PIN].pin = RTE_USART6_RX_BIT;
+    USART6_PinConfig[RX_PIN].alt_func = GPIO_IO_AF_7;
+#elif (RTE_USART6_RX_ID == 3)
+    USART6_PinConfig[RX_PIN].GPIOx = RTE_USART6_RX_PORT;
+    USART6_PinConfig[RX_PIN].port = GPIO_PORT_G;
+    USART6_PinConfig[RX_PIN].pin = RTE_USART6_RX_BIT;
+    USART6_PinConfig[RX_PIN].alt_func = GPIO_IO_AF_7;
+#else
+#error "Invalid USART6_RX Pin Configuration"
+#endif //(RTE_USART6_RX_ID == 0)
+
+#if (RTE_USART6_CK_ID == 0)
+#error "The USART6_CK Pin Configuration not used"
+#elif (RTE_USART6_CK_ID == 1)
+    USART6_PinConfig[CK_PIN].GPIOx = RTE_USART6_CK_PORT;
+    USART6_PinConfig[CK_PIN].port = GPIO_PORT_Ñ;
+    USART6_PinConfig[CK_PIN].pin = RTE_USART6_CK_BIT;
+    USART6_PinConfig[CK_PIN].alt_func = GPIO_IO_AF_7;
+#elif (RTE_USART6_CK_ID == 2)
+    USART6_PinConfig[CK_PIN].GPIOx = RTE_USART6_CK_PORT;
+    USART6_PinConfig[CK_PIN].port = GPIO_PORT_G;
+    USART6_PinConfig[CK_PIN].pin = RTE_USART6_CK_BIT;
+    USART6_PinConfig[CK_PIN].alt_func = GPIO_IO_AF_7;
+#else
+#error "Invalid USART6_CK Pin Configuration"
+#endif //(RTE_USART6_CK_ID == 0)
+
+#if (RTE_USART6_CTS_ID == 0)
+#error "The USART6_CTS Pin Configuration not used"
+#elif (RTE_USART6_CTS_ID == 1)
+    USART6_PinConfig[CTS_PIN].GPIOx = RTE_USART6_CTS_PORT;
+    USART6_PinConfig[CTS_PIN].port = GPIO_PORT_G;
+    USART6_PinConfig[CTS_PIN].pin = RTE_USART6_CTS_BIT;
+    USART6_PinConfig[CTS_PIN].alt_func = GPIO_IO_AF_7;
+#elif (RTE_USART6_CTS_ID == 2)
+    USART6_PinConfig[CTS_PIN].GPIOx = RTE_USART6_CTS_PORT;
+    USART6_PinConfig[CTS_PIN].port = GPIO_PORT_G;
+    USART6_PinConfig[CTS_PIN].pin = RTE_USART6_CTS_BIT;
+    USART6_PinConfig[CTS_PIN].alt_func = GPIO_IO_AF_7;
+#else
+#error "Invalid USART6_CTS Pin Configuration"
+#endif //(RTE_USART6_CTS_ID == 0)
+
+#if (RTE_USART6_RTS_ID == 0)
+#error "The USART6_RTS Pin Configuration not used"
+#elif (RTE_USART6_RTS_ID == 1)
+    USART6_PinConfig[RTS_PIN].GPIOx = RTE_USART6_RTS_PORT;
+    USART6_PinConfig[RTS_PIN].port = GPIO_PORT_G;
+    USART6_PinConfig[RTS_PIN].pin = RTE_USART6_RTS_BIT;
+    USART6_PinConfig[RTS_PIN].alt_func = GPIO_IO_AF_7;
+#elif (RTE_USART6_RTS_ID == 2)
+    USART6_PinConfig[RTS_PIN].GPIOx = RTE_USART6_RTS_PORT;
+    USART6_PinConfig[RTS_PIN].port = GPIO_PORT_G;
+    USART6_PinConfig[RTS_PIN].pin = RTE_USART6_RTS_BIT;
+    USART6_PinConfig[RTS_PIN].alt_func = GPIO_IO_AF_7;
+#else
+#error "Invalid USART6_RTS Pin Configuration"
+#endif //(RTE_USART6_RTS_ID == 0)
+
+#endif //(RTE_USART6==1)
+
 }

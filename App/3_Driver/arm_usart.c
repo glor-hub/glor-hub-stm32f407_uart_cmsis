@@ -2,8 +2,8 @@
 //arm_usart.c
 //********************************************************************************
 #include "stm32f4xx.h"
-#include "discovery-kit.h"
 #include "RTE_Device.h"
+#include "discovery-kit.h"
 #include "RTE_Components.h"
 #include "Driver_USART.h"
 #include "gpio.h"
@@ -60,10 +60,10 @@ typedef struct {
 static const ARM_DRIVER_VERSION ARM_USART_Driver_Version =
 { ARM_USART_API_VERSION, ARM_USART_DRV_VERSION };
 
-#ifdef USART1_ENABLE
+#if (RTE_USART1==1)
 static ARM_USART_RESOURCES ARM_USART1_Resources;
 static USART_INFO USART1_Info = {0};
-#endif//USART1_ENABLE
+#endif//(RTE_USART1==1)
 
 
 
@@ -90,7 +90,7 @@ static int32_t ARM_USART_SetModemControl(ARM_USART_MODEM_CONTROL control, ARM_US
 static ARM_USART_MODEM_STATUS ARM_USART_GetModemStatus(ARM_USART_RESOURCES *usart);
 static void USART_IRQHandler(ARM_USART_RESOURCES *usart);
 
-#ifdef USART1_ENABLE
+#if (RTE_USART1==1)
 static void ARM_USART1_Resources_Struct_Init(void);
 static ARM_USART_CAPABILITIES ARM_USART1_GetCapabilities(void);
 static int32_t ARM_USART1_Initialize(ARM_USART_SignalEvent_t cb_event);
@@ -107,7 +107,7 @@ static int32_t ARM_USART1_Control(uint32_t control, uint32_t arg);;
 static ARM_USART_STATUS ARM_USART1_GetStatus(void);
 static int32_t ARM_USART1_SetModemControl(ARM_USART_MODEM_CONTROL control);
 static ARM_USART_MODEM_STATUS ARM_USART1_GetModemStatus(void);
-#endif//USART1_ENABLE
+#endif//(RTE_USART1==1)
 
 //================================================================================
 //Private
@@ -377,7 +377,7 @@ static void USART_IRQHandler(ARM_USART_RESOURCES *usart)
 
 
 
-#ifdef USART1_ENABLE
+#if (RTE_USART1==1)
 
 static void ARM_USART1_Resources_Struct_Init(void)
 {
@@ -549,7 +549,7 @@ static ARM_DRIVER_USART ARM_USART1_Driver = {
     ARM_USART1_GetModemStatus
 
 };
-#endif //USART1_ENABLE
+#endif //(RTE_USART1==1)
 
 //================================================================================
 //Public
@@ -558,11 +558,11 @@ static ARM_DRIVER_USART ARM_USART1_Driver = {
 void ARM_USART_Init(void)
 {
     ARM_DRIVER_USART *p_drv;
-#ifdef USART1_ENABLE
+#if (RTE_USART1==1)
     p_drv = &ARM_USART1_Driver;
     ARM_USART1_Resources_Struct_Init();
     p_drv->Initialize(&USART1_cb);
     p_drv->PowerControl(ARM_POWER_FULL);
-#endif//USART1_ENABLE
+#endif//(RTE_USART1==1)
 
 }

@@ -2,6 +2,7 @@
 //timer.c
 //********************************************************************************
 #include "stm32f4xx.h"
+#include "RTE_Device.h"
 #include "common.h"
 #include "timer.h"
 #include "discovery-kit.h"

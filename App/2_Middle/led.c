@@ -2,6 +2,7 @@
 //.c
 //********************************************************************************
 #include "stm32f4xx.h"
+#include "RTE_Device.h"
 #include "common.h"
 #include "discovery-kit.h"
 #include "led.h"

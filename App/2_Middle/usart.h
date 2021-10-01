@@ -1,13 +1,6 @@
 #ifndef _USART_H_
 #define _USART_H_
 
-#define USART1_ENABLE
-//#define USART2_ENABLE
-//#define USART3_ENABLE
-#define UART4_ENABLE
-//#define UART5_ENABLE
-//#define USART6_ENABLE
-
 typedef enum {
     USART_1 = 0,
     USART_2,
@@ -67,167 +60,7 @@ typedef struct _USART_INFO {
     uint32_t                baudrate;      // Baudrate
 } USART_INFO;
 
-#ifdef USART1_ENABLE
-
-/***************************************************
-configure USART1:
-****************************************************/
-
-/***************************************************
-choise pin ID
-****************************************************/
-#define USART1_PIN_ID USART_PIN_ID0
-//#define USART1_PIN_ID USART_PIN_ID1
-
-/***************************************************
-Transmitter clock output for synchronous transmission
-(unsupported in Version 1.0)
-****************************************************/
-//#define USART1_SCLK_PIN_ENABLE //only for ID0 option
-
-/***************************************************
-RTS Flow Control
-(unsupported in Version 1.0)
-****************************************************/
-//#define USART1_RTS_PIN_ENABLE //only for ID0 option
-
-/***************************************************
-CTS Flow Control
-(unsupported in Version 1.0)
-****************************************************/
-//#define USART1_CTS_PIN_ENABLE //only for ID0 option
-
-
-/***************************************************
-Multibuffer communication using DMA
-(unsupported in Version 1.0)
-****************************************************/
-//#define USART1_DMA_TX_ENABLE //DMA for transmission
-//#define USART1_DMA_RX_ENABLE //DMA for reception
-
-#endif //USART1_ENABLE
-
-#ifdef USART2_ENABLE
-/***************************************************
-//configure USART2:
-****************************************************/
-
-/***************************************************
-choise pin ID
-****************************************************/
-//#define USART2_PIN_ID USART_PIN_ID0
-//#define USART2_PIN_ID USART_PIN_ID1
-
-/***************************************************
-Transmitter clock output for synchronous transmission
-(unsupported in Version 1.0)
-****************************************************/
-//#define USART2_SCLK_PIN_ENABLE
-
-/***************************************************
-RTS Flow Control
-(unsupported in Version 1.0)
-****************************************************/
-//#define USART2_RTS_PIN_ENABLE
-
-/***************************************************
-CTS Flow Control
-(unsupported in Version 1.0)
-****************************************************/
-//#define USART2_CTS_PIN_ENABLE
-
-
-/***************************************************
-Multibuffer communication using DMA
-(unsupported in Version 1.0)
-****************************************************/
-//#define USART2_DMA_TX_ENABLE //DMA for transmission
-//#define USART2_DMA_RX_ENABLE //DMA for reception
-
-#endif //USART2_ENABLE
-
-#ifdef USART3_ENABLE
-
-/***************************************************
-configure USART3:
-****************************************************/
-
-/***************************************************
-choise pin ID
-****************************************************/
-//#define USART3_PIN_ID USART_PIN_ID0
-//#define USART3_PIN_ID USART_PIN_ID1
-//#define USART3_PIN_ID USART_PIN_ID2
-
-/***************************************************
-Transmitter clock output for synchronous transmission
-(unsupported in Version 1.0)
-****************************************************/
-//#define USART3_SCLK_PIN_ENABLE
-
-/***************************************************
-RTS Flow Control
-(unsupported in Version 1.0)
-****************************************************/
-//#define USART3_RTS_PIN_ENABLE //only for ID0 and ID2 options
-
-/***************************************************
-CTS Flow Control
-(unsupported in Version 1.0)
-****************************************************/
-//#define USART3_CTS_PIN_ENABLE //only for ID0 and ID2 options
-
-/***************************************************
-Multibuffer communication using DMA
-(unsupported in Version 1.0)
-****************************************************/
-//#define USART3_DMA_TX_ENABLE //DMA for transmission
-//#define USART3_DMA_RX_ENABLE //DMA for reception
-
-#endif //USART3_ENABLE
-
-#ifdef UART4_ENABLE
-
-/***************************************************
-configure UART4:
-****************************************************/
-
-/***************************************************
-choise pin ID
-****************************************************/
-//#define UART4_PIN_ID USART_PIN_ID0
-//#define UART4_PIN_ID USART_PIN_ID1
-
-/***************************************************
-Multibuffer communication using DMA
-(unsupported in Version 1.0)
-****************************************************/
-//#define UART4_DMA_TX_ENABLE //DMA for transmission
-//#define UART4_DMA_RX_ENABLE //DMA for reception
-
-#endif //UART4_ENABLE
-
-#ifdef UART5_ENABLE
-
-/***************************************************
-configure UART5:
-****************************************************/
-
-/***************************************************
-uncomment pin ID0 for UART5 using
-****************************************************/
-//#define UART5_PIN_ID USART_PIN_ID0
-
-/***************************************************
-Multibuffer communication using DMA
-(unsupported in Version 1.0)
-****************************************************/
-//#define UART5_DMA_TX_ENABLE //DMA for transmission
-//#define UART5_DMA_RX_ENABLE //DMA for reception
-
-#endif //UART5_ENABLE
-
-#ifdef USART6_ENABLE
+#if (RTE_USART6==1)
 /***************************************************
 //configure USART6:
 ****************************************************/
@@ -263,17 +96,17 @@ Multibuffer communication using DMA
 //#define USART6_DMA_TX_ENABLE //DMA for transmission
 //#define USART6_DMA_RX_ENABLE //DMA for reception
 
-#endif //USART6_ENABLE
+#endif //(RTE_USART6==1)
 
 
 void USART_Init(void);
 USART_PinCfg_t *USART_GetPinConfig(eUSART_InterfaceNames usart_name);
 
-#ifdef USART1_ENABLE
+#if (RTE_USART1==1)
 void USART1_cb(uint32_t event);
-#endif //USART1_ENABLE
+#endif //(RTE_USART1==1)
 
-#ifdef UART4_ENABLE
+#if (RTE_UART4==1)
 void UART4_cb(uint32_t event);
-#endif //UART4_ENABLE
+#endif //(RTE_UART4==1)
 #endif //_USART_H_

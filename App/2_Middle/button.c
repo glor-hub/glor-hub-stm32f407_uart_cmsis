@@ -2,6 +2,7 @@
 //button.c
 //********************************************************************************
 #include "stm32f4xx.h"
+#include "RTE_Device.h"
 #include "button.h"
 #include "discovery-kit.h"
 #include "gpio.h"

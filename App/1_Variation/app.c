@@ -2,6 +2,7 @@
 //app_process.c
 //********************************************************************************
 #include "stm32f4xx.h"
+#include "RTE_Device.h"
 #include "common.h"
 #include "app.h"
 #include "discovery-kit.h"
@@ -11,6 +12,7 @@
 #include "timer.h"
 #include "button.h"
 #include "Driver_USART.h"
+
 #include "usart.h"
 
 //********************************************************************************
