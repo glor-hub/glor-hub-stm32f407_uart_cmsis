@@ -9,7 +9,9 @@ using STM32F4DISCOVERY kit.
 //********************************************************************************
 
 #include "stm32f4xx.h"
+#include <stdio.h>
 #include "common.h"
+#include "assert.h"
 #include "app.h"
 
 
@@ -45,11 +47,12 @@ using STM32F4DISCOVERY kit.
 int main(void)
 {
     uint32_t app_init_result = App_Init();
+//
+    ASSERT(app_init_result == PASSED);
 
-    if(app_init_result != PASSED) {
-        //Error handle here
-        while(1);
-    }
+#ifdef HARDWARE_TESTING_MODE
+    ASSERT(FALSE);
+#endif //HARDWARE_TESTING_MODE
 
     while(1) {
         App_IdleTask();

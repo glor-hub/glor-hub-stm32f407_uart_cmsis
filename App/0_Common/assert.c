@@ -1,20 +1,10 @@
 //********************************************************************************
-//app_process.c
+//assert.c
 //********************************************************************************
 #include "stm32f4xx.h"
 #include <stdio.h>
-#include "RTE_Device.h"
-#include "common.h"
-#include "app.h"
-#include "discovery-kit.h"
-#include "clock.h"
-#include "led.h"
-#include "gpio.h"
-#include "timer.h"
-#include "button.h"
-#include "Driver_USART.h"
+#include "assert.h"
 
-#include "usart.h"
 
 //********************************************************************************
 //Macros
@@ -36,49 +26,18 @@
 //Prototypes
 //********************************************************************************
 
-static void App_PeripherialTest(void);
-static void App_CorePeripherialTest(void);
-static void App_ExtPeripherialTest(void);
-
 //================================================================================
 //Public
 //================================================================================
-void App_IdleTask(void)
-{
-    //Some IDLE task implemenation here. This is the lowest priority task
-    App_PeripherialTest();
-    Button_Test();
-}
 
-uint32_t App_Init(void)
+void assert_failed(uint8_t *file, uint32_t line)
 {
-    uint32_t init_result = PASSED;
-    init_result |= Clock_Init();
-    GPIO_Init();
-    //Sys_Status |= Timer_Init();
-    LED_Init();
-    Button_Init();
-    USART_Init();
-    return init_result;
+    printf("Wrong parameters value: file %s on line %d\r\n", file, line);
+
+    while(1);
 }
 
 //================================================================================
 //Private
 //================================================================================
-static void App_PeripherialTest(void)
-{
-    App_CorePeripherialTest();
-    App_ExtPeripherialTest();
-}
-static void App_CorePeripherialTest(void)
-{
-#ifdef HARDWARE_TESTING_MODE
-//SYSCLOCK testing
-    Clock_Test();
-#endif//HARDWARE_TESTING_MODE
-}
 
-static void App_ExtPeripherialTest(void)
-{
-    LED_Test();
-}

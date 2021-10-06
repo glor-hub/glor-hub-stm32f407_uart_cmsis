@@ -7,4 +7,7 @@
 #define PASSED 1
 #define FAILED 0
 
+//#define NDEBUG
+#define HARDWARE_TESTING_MODE
+
 #endif //_COMMON_H_
