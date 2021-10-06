@@ -3,9 +3,9 @@
 
 #ifndef NDEBUG
 
-void assert_failed(uint8_t *file, uint32_t line);
+void assert_failed(uint8_t *func, uint8_t *file, uint32_t line);
 
-#define ASSERT(expr) expr ? (void)0 : assert_failed((uint8_t *)__FILE__, __LINE__)
+#define ASSERT(expr) expr ? (void)0 : assert_failed((uint8_t *)__FUNCTION__, (uint8_t *)__FILE__, __LINE__)
 
 #else
 
