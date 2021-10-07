@@ -34,20 +34,20 @@ typedef enum {
     NUM_CLOCK_SOURCES
 } eARM_RCC_ClockSources;
 
-#define ARM_RCC_STA_READY ((uint32_t)0x00000000)
-#define ARM_RCC_STA_HSE_READY_ERR ((uint32_t)0x00000001)
-#define ARM_RCC_STA_HSI_READY_ERR ((uint32_t)0x00000002)
-#define ARM_RCC_STA_PLL_READY_ERR ((uint32_t)0x00000004)
-#define ARM_RCC_STA_PLL_CLOCK_SWITCH_ERR ((uint32_t)0x00000008)
+#define ARM_RCC_STA_READY                ((uint32_t)0UL)
+#define ARM_RCC_STA_HSE_READY_ERR        ((uint32_t)1UL << 0)
+#define ARM_RCC_STA_HSI_READY_ERR        ((uint32_t)1UL << 1)
+#define ARM_RCC_STA_PLL_READY_ERR        ((uint32_t)1UL << 2)
+#define ARM_RCC_STA_PLL_CLOCK_SWITCH_ERR ((uint32_t)1UL << 3)
 
 //8 MHz crystal resonator, SYSCK = 168 MHz
 //for 20 MHz crystal resonator Ì=20 is used
 //for USB: PLL48CK = 48 MHz
 
-#define ARM_RCC_PLL_COEFF_M_8 RCC_PLLCFGR_PLLM_3
+#define ARM_RCC_PLL_COEFF_M_8   RCC_PLLCFGR_PLLM_3
 #define ARM_RCC_PLL_COEFF_N_336 (RCC_PLLCFGR_PLLN_4 | RCC_PLLCFGR_PLLN_6 | RCC_PLLCFGR_PLLN_8)
-#define ARM_RCC_PLL_COEFF_P_2 ((uint32_t)0x00)
-#define ARM_RCC_PLL_COEFF_Q_7 (RCC_PLLCFGR_PLLQ_0 | RCC_PLLCFGR_PLLQ_1 | RCC_PLLCFGR_PLLQ_2)
+#define ARM_RCC_PLL_COEFF_P_2   ((uint32_t)0x00)
+#define ARM_RCC_PLL_COEFF_Q_7   (RCC_PLLCFGR_PLLQ_0 | RCC_PLLCFGR_PLLQ_1 | RCC_PLLCFGR_PLLQ_2)
 
 //********************************************************************************
 //Variables
@@ -335,7 +335,7 @@ static void ARM_RCC_ClockSourceCmd(eARM_RCC_ClockSources source, ePeriphCmd cmd)
 //reset HSI calibration
                     RCC->CR &= ~RCC_CR_HSITRIM;
 //set the default HSI calibration
-                    RCC->CR |= (uint32_t)0x80;
+                    RCC->CR |= RCC_CR_HSITRIM_4;
                 }
             } else {
 //stop HSI
