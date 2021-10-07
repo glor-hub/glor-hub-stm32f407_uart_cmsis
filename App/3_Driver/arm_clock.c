@@ -4,6 +4,9 @@
 #include "stm32f4xx.h"
 #include "RTE_Device.h"
 #include "discovery-kit.h"
+#include <stdio.h>
+#include "common.h"
+#include "assert.h"
 #include "gpio.h"
 #include "Driver_USART.h"
 #include "usart.h"
@@ -34,19 +37,13 @@ typedef enum {
     NUM_CLOCK_SOURCES
 } eARM_RCC_ClockSources;
 
-#define ARM_RCC_STA_READY                ((uint32_t)0UL)
-#define ARM_RCC_STA_HSE_READY_ERR        ((uint32_t)1UL << 0)
-#define ARM_RCC_STA_HSI_READY_ERR        ((uint32_t)1UL << 1)
-#define ARM_RCC_STA_PLL_READY_ERR        ((uint32_t)1UL << 2)
-#define ARM_RCC_STA_PLL_CLOCK_SWITCH_ERR ((uint32_t)1UL << 3)
-
 //8 MHz crystal resonator, SYSCK = 168 MHz
 //for 20 MHz crystal resonator Ì=20 is used
 //for USB: PLL48CK = 48 MHz
 
 #define ARM_RCC_PLL_COEFF_M_8   RCC_PLLCFGR_PLLM_3
 #define ARM_RCC_PLL_COEFF_N_336 (RCC_PLLCFGR_PLLN_4 | RCC_PLLCFGR_PLLN_6 | RCC_PLLCFGR_PLLN_8)
-#define ARM_RCC_PLL_COEFF_P_2   ((uint32_t)0x00)
+#define ARM_RCC_PLL_COEFF_P_2   ((uint32_t)0UL)
 #define ARM_RCC_PLL_COEFF_Q_7   (RCC_PLLCFGR_PLLQ_0 | RCC_PLLCFGR_PLLQ_1 | RCC_PLLCFGR_PLLQ_2)
 
 //********************************************************************************
@@ -57,8 +54,8 @@ static uint32_t ARM_RCCStatus;
 //Prototypes
 //********************************************************************************
 
-static void ARM_RCC_ConfigReset(void);
-static void ARM_RCC_ClockSourceCmd(eARM_RCC_ClockSources source, ePeriphCmd cmd);
+static uint32_t ARM_RCC_ConfigReset(void);
+static uint32_t ARM_RCC_ClockSourceCmd(eARM_RCC_ClockSources source, ePeriphCmd cmd);
 static void ARM_RCC_HSEClockDetectorCmd(ePeriphCmd cmd);
 static void ARM_RCC_SysClockSwitchCmd(eARM_RCC_ClockSources source);
 static void ARM_RCC_PLLConfig(void);
@@ -69,45 +66,46 @@ static void ARM_RCC_InteruptDisable(void);
 //Public
 //================================================================================
 
-bool ARM_RCC_isReady(void)
+bool ARM_RCC_isReady(uint32_t drv_status)
 {
-    return (ARM_RCCStatus == ARM_RCC_STA_READY);
+    return (drv_status == ARM_RCC_STA_READY);
 }
 
-uint32_t *ARM_RCC_GetStatus(void)
+uint32_t ARM_RCC_Reset(void)
 {
-    return &ARM_RCCStatus;
-}
-
-void ARM_RCC_Reset(void)
-{
-    ARM_RCCStatus = ARM_RCC_STA_READY;
-    ARM_RCC_ClockSourceCmd(ARM_RCC_HSI, ENABLE_CMD);
-    ARM_RCC_ConfigReset();
-    ARM_RCC_ClockSourceCmd(ARM_RCC_PLL, DISABLE_CMD);
-    ARM_RCC_ClockSourceCmd(ARM_RCC_HSE, DISABLE_CMD);
+    uint32_t drv_status = ARM_RCC_STA_READY;
+    drv_status |= ARM_RCC_ClockSourceCmd(ARM_RCC_HSI, ENABLE_CMD);
+    drv_status |= ARM_RCC_ConfigReset();
+    drv_status |= ARM_RCC_ClockSourceCmd(ARM_RCC_PLL, DISABLE_CMD);
+    drv_status |= ARM_RCC_ClockSourceCmd(ARM_RCC_HSE, DISABLE_CMD);
     ARM_RCC_HSEClockDetectorCmd(DISABLE_CMD);
-    ARM_RCC_ClockSourceCmd(ARM_RCC_HSEBYP, DISABLE_CMD);
+    drv_status |= ARM_RCC_ClockSourceCmd(ARM_RCC_HSEBYP, DISABLE_CMD);
     ARM_RCC_ClearResetFlags();
     ARM_RCC_InteruptDisable();
+    ASSERT(drv_status == ARM_RCC_STA_READY);
+    return drv_status;
 }
 
-void ARM_RCC_SetSysClockTo168(void)
+uint32_t ARM_RCC_SetSysClockTo168(void)
 {
-    ARM_RCC_ClockSourceCmd(ARM_RCC_HSE, ENABLE_CMD);
+
+    uint32_t drv_status = ARM_RCC_STA_READY;
+    drv_status |= ARM_RCC_ClockSourceCmd(ARM_RCC_HSE, ENABLE_CMD);
 //the number of wait states (LATENCY) must be correctly programmed in the Flash according to HCLK
 //and the supply voltage of the device before starting phase locked loop (PLL)
     ARM_FLASH_Init();
 //enable clock security system HSE. If the HSE clock happens to fail, the CSS generates an interrupt,
 //which causes the automatic generation of an NMI
     ARM_RCC_HSEClockDetectorCmd(ENABLE_CMD);
-//    ARM_RCC_ClockSourceCmd(ARM_RCC_HSI, DISABLE_CMD);
+//    drv_status |=ARM_RCC_ClockSourceCmd(ARM_RCC_HSI, DISABLE_CMD);
 //configure PLL
     ARM_RCC_PLLConfig();
 //start PLL
-    ARM_RCC_ClockSourceCmd(ARM_RCC_PLL, ENABLE_CMD);
+    drv_status |= ARM_RCC_ClockSourceCmd(ARM_RCC_PLL, ENABLE_CMD);
 //select PLL as system clock
     ARM_RCC_SysClockSwitchCmd(ARM_RCC_PLL);
+    ASSERT(drv_status == ARM_RCC_STA_READY);
+    return drv_status;
 }
 
 void NMI_Handler(void)
@@ -315,9 +313,9 @@ void ARM_RCC_ConfigMCO2(void)
 //Private
 //================================================================================
 
-static void ARM_RCC_ClockSourceCmd(eARM_RCC_ClockSources source, ePeriphCmd cmd)
+static uint32_t ARM_RCC_ClockSourceCmd(eARM_RCC_ClockSources source, ePeriphCmd cmd)
 {
-    uint32_t counter;
+    uint32_t counter, status;
     switch(source) {
         case ARM_RCC_HSI: {
             if(cmd == ENABLE_CMD) {
@@ -328,10 +326,10 @@ static void ARM_RCC_ClockSourceCmd(eARM_RCC_ClockSources source, ePeriphCmd cmd)
                     counter++;
                 }
                 if((RCC->CR & RCC_CR_HSIRDY) == RESET) {
-                    ARM_RCCStatus |= ARM_RCC_STA_HSI_READY_ERR;
+                    status |= ARM_RCC_STA_HSI_READY_ERR;
 
                 } else {
-                    ARM_RCCStatus &= ~ARM_RCC_STA_HSI_READY_ERR;
+                    status &= ~ARM_RCC_STA_HSI_READY_ERR;
 //reset HSI calibration
                     RCC->CR &= ~RCC_CR_HSITRIM;
 //set the default HSI calibration
@@ -354,9 +352,9 @@ static void ARM_RCC_ClockSourceCmd(eARM_RCC_ClockSources source, ePeriphCmd cmd)
                     counter++;
                 }
                 if((RCC->CR & RCC_CR_HSERDY) == RESET) {
-                    ARM_RCCStatus |= ARM_RCC_STA_HSE_READY_ERR;
+                    status |= ARM_RCC_STA_HSE_READY_ERR;
                 } else {
-                    ARM_RCCStatus &= ~ARM_RCC_STA_HSE_READY_ERR;
+                    status &= ~ARM_RCC_STA_HSE_READY_ERR;
                 }
             } else {
 //stop HSI
@@ -375,9 +373,9 @@ static void ARM_RCC_ClockSourceCmd(eARM_RCC_ClockSources source, ePeriphCmd cmd)
                     counter++;
                 }
                 if((RCC->CR & RCC_CR_PLLRDY) == RESET) {
-                    ARM_RCCStatus |= ARM_RCC_STA_PLL_READY_ERR;
+                    status |= ARM_RCC_STA_PLL_READY_ERR;
                 } else {
-                    ARM_RCCStatus &= ~ARM_RCC_STA_PLL_READY_ERR;
+                    status &= ~ARM_RCC_STA_PLL_READY_ERR;
                 }
             } else {
 //stop PLL
@@ -398,6 +396,7 @@ static void ARM_RCC_ClockSourceCmd(eARM_RCC_ClockSources source, ePeriphCmd cmd)
             break;
         }
     }
+    return status;
 }
 
 static void ARM_RCC_ClearResetFlags(void)
@@ -407,15 +406,16 @@ static void ARM_RCC_ClearResetFlags(void)
 
 static void ARM_RCC_InteruptDisable(void)
 {
-    RCC->CIR = (uint32_t)0x00;
+    RCC->CIR = (uint32_t)0UL;
 }
 
-static void ARM_RCC_ConfigReset(void)
+static uint32_t ARM_RCC_ConfigReset(void)
 {
 //ñlear clock configuration register
-    RCC->CFGR = (uint32_t)0x00;
+    RCC->CFGR = (uint32_t)0UL;
 //waiting for none of the system clock sources will not be used
     while(RCC->CFGR & RCC_CFGR_SWS);
+    return ARM_RCC_STA_READY;
 }
 
 static void ARM_RCC_HSEClockDetectorCmd(ePeriphCmd cmd)
@@ -432,7 +432,7 @@ static void ARM_RCC_HSEClockDetectorCmd(ePeriphCmd cmd)
 
 static void ARM_RCC_PLLConfig(void)
 {
-    RCC->PLLCFGR = (uint32_t)0x00;
+    RCC->PLLCFGR = (uint32_t)0UL;
 //configurå for maximum frequency: SYSCK=f*N/(M*P)=8*336/(8*2)=168MHz
 //PLL48CK=f*N/(M*Q)=48MHZ
     RCC->PLLCFGR |= (ARM_RCC_PLL_COEFF_M_8 | ARM_RCC_PLL_COEFF_N_336 | ARM_RCC_PLL_COEFF_P_2 | ARM_RCC_PLL_COEFF_Q_7);

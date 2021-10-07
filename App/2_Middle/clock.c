@@ -5,10 +5,12 @@
 #include "RTE_Device.h"
 #include "discovery-kit.h"
 #include "common.h"
-#include "clock.h"
+#include <stdio.h>
+#include "assert.h"
 #include "gpio.h"
 #include "Driver_USART.h"
 #include "usart.h"
+#include "clock.h"
 #include "arm_clock.h"
 #include "arm_gpio.h"
 
@@ -39,10 +41,12 @@
 
 uint32_t Clock_Init(void)
 {
-    ARM_RCC_Reset();
-    ARM_RCC_SetSysClockTo168();
+    uint32_t arm_status = 0UL;
+    arm_status |= ARM_RCC_Reset();
+    arm_status |= ARM_RCC_SetSysClockTo168();
     SystemCoreClockUpdate();
-    return ARM_RCC_isReady() ? PASSED : FAILED;
+    ASSERT(arm_status == ARM_RCC_STA_READY);
+    return ARM_RCC_isReady(arm_status) ? PASSED : FAILED;
 }
 
 void Clock_Test(void)

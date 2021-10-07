@@ -49,10 +49,6 @@ int main(void)
     uint32_t app_init_result = App_Init();
     ASSERT(app_init_result == PASSED);
 
-#ifdef HARDWARE_TESTING_MODE
-    ASSERT(FALSE);
-#endif //HARDWARE_TESTING_MODE
-
     while(1) {
         App_IdleTask();
     }
