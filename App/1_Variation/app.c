@@ -3,17 +3,16 @@
 //********************************************************************************
 #include "stm32f4xx.h"
 #include <stdio.h>
-#include "RTE_Device.h"
+#include <stdbool.h>
+#include "discovery-kit.h"
 #include "common.h"
 #include "app.h"
-#include "discovery-kit.h"
 #include "clock.h"
 #include "led.h"
 #include "gpio.h"
 #include "timer.h"
 #include "button.h"
 #include "Driver_USART.h"
-
 #include "usart.h"
 
 //********************************************************************************
@@ -50,12 +49,12 @@ void App_IdleTask(void)
     Button_Test();
 }
 
-uint32_t App_Init(void)
+bool App_Init(void)
 {
-    uint32_t init_result = PASSED;
+    bool init_result = PASSED;
     init_result |= Clock_Init();
     GPIO_Init();
-    //Sys_Status |= Timer_Init();
+    init_result |= Timer_Init();
     LED_Init();
     Button_Init();
     USART_Init();

@@ -9,6 +9,7 @@ using STM32F4DISCOVERY kit.
 //********************************************************************************
 
 #include "stm32f4xx.h"
+#include <stdbool.h>
 #include <stdio.h>
 #include "common.h"
 #include "assert.h"
@@ -46,7 +47,7 @@ using STM32F4DISCOVERY kit.
 
 int main(void)
 {
-    uint32_t app_init_result = App_Init();
+    bool app_init_result = App_Init();
     ASSERT(app_init_result == PASSED);
 
     while(1) {

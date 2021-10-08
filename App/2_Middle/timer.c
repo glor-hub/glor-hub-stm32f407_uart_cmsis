@@ -2,8 +2,11 @@
 //timer.c
 //********************************************************************************
 #include "stm32f4xx.h"
+#include <stdbool.h>
 #include "RTE_Device.h"
 #include "common.h"
+#include <stdio.h>
+#include "assert.h"
 #include "timer.h"
 #include "discovery-kit.h"
 #include <string.h>
@@ -11,8 +14,8 @@
 //********************************************************************************
 //Macros
 //********************************************************************************
-#define TIMER_STA_READY ((uint32_t)0x00000000)
-#define TIMER_STA_INIT_ERR ((uint32_t)0x00000001)
+#define TIMER_STA_READY ((uint32_t)0UL)
+#define TIMER_STA_INIT_ERR ((uint32_t)1UL)
 
 //********************************************************************************
 //Enums
@@ -37,9 +40,6 @@ typedef struct {
 
 static Timer_Data_t Timer_Data[NUM_TIMERS];
 
-static uint32_t Timer_Status;
-
-
 //********************************************************************************
 //Prototypes
 //********************************************************************************
@@ -60,14 +60,20 @@ void SysTick_Handler(void)
     }
 }
 
+bool Timer_is_Ready(uint32_t status)
+{
+    return (status == TIMER_STA_READY);
+}
+
 uint32_t Timer_Init(void)
 {
-    Timer_Status = TIMER_STA_READY;
+    uint32_t status = TIMER_STA_READY;
     memset(&Timer_Data, 0, sizeof(Timer_Data_t) * NUM_TIMERS);
     if(SysTick_Config(SystemCoreClock / 1000 - 1)) {
-        Timer_Status = TIMER_STA_INIT_ERR;
+        status = TIMER_STA_INIT_ERR;
     }
-    return (Timer_Status == TIMER_STA_READY) ? PASSED : FAILED;
+    ASSERT(status == TIMER_STA_READY);
+    return Timer_is_Ready(status) ? PASSED : FAILED;
 }
 
 void Timer_Enable(eTimer_Types timer, uint32_t time)

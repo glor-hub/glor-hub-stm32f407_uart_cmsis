@@ -9,6 +9,7 @@ typedef enum {
 #define ONE_SECOND (1000UL)
 
 uint32_t Timer_Init(void);
+bool Timer_is_Ready(uint32_t status);
 void Timer_Enable(eTimer_Types timer, uint32_t time);
 void Timer_Disable(eTimer_Types timer);
 uint8_t Timer_GetFlag(eTimer_Types timer);
