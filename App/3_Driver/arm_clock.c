@@ -4,8 +4,8 @@
 #include "stm32f4xx.h"
 #include "RTE_Device.h"
 #include "discovery-kit.h"
-#include <stdio.h>
 #include "common.h"
+#include <stdio.h>
 #include "assert.h"
 #include "gpio.h"
 #include "Driver_USART.h"
@@ -49,7 +49,7 @@ typedef enum {
 //********************************************************************************
 //Variables
 //********************************************************************************
-static uint32_t ARM_RCCStatus;
+static uint32_t ARM_RCC_NMI_HandlerFlag;
 //********************************************************************************
 //Prototypes
 //********************************************************************************
@@ -57,7 +57,7 @@ static uint32_t ARM_RCCStatus;
 static uint32_t ARM_RCC_ConfigReset(void);
 static uint32_t ARM_RCC_ClockSourceCmd(eARM_RCC_ClockSources source, ePeriphCmd cmd);
 static void ARM_RCC_HSEClockDetectorCmd(ePeriphCmd cmd);
-static void ARM_RCC_SysClockSwitchCmd(eARM_RCC_ClockSources source);
+static uint32_t ARM_RCC_SysClockSwitchCmd(eARM_RCC_ClockSources source);
 static void ARM_RCC_PLLConfig(void);
 static void ARM_RCC_ClearResetFlags(void);
 static void ARM_RCC_InteruptDisable(void);
@@ -74,6 +74,7 @@ bool ARM_RCC_isReady(uint32_t drv_status)
 uint32_t ARM_RCC_Reset(void)
 {
     uint32_t drv_status = ARM_RCC_STA_READY;
+    ARM_RCC_NMI_HandlerFlag = FALSE;
     drv_status |= ARM_RCC_ClockSourceCmd(ARM_RCC_HSI, ENABLE_CMD);
     drv_status |= ARM_RCC_ConfigReset();
     drv_status |= ARM_RCC_ClockSourceCmd(ARM_RCC_PLL, DISABLE_CMD);
@@ -82,7 +83,6 @@ uint32_t ARM_RCC_Reset(void)
     drv_status |= ARM_RCC_ClockSourceCmd(ARM_RCC_HSEBYP, DISABLE_CMD);
     ARM_RCC_ClearResetFlags();
     ARM_RCC_InteruptDisable();
-    ASSERT(drv_status == ARM_RCC_STA_READY);
     return drv_status;
 }
 
@@ -103,15 +103,26 @@ uint32_t ARM_RCC_SetSysClockTo168(void)
 //start PLL
     drv_status |= ARM_RCC_ClockSourceCmd(ARM_RCC_PLL, ENABLE_CMD);
 //select PLL as system clock
-    ARM_RCC_SysClockSwitchCmd(ARM_RCC_PLL);
-    ASSERT(drv_status == ARM_RCC_STA_READY);
+    drv_status |= ARM_RCC_SysClockSwitchCmd(ARM_RCC_PLL);
     return drv_status;
 }
 
 void NMI_Handler(void)
 {
-    ARM_RCCStatus |= ARM_RCC_STA_HSE_READY_ERR;
+    ARM_RCC_NMI_HandlerFlag = TRUE;
 }
+
+uint32_t ARM_RCC_NMI_HandlerErrCheck(void)
+{
+    uint32_t hardware_error = 0UL;
+    if(ARM_RCC_NMI_HandlerFlag) {
+        hardware_error = ARM_RCC_STA_HSE_READY_ERR;
+        printf(" Clock security system has detected HSE clock failure.\n\r");
+        ARM_RCC_NMI_HandlerFlag = FALSE;
+    }
+    return hardware_error;
+}
+
 
 void ARM_RCC_USART_ClockCmd(eUSART_InterfaceNames usart, ePeriphCmd cmd)
 {
@@ -316,6 +327,7 @@ void ARM_RCC_ConfigMCO2(void)
 static uint32_t ARM_RCC_ClockSourceCmd(eARM_RCC_ClockSources source, ePeriphCmd cmd)
 {
     uint32_t counter, status;
+    status = ARM_RCC_STA_READY;
     switch(source) {
         case ARM_RCC_HSI: {
             if(cmd == ENABLE_CMD) {
@@ -440,8 +452,9 @@ static void ARM_RCC_PLLConfig(void)
     RCC->PLLCFGR |= RCC_PLLCFGR_PLLSRC_HSE;
 }
 
-static void ARM_RCC_SysClockSwitchCmd(eARM_RCC_ClockSources source)
+static uint32_t ARM_RCC_SysClockSwitchCmd(eARM_RCC_ClockSources source)
 {
+    uint32_t status = ARM_RCC_STA_READY;
     RCC->CFGR &= ~RCC_CFGR_SW;
     switch(source) {
         case ARM_RCC_HSI: {
@@ -462,4 +475,6 @@ static void ARM_RCC_SysClockSwitchCmd(eARM_RCC_ClockSources source)
             break;
         }
     }
+    return status;
+
 }

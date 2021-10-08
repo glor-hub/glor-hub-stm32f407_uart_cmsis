@@ -44,6 +44,7 @@ uint32_t Clock_Init(void)
     uint32_t arm_status = 0UL;
     arm_status |= ARM_RCC_Reset();
     arm_status |= ARM_RCC_SetSysClockTo168();
+    arm_status |= ARM_RCC_NMI_HandlerErrCheck();
     SystemCoreClockUpdate();
     ASSERT(arm_status == ARM_RCC_STA_READY);
     return ARM_RCC_isReady(arm_status) ? PASSED : FAILED;

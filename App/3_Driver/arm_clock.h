@@ -10,6 +10,7 @@
 bool ARM_RCC_isReady(uint32_t drv_status);
 uint32_t ARM_RCC_Reset(void);
 uint32_t ARM_RCC_SetSysClockTo168(void);
+uint32_t ARM_RCC_NMI_HandlerErrCheck(void);
 void ARM_RCC_OutputSysClocktoMCO2(void);
 void ARM_RCC_ConfigMCO2(void);
 void ARM_RCC_USART_ResetCmd(eUSART_InterfaceNames usart, ePeriphCmd cmd);

@@ -4,8 +4,8 @@
 #define TRUE 1
 #define FALSE 0
 
-#define PASSED 1
-#define FAILED 0
+#define PASSED 0
+#define FAILED 1
 
 //#define NDEBUG
 #define HARDWARE_TESTING_MODE
