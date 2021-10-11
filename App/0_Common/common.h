@@ -10,4 +10,10 @@
 //#define NDEBUG
 #define HARDWARE_TESTING_MODE
 
+typedef enum {
+    ENABLE_CMD = 0,
+    DISABLE_CMD,
+    NUM_PERIPH_STATES
+} ePeriphCmd;
+
 #endif //_COMMON_H_

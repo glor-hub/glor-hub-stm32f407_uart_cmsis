@@ -4,7 +4,6 @@
 #include "stm32f4xx.h"
 #include "RTE_Device.h"
 #include "common.h"
-#include "discovery-kit.h"
 #include "led.h"
 #include "gpio.h"
 #include "Driver_USART.h"

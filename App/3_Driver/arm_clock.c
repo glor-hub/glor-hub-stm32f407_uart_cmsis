@@ -4,7 +4,6 @@
 #include "stm32f4xx.h"
 #include <stdbool.h>
 #include "RTE_Device.h"
-#include "discovery-kit.h"
 #include "common.h"
 #include <stdio.h>
 #include "gpio.h"

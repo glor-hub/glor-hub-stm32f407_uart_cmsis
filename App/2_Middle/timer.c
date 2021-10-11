@@ -8,7 +8,6 @@
 #include <stdio.h>
 #include "assert.h"
 #include "timer.h"
-#include "discovery-kit.h"
 #include <string.h>
 
 //********************************************************************************

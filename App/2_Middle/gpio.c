@@ -3,7 +3,7 @@
 //********************************************************************************
 #include "stm32f4xx.h"
 #include "RTE_Device.h"
-#include "discovery-kit.h"
+#include "common.h"
 #include "gpio.h"
 #include "Driver_USART.h"
 #include "usart.h"

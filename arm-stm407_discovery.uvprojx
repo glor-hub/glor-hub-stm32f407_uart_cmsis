@@ -386,11 +386,6 @@
               <FilePath>.\App\0_Common\main.c</FilePath>
             </File>
             <File>
-              <FileName>discovery-kit.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\App\0_Common\discovery-kit.c</FilePath>
-            </File>
-            <File>
               <FileName>assert.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\App\0_Common\assert.c</FilePath>

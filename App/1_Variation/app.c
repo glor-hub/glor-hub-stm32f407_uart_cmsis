@@ -4,7 +4,6 @@
 #include "stm32f4xx.h"
 #include <stdio.h>
 #include <stdbool.h>
-#include "discovery-kit.h"
 #include "common.h"
 #include "app.h"
 #include "clock.h"
