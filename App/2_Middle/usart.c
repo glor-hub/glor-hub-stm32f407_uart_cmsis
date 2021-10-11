@@ -2,6 +2,7 @@
 //usart.c
 //********************************************************************************
 #include "stm32f4xx.h"
+#include "common.h"
 #include "RTE_Device.h"
 #include "Driver_USART.h"
 #include "gpio.h"
@@ -65,7 +66,7 @@ void USART_Init(void)
 
 }
 
-USART_PinCfg_t *USART_GetPinConfig(eUSART_InterfaceNames usart_name)
+USART_PinCfg_t *USART_GetPinConfig(ePeriphTypes usart_name)
 {
     USART_PinCfg_t *pUSART_PinCfg = NULL;
 

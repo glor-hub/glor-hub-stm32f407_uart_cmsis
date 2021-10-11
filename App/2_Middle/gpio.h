@@ -2,20 +2,6 @@
 #define _GPIO_H_
 
 typedef enum {
-    GPIO_PORT_A = 0,
-    GPIO_PORT_B,
-    GPIO_PORT_C,
-    GPIO_PORT_D,
-    GPIO_PORT_E,
-    GPIO_PORT_F,
-    GPIO_PORT_G,
-    GPIO_PORT_H,
-    GPIO_PORT_I,
-    NUM_GPIO
-} eGPIO_PortNames;
-
-
-typedef enum {
     GPIO_IO_0 = 0,
     GPIO_IO_1,
     GPIO_IO_2,

@@ -52,7 +52,7 @@ uint32_t Clock_Init(void)
 void Clock_Test(void)
 {
 
-    ARM_RCC_GPIO_ClockCmd(GPIO_PORT_C, ENABLE_CMD);
+    ARM_RCC_Periph_ClockCmd(GPIO_PORT_C, ENABLE_CMD);
 //configure MCO2 pin for SYSCLOCK testing
     GPIO_SetCfg(GPIOC, GPIO_IO_9, GPIO_IO_MODE_ALT_FUNC, GPIO_IO_TYPE_PUSH_PULL, GPIO_IO_PULL_UP,
                 GPIO_IO_SPEED_FREQ_HIGH, GPIO_IO_AF_0);

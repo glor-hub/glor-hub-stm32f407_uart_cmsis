@@ -2,8 +2,8 @@
 //arm_exti.c
 //********************************************************************************
 #include "stm32f4xx.h"
-#include "RTE_Device.h"
 #include "common.h"
+#include "RTE_Device.h"
 #include "gpio.h"
 #include "exti.h"
 #include "arm_exti.h"
@@ -32,7 +32,7 @@
 //================================================================================
 //Public
 //================================================================================
-void ARM_EXTI_SetPinCfg(eGPIO_PortNames port_name, eGPIO_IONumbers pin_num,
+void ARM_EXTI_SetPinCfg(ePeriphTypes port_name, eGPIO_IONumbers pin_num,
                         eEXTI_TriggerModes trigger_mode)
 {
     SYSCFG_TypeDef *p_cfgReg = SYSCFG;

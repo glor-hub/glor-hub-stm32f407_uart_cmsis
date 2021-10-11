@@ -16,4 +16,24 @@ typedef enum {
     NUM_PERIPH_STATES
 } ePeriphCmd;
 
+typedef enum {
+    GPIO_PORT_A = 0,
+    GPIO_PORT_B,
+    GPIO_PORT_C,
+    GPIO_PORT_D,
+    GPIO_PORT_E,
+    GPIO_PORT_F,
+    GPIO_PORT_G,
+    GPIO_PORT_H,
+    GPIO_PORT_I,
+    USART_1,
+    USART_2,
+    USART_3,
+    UART_4,
+    UART_5,
+    USART_6,
+} ePeriphTypes;
+
+
+
 #endif //_COMMON_H_

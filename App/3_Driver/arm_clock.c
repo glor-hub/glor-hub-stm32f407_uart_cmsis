@@ -123,117 +123,9 @@ uint32_t ARM_RCC_NMI_HandlerErrCheck(void)
 }
 
 
-void ARM_RCC_USART_ClockCmd(eUSART_InterfaceNames usart, ePeriphCmd cmd)
+void ARM_RCC_Periph_ClockCmd(ePeriphTypes periph, ePeriphCmd cmd)
 {
-    switch(usart) {
-        case USART_1: {
-            if(cmd == ENABLE_CMD) {
-                RCC->APB2ENR |= RCC_APB2ENR_USART1EN;
-            } else {
-                RCC->APB2ENR &= ~RCC_APB2ENR_USART1EN;
-            }
-            break;
-        }
-        case USART_2: {
-            if(cmd == ENABLE_CMD) {
-                RCC->APB1ENR |= RCC_APB1ENR_USART2EN;
-            } else {
-                RCC->APB1ENR &= ~RCC_APB1ENR_USART2EN;
-            }
-            break;
-        }
-        case USART_3: {
-            if(cmd == ENABLE_CMD) {
-                RCC->APB1ENR |= RCC_APB1ENR_USART3EN;
-            } else {
-                RCC->APB1ENR &= ~RCC_APB1ENR_USART3EN;
-            }
-            break;
-        }
-        case UART_4: {
-            if(cmd == ENABLE_CMD) {
-                RCC->APB1ENR |= RCC_APB1ENR_UART4EN;
-            } else {
-                RCC->APB1ENR &= ~RCC_APB1ENR_UART4EN;
-            }
-            break;
-        }
-        case UART_5: {
-            if(cmd == ENABLE_CMD) {
-                RCC->APB1ENR |= RCC_APB1ENR_UART5EN;
-            } else {
-                RCC->APB1ENR &= ~RCC_APB1ENR_UART5EN;
-            }
-            break;
-        }
-        case USART_6: {
-            if(cmd == ENABLE_CMD) {
-                RCC->APB2ENR |= RCC_APB2ENR_USART6EN;
-            } else {
-                RCC->APB2ENR &= ~RCC_APB2ENR_USART6EN;
-            }
-            break;
-        }
-    }
-}
-
-void ARM_RCC_USART_ResetCmd(eUSART_InterfaceNames usart, ePeriphCmd cmd)
-{
-    switch(usart) {
-        case USART_1: {
-            if(cmd == ENABLE_CMD) {
-                RCC->APB2RSTR |= RCC_APB2RSTR_USART1RST;
-            } else {
-                RCC->APB2RSTR &= ~RCC_APB2RSTR_USART1RST;
-            }
-            break;
-        }
-        case USART_2: {
-            if(cmd == ENABLE_CMD) {
-                RCC->APB1RSTR |= RCC_APB1RSTR_USART2RST;
-            } else {
-                RCC->APB1RSTR &= ~RCC_APB1RSTR_USART2RST;
-            }
-            break;
-        }
-        case USART_3: {
-            if(cmd == ENABLE_CMD) {
-                RCC->APB1RSTR |= RCC_APB1RSTR_USART3RST;
-            } else {
-                RCC->APB1RSTR &= ~RCC_APB1RSTR_USART3RST;
-            }
-            break;
-        }
-        case UART_4: {
-            if(cmd == ENABLE_CMD) {
-                RCC->APB1RSTR |= RCC_APB1RSTR_UART4RST;
-            } else {
-                RCC->APB1RSTR &= ~RCC_APB1RSTR_UART4RST;
-            }
-            break;
-        }
-        case UART_5: {
-            if(cmd == ENABLE_CMD) {
-                RCC->APB1RSTR |= RCC_APB1RSTR_UART5RST;
-            } else {
-                RCC->APB1RSTR &= ~RCC_APB1RSTR_UART5RST;
-            }
-            break;
-        }
-        case USART_6: {
-            if(cmd == ENABLE_CMD) {
-                RCC->APB2RSTR |= RCC_APB2RSTR_USART6RST;
-            } else {
-                RCC->APB2RSTR &= ~RCC_APB2RSTR_USART6RST;
-            }
-            break;
-        }
-    }
-}
-
-void ARM_RCC_GPIO_ClockCmd(eGPIO_PortNames port_name, ePeriphCmd cmd)
-{
-    switch(port_name) {
+    switch(periph) {
         case GPIO_PORT_A: {
             if(cmd == ENABLE_CMD) {
 //enable GPIOA clock
@@ -305,6 +197,180 @@ void ARM_RCC_GPIO_ClockCmd(eGPIO_PortNames port_name, ePeriphCmd cmd)
                 RCC->AHB1ENR |= RCC_AHB1ENR_GPIOIEN;
             } else {
                 RCC->AHB1ENR &= ~RCC_AHB1ENR_GPIOIEN;
+            }
+            break;
+        }
+        case USART_1: {
+            if(cmd == ENABLE_CMD) {
+                RCC->APB2ENR |= RCC_APB2ENR_USART1EN;
+            } else {
+                RCC->APB2ENR &= ~RCC_APB2ENR_USART1EN;
+            }
+            break;
+        }
+        case USART_2: {
+            if(cmd == ENABLE_CMD) {
+                RCC->APB1ENR |= RCC_APB1ENR_USART2EN;
+            } else {
+                RCC->APB1ENR &= ~RCC_APB1ENR_USART2EN;
+            }
+            break;
+        }
+        case USART_3: {
+            if(cmd == ENABLE_CMD) {
+                RCC->APB1ENR |= RCC_APB1ENR_USART3EN;
+            } else {
+                RCC->APB1ENR &= ~RCC_APB1ENR_USART3EN;
+            }
+            break;
+        }
+        case UART_4: {
+            if(cmd == ENABLE_CMD) {
+                RCC->APB1ENR |= RCC_APB1ENR_UART4EN;
+            } else {
+                RCC->APB1ENR &= ~RCC_APB1ENR_UART4EN;
+            }
+            break;
+        }
+        case UART_5: {
+            if(cmd == ENABLE_CMD) {
+                RCC->APB1ENR |= RCC_APB1ENR_UART5EN;
+            } else {
+                RCC->APB1ENR &= ~RCC_APB1ENR_UART5EN;
+            }
+            break;
+        }
+        case USART_6: {
+            if(cmd == ENABLE_CMD) {
+                RCC->APB2ENR |= RCC_APB2ENR_USART6EN;
+            } else {
+                RCC->APB2ENR &= ~RCC_APB2ENR_USART6EN;
+            }
+            break;
+        }
+    }
+}
+
+void ARM_RCC_Periph_ResetCmd(ePeriphTypes periph, ePeriphCmd cmd)
+{
+    switch(periph) {
+        case GPIO_PORT_A: {
+            if(cmd == ENABLE_CMD) {
+                RCC->AHB1RSTR |= RCC_AHB1RSTR_GPIOARST;
+            } else {
+                RCC->AHB1RSTR &= ~RCC_AHB1RSTR_GPIOARST;
+            }
+
+        }
+        case GPIO_PORT_B: {
+            if(cmd == ENABLE_CMD) {
+                RCC->AHB1RSTR |= RCC_AHB1RSTR_GPIOBRST;
+            } else {
+                RCC->AHB1RSTR &= ~RCC_AHB1RSTR_GPIOBRST;
+            }
+            break;
+        }
+        case GPIO_PORT_C: {
+            if(cmd == ENABLE_CMD) {
+                RCC->AHB1RSTR |= RCC_AHB1RSTR_GPIOCRST;
+            } else {
+                RCC->AHB1RSTR &= ~RCC_AHB1RSTR_GPIOCRST;
+            }
+            break;
+        }
+        case GPIO_PORT_D: {
+            if(cmd == ENABLE_CMD) {
+                RCC->AHB1RSTR |= RCC_AHB1RSTR_GPIODRST;
+            } else {
+                RCC->AHB1RSTR &= ~RCC_AHB1RSTR_GPIODRST;
+            }
+            break;
+        }
+        case GPIO_PORT_E: {
+            if(cmd == ENABLE_CMD) {
+                RCC->AHB1RSTR |= RCC_AHB1RSTR_GPIOERST;
+            } else {
+                RCC->AHB1RSTR &= ~RCC_AHB1RSTR_GPIOERST;
+            }
+            break;
+        }
+        case GPIO_PORT_F: {
+            if(cmd == ENABLE_CMD) {
+                RCC->AHB1RSTR |= RCC_AHB1RSTR_GPIOFRST;
+            } else {
+                RCC->AHB1RSTR &= ~RCC_AHB1RSTR_GPIOFRST;
+            }
+            break;
+        }
+        case GPIO_PORT_G: {
+            if(cmd == ENABLE_CMD) {
+                RCC->AHB1RSTR |= RCC_AHB1RSTR_GPIOGRST;
+            } else {
+                RCC->AHB1RSTR &= ~RCC_AHB1RSTR_GPIOGRST;
+            }
+            break;
+        }
+        case GPIO_PORT_H: {
+            if(cmd == ENABLE_CMD) {
+                RCC->AHB1RSTR |= RCC_AHB1RSTR_GPIOHRST;
+            } else {
+                RCC->AHB1RSTR &= ~RCC_AHB1RSTR_GPIOHRST;
+            }
+            break;
+        }
+        case GPIO_PORT_I: {
+            if(cmd == ENABLE_CMD) {
+                RCC->AHB1RSTR |= RCC_AHB1RSTR_GPIOIRST;
+            } else {
+                RCC->AHB1RSTR &= ~RCC_AHB1RSTR_GPIOIRST;
+            }
+            break;
+        }
+        case USART_1: {
+            if(cmd == ENABLE_CMD) {
+                RCC->APB2RSTR |= RCC_APB2RSTR_USART1RST;
+            } else {
+                RCC->APB2RSTR &= ~RCC_APB2RSTR_USART1RST;
+            }
+            break;
+        }
+        case USART_2: {
+            if(cmd == ENABLE_CMD) {
+                RCC->APB1RSTR |= RCC_APB1RSTR_USART2RST;
+            } else {
+                RCC->APB1RSTR &= ~RCC_APB1RSTR_USART2RST;
+            }
+            break;
+        }
+        case USART_3: {
+            if(cmd == ENABLE_CMD) {
+                RCC->APB1RSTR |= RCC_APB1RSTR_USART3RST;
+            } else {
+                RCC->APB1RSTR &= ~RCC_APB1RSTR_USART3RST;
+            }
+            break;
+        }
+        case UART_4: {
+            if(cmd == ENABLE_CMD) {
+                RCC->APB1RSTR |= RCC_APB1RSTR_UART4RST;
+            } else {
+                RCC->APB1RSTR &= ~RCC_APB1RSTR_UART4RST;
+            }
+            break;
+        }
+        case UART_5: {
+            if(cmd == ENABLE_CMD) {
+                RCC->APB1RSTR |= RCC_APB1RSTR_UART5RST;
+            } else {
+                RCC->APB1RSTR &= ~RCC_APB1RSTR_UART5RST;
+            }
+            break;
+        }
+        case USART_6: {
+            if(cmd == ENABLE_CMD) {
+                RCC->APB2RSTR |= RCC_APB2RSTR_USART6RST;
+            } else {
+                RCC->APB2RSTR &= ~RCC_APB2RSTR_USART6RST;
             }
             break;
         }

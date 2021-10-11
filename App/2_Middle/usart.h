@@ -2,16 +2,6 @@
 #define _USART_H_
 
 typedef enum {
-    USART_1 = 0,
-    USART_2,
-    USART_3,
-    UART_4,
-    UART_5,
-    USART_6,
-    MAX_USART_INTERFACE_NAMES
-} eUSART_InterfaceNames;
-
-typedef enum {
     TX_PIN = 0,
     RX_PIN,
     SCLK_PIN, // CK pin in datasheet
@@ -23,7 +13,7 @@ typedef enum {
 // USART pins configuration
 typedef struct {
     GPIO_TypeDef *GPIOx;
-    eGPIO_PortNames port;
+    ePeriphTypes port;
     eGPIO_IONumbers pin;
     eGPIO_IOAltFunc alt_func; //used only for alternate mode
 } USART_PinCfg_t;
@@ -100,7 +90,7 @@ Multibuffer communication using DMA
 
 
 void USART_Init(void);
-USART_PinCfg_t *USART_GetPinConfig(eUSART_InterfaceNames usart_name);
+USART_PinCfg_t *USART_GetPinConfig(ePeriphTypes usart_name);
 
 #if (RTE_USART1==1)
 void USART1_cb(uint32_t event);

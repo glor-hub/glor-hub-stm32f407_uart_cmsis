@@ -49,7 +49,7 @@ void Button_Test(void)
 
 void Button_Init(void)
 {
-    ARM_RCC_GPIO_ClockCmd(GPIO_PORT_A, ENABLE_CMD);
+    ARM_RCC_Periph_ClockCmd(GPIO_PORT_A, ENABLE_CMD);
     GPIO_SetCfg(GPIOA, GPIO_IO_0, GPIO_IO_MODE_INPUT, GPIO_IO_TYPE_NO,
                 GPIO_IO_HI_Z, GPIO_IO_SPEED_FREQ_LOW, GPIO_IO_AF_0);
     ARM_GPIO_Config();

@@ -40,7 +40,7 @@
 // USART Resources definitions
 typedef struct {
     ARM_USART_CAPABILITIES  capabilities;  // Capabilities
-    eUSART_InterfaceNames   usart_name;
+    ePeriphTypes   usart_name;
     USART_TypeDef           *p_reg;          // Pointer to USART peripheral registers
     USART_PinCfg_t          *p_pin;          // Pointer to USART pins configuration
 //    USART_CLOCKS            clk;           // USART clocks configuration
@@ -205,13 +205,13 @@ static int32_t ARM_USART_PowerControl(ARM_POWER_STATE  state,
             // Disable USART IRQ
             NVIC_DisableIRQ(usart->irq_num);
 
-            ARM_RCC_USART_ClockCmd(usart->usart_name, ENABLE_CMD);
+            ARM_RCC_Periph_ClockCmd(usart->usart_name, ENABLE_CMD);
             // Reset USART registers
-            ARM_RCC_USART_ResetCmd(usart->usart_name, ENABLE_CMD);
+            ARM_RCC_Periph_ResetCmd(usart->usart_name, ENABLE_CMD);
             // Release reset signal from USART
-            ARM_RCC_USART_ResetCmd(usart->usart_name, DISABLE_CMD);
+            ARM_RCC_Periph_ResetCmd(usart->usart_name, DISABLE_CMD);
             // Disable clock to UARTx block
-            ARM_RCC_USART_ClockCmd(usart->usart_name, DISABLE_CMD);
+            ARM_RCC_Periph_ClockCmd(usart->usart_name, DISABLE_CMD);
             // Clear pending USART interrupts in NVIC
             NVIC_ClearPendingIRQ(usart->irq_num);
 
@@ -238,13 +238,13 @@ static int32_t ARM_USART_PowerControl(ARM_POWER_STATE  state,
             }
 
             // Enable clock to UARTx block
-            ARM_RCC_USART_ClockCmd(usart->usart_name, ENABLE_CMD);
+            ARM_RCC_Periph_ClockCmd(usart->usart_name, ENABLE_CMD);
             // Reset USART registers
-            ARM_RCC_USART_ResetCmd(usart->usart_name, ENABLE_CMD);
+            ARM_RCC_Periph_ResetCmd(usart->usart_name, ENABLE_CMD);
             // Release reset signal from USART
-            ARM_RCC_USART_ResetCmd(usart->usart_name, DISABLE_CMD);
+            ARM_RCC_Periph_ResetCmd(usart->usart_name, DISABLE_CMD);
             // Disable clock to UARTx block
-            ARM_RCC_USART_ClockCmd(usart->usart_name, DISABLE_CMD);
+            ARM_RCC_Periph_ClockCmd(usart->usart_name, DISABLE_CMD);
 
             // Clear driver variables
             usart->p_info->rx_status.rx_busy          = 0U;

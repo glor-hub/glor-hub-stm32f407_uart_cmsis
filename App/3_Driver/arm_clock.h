@@ -13,9 +13,7 @@ uint32_t ARM_RCC_SetSysClockTo168(void);
 uint32_t ARM_RCC_NMI_HandlerErrCheck(void);
 void ARM_RCC_OutputSysClocktoMCO2(void);
 void ARM_RCC_ConfigMCO2(void);
-void ARM_RCC_USART_ResetCmd(eUSART_InterfaceNames usart, ePeriphCmd cmd);
-void ARM_RCC_USART_ClockCmd(eUSART_InterfaceNames usart, ePeriphCmd cmd);
-void ARM_RCC_GPIO_ClockCmd(eGPIO_PortNames port_name, ePeriphCmd cmd);
-
+void ARM_RCC_Periph_ResetCmd(ePeriphTypes periph, ePeriphCmd cmd);
+void ARM_RCC_Periph_ClockCmd(ePeriphTypes periph, ePeriphCmd cmd);
 
 #endif //_ARM_CLOCK_H_

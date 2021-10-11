@@ -35,7 +35,7 @@ typedef enum {
 typedef struct {
     eLED_Colors color;
     GPIO_TypeDef *GPIOx;
-    eGPIO_PortNames port;
+    ePeriphTypes port;
     eGPIO_IONumbers pin;
     uint32_t pin_mask;
     uint32_t pin_active_state;
@@ -77,7 +77,7 @@ void LED_Init(void)
 {
     LED_SetData();
     for(eLED_Colors led_color = ORANGE; led_color < MAX_LED_COLORS; led_color++) {
-        ARM_RCC_GPIO_ClockCmd(LED_Data[led_color].port, ENABLE_CMD);
+        ARM_RCC_Periph_ClockCmd(LED_Data[led_color].port, ENABLE_CMD);
         GPIO_SetCfg(LED_Data[led_color].GPIOx, LED_Data[led_color].pin,
                     GPIO_IO_MODE_OUTPUT, GPIO_IO_TYPE_PUSH_PULL, GPIO_IO_HI_Z, GPIO_IO_SPEED_FREQ_LOW, GPIO_IO_AF_0);
         ARM_GPIO_Config();
