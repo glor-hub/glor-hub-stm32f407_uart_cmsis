@@ -4,9 +4,8 @@
 #include "stm32f4xx.h"
 #include "common.h"
 #include "arm_gpio.h"
-#include "gpio.h"
+//#include "gpio.h"
 #include "arm_exti.h"
-
 
 //********************************************************************************
 //Macros
@@ -28,14 +27,21 @@
 //Prototypes
 //********************************************************************************
 
+static void ARM_EXTI_EventEnable(eARM_GPIO_IONumbers pin_num, ePeriphCmd cmd);
+
 //================================================================================
 //Public
 //================================================================================
-void ARM_EXTI_SetPinCfg(ePeriphTypes port_name, eARM_GPIO_IONumbers pin_num,
-                        eARM_EXTI_TriggerModes trigger_mode)
+void ARM_EXTI_SetCfg(ARM_EXTI_Cfg_t *pEXTI_Cfg)
 {
+    ePeriphTypes port_name;
+    eARM_GPIO_IONumbers pin_num;
+    eARM_EXTI_TriggerModes mode;
     SYSCFG_TypeDef *p_cfgReg = SYSCFG;
     EXTI_TypeDef *p_reg = EXTI;
+    port_name = pEXTI_Cfg->Port;
+    pin_num = pEXTI_Cfg->Pin;
+    mode = pEXTI_Cfg->Trigger_Mode;
     switch(pin_num) {
         case ARM_GPIO_IO_0:
         case ARM_GPIO_IO_1:
@@ -75,7 +81,7 @@ void ARM_EXTI_SetPinCfg(ePeriphTypes port_name, eARM_GPIO_IONumbers pin_num,
         }
 
     }
-    switch(trigger_mode) {
+    switch(mode) {
         case ARM_EXTI_FALLING_TRIGGER_MODE: {
             p_reg->RTSR &= ~(EXTI_RTSR_TR0_Msk << (uint32_t)pin_num);
             p_reg->FTSR |= EXTI_FTSR_TR0_Msk << (uint32_t)pin_num;
@@ -94,17 +100,6 @@ void ARM_EXTI_SetPinCfg(ePeriphTypes port_name, eARM_GPIO_IONumbers pin_num,
     }
 }
 
-void ARM_EXTI_EventEnable(eARM_GPIO_IONumbers pin_num,
-                          ePeriphCmd cmd)
-{
-    EXTI_TypeDef *p_reg = EXTI;
-    if(cmd == ENABLE_CMD) {
-        p_reg->EMR |= EXTI_EMR_MR0_Msk << (uint32_t)pin_num;
-    } else {
-
-        p_reg->EMR &= ~(EXTI_EMR_MR0_Msk << (uint32_t)pin_num);
-    }
-}
 void ARM_EXTI_IRQEnable(eARM_GPIO_IONumbers pin_num, ePeriphCmd cmd)
 {
     EXTI_TypeDef *p_reg = EXTI;
@@ -126,3 +121,14 @@ void ARM_EXTI_ClearPendingIRQ(eARM_GPIO_IONumbers pin_num)
 //Private
 //================================================================================
 
+void ARM_EXTI_EventEnable(eARM_GPIO_IONumbers pin_num,
+                          ePeriphCmd cmd)
+{
+    EXTI_TypeDef *p_reg = EXTI;
+    if(cmd == ENABLE_CMD) {
+        p_reg->EMR |= EXTI_EMR_MR0_Msk << (uint32_t)pin_num;
+    } else {
+
+        p_reg->EMR &= ~(EXTI_EMR_MR0_Msk << (uint32_t)pin_num);
+    }
+}

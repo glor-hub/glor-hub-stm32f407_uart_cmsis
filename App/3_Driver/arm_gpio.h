@@ -83,7 +83,7 @@ typedef enum {
 
 typedef struct {
     GPIO_TypeDef *pReg;
-    uint32_t Pin;
+    eARM_GPIO_IONumbers Pin;
     uint32_t Mode;
     uint32_t Type;
     uint32_t Pull;

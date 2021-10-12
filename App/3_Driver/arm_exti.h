@@ -9,8 +9,13 @@ typedef enum {
     NUM_ARM_EXTI_TRIGGER_MODE
 } eARM_EXTI_TriggerModes;
 
-void ARM_EXTI_SetPinCfg(ePeriphTypes port_name, eARM_GPIO_IONumbers pin_num, eARM_EXTI_TriggerModes trigger_mode);
-void ARM_EXTI_EventEnable(eARM_GPIO_IONumbers pin_num, ePeriphCmd cmd);
+typedef struct {
+    ePeriphTypes           Port;
+    eARM_GPIO_IONumbers    Pin;
+    eARM_EXTI_TriggerModes Trigger_Mode;
+} ARM_EXTI_Cfg_t;
+
+void ARM_EXTI_SetCfg(ARM_EXTI_Cfg_t *pEXTI_Cfg);
 void ARM_EXTI_IRQEnable(eARM_GPIO_IONumbers pin_num, ePeriphCmd cmd);
 void ARM_EXTI_ClearPendingIRQ(eARM_GPIO_IONumbers pin_num);
 
