@@ -56,18 +56,18 @@ void LED_Test(void)
     for(eLED_Colors led_color = ORANGE; led_color < MAX_LED_COLORS; led_color++) {
         LED_Set(led_color, TRUE);
     }
-    Delay(ONE_SECOND);
+    Timer_Delay(ONE_SECOND);
 
     for(eLED_Colors led_color = ORANGE; led_color < MAX_LED_COLORS; led_color++) {
         LED_Set(led_color, FALSE);
     }
-    Delay(ONE_SECOND);
+    Timer_Delay(ONE_SECOND);
 
     for(eLED_Colors led_color = ORANGE; led_color < MAX_LED_COLORS; led_color++) {
         LED_Set(led_color, TRUE);
-        Delay(ONE_SECOND);
+        Timer_Delay(ONE_SECOND);
         LED_Set(led_color, FALSE);
-        Delay(ONE_SECOND);
+        Timer_Delay(ONE_SECOND);
     }
 }
 

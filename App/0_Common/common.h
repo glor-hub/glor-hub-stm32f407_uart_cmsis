@@ -34,6 +34,4 @@ typedef enum {
     USART_6,
 } ePeriphTypes;
 
-
-
 #endif //_COMMON_H_

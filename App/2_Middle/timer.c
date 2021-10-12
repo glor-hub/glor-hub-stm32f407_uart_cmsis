@@ -95,7 +95,7 @@ uint8_t Timer_GetFlag(eTimer_Types timer)
     return Timer_Data[timer].flag;
 }
 
-void Delay(uint32_t time)
+void Timer_Delay(uint32_t time)
 {
     Timer_Enable(TIMER_DELAY, time);
     while(!Timer_Data[TIMER_DELAY].flag);
