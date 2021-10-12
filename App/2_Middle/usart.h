@@ -14,7 +14,7 @@ typedef enum {
 typedef struct {
     GPIO_TypeDef *GPIOx;
     ePeriphTypes port;
-    eGPIO_IONumbers pin;
+    eARM_GPIO_IONumbers pin;
     eARM_GPIO_IOAltFunc alt_func; //used only for alternate mode
 } USART_PinCfg_t;
 

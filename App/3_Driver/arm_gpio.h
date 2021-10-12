@@ -42,6 +42,26 @@
 #define ARM_GPIO_IO_SPEED_FREQ_VERY_HIGH ((uint32_t)0x03) // max 100-180 MHz
 
 typedef enum {
+    ARM_GPIO_IO_0 = 0,
+    ARM_GPIO_IO_1,
+    ARM_GPIO_IO_2,
+    ARM_GPIO_IO_3,
+    ARM_GPIO_IO_4,
+    ARM_GPIO_IO_5,
+    ARM_GPIO_IO_6,
+    ARM_GPIO_IO_7,
+    ARM_GPIO_IO_8,
+    ARM_GPIO_IO_9,
+    ARM_GPIO_IO_10,
+    ARM_GPIO_IO_11,
+    ARM_GPIO_IO_12,
+    ARM_GPIO_IO_13,
+    ARM_GPIO_IO_14,
+    ARM_GPIO_IO_15,
+    NUM_ARM_GPIO_IO
+} eARM_GPIO_IONumbers;
+
+typedef enum {
     ARM_GPIO_IO_AF_0 = 0,
     ARM_GPIO_IO_AF_1,
     ARM_GPIO_IO_AF_2,

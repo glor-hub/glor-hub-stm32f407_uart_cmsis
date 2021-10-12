@@ -5,7 +5,6 @@
 #include "common.h"
 #include "arm_gpio.h"
 #include "gpio.h"
-//#include "exti.h"
 #include "arm_exti.h"
 
 
@@ -32,43 +31,43 @@
 //================================================================================
 //Public
 //================================================================================
-void ARM_EXTI_SetPinCfg(ePeriphTypes port_name, eGPIO_IONumbers pin_num,
+void ARM_EXTI_SetPinCfg(ePeriphTypes port_name, eARM_GPIO_IONumbers pin_num,
                         eARM_EXTI_TriggerModes trigger_mode)
 {
     SYSCFG_TypeDef *p_cfgReg = SYSCFG;
     EXTI_TypeDef *p_reg = EXTI;
     switch(pin_num) {
-        case GPIO_IO_0:
-        case GPIO_IO_1:
-        case GPIO_IO_2:
-        case GPIO_IO_3: {
+        case ARM_GPIO_IO_0:
+        case ARM_GPIO_IO_1:
+        case ARM_GPIO_IO_2:
+        case ARM_GPIO_IO_3: {
             p_cfgReg->EXTICR[0] &= ~(SYSCFG_EXTICR1_EXTI0_Msk << (4U * (uint32_t)pin_num));
             p_cfgReg->EXTICR[0] |= (uint32_t)port_name <<
                                    (4U * ((uint32_t)pin_num >> SYSCFG_EXTICR1_EXTI0_Pos));
             break;
         }
-        case GPIO_IO_4:
-        case GPIO_IO_5:
-        case GPIO_IO_6:
-        case GPIO_IO_7: {
+        case ARM_GPIO_IO_4:
+        case ARM_GPIO_IO_5:
+        case ARM_GPIO_IO_6:
+        case ARM_GPIO_IO_7: {
             p_cfgReg->EXTICR[1] &= ~(SYSCFG_EXTICR1_EXTI0_Msk << (4U * (uint32_t)pin_num));
             p_cfgReg->EXTICR[1] |= (uint32_t)port_name <<
                                    (4U * ((uint32_t)pin_num >> SYSCFG_EXTICR1_EXTI1_Pos));
             break;
         }
-        case GPIO_IO_8:
-        case GPIO_IO_9:
-        case GPIO_IO_10:
-        case GPIO_IO_11: {
+        case ARM_GPIO_IO_8:
+        case ARM_GPIO_IO_9:
+        case ARM_GPIO_IO_10:
+        case ARM_GPIO_IO_11: {
             p_cfgReg->EXTICR[2] &= ~(SYSCFG_EXTICR1_EXTI0_Msk << (4U * (uint32_t)pin_num));
             p_cfgReg->EXTICR[2] |= (uint32_t)port_name <<
                                    (4U * ((uint32_t)pin_num >> SYSCFG_EXTICR1_EXTI2_Pos));
             break;
         }
-        case GPIO_IO_12:
-        case GPIO_IO_13:
-        case GPIO_IO_14:
-        case GPIO_IO_15: {
+        case ARM_GPIO_IO_12:
+        case ARM_GPIO_IO_13:
+        case ARM_GPIO_IO_14:
+        case ARM_GPIO_IO_15: {
             p_cfgReg->EXTICR[3] &= ~(SYSCFG_EXTICR1_EXTI0_Msk << (4U * (uint32_t)pin_num));
             p_cfgReg->EXTICR[3] |= (uint32_t)port_name <<
                                    (4U * ((uint32_t)pin_num >> SYSCFG_EXTICR1_EXTI3_Pos));
@@ -95,7 +94,7 @@ void ARM_EXTI_SetPinCfg(ePeriphTypes port_name, eGPIO_IONumbers pin_num,
     }
 }
 
-void ARM_EXTI_EventEnable(eGPIO_IONumbers pin_num,
+void ARM_EXTI_EventEnable(eARM_GPIO_IONumbers pin_num,
                           ePeriphCmd cmd)
 {
     EXTI_TypeDef *p_reg = EXTI;
@@ -106,7 +105,7 @@ void ARM_EXTI_EventEnable(eGPIO_IONumbers pin_num,
         p_reg->EMR &= ~(EXTI_EMR_MR0_Msk << (uint32_t)pin_num);
     }
 }
-void ARM_EXTI_IRQEnable(eGPIO_IONumbers pin_num, ePeriphCmd cmd)
+void ARM_EXTI_IRQEnable(eARM_GPIO_IONumbers pin_num, ePeriphCmd cmd)
 {
     EXTI_TypeDef *p_reg = EXTI;
     if(cmd == ENABLE_CMD) {
@@ -117,7 +116,7 @@ void ARM_EXTI_IRQEnable(eGPIO_IONumbers pin_num, ePeriphCmd cmd)
     }
 }
 
-void ARM_EXTI_ClearPendingIRQ(eGPIO_IONumbers pin_num)
+void ARM_EXTI_ClearPendingIRQ(eARM_GPIO_IONumbers pin_num)
 {
     EXTI_TypeDef *p_reg = EXTI;
     p_reg->PR |= EXTI_PR_PR0_Msk << (uint32_t)pin_num;

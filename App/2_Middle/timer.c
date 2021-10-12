@@ -3,12 +3,11 @@
 //********************************************************************************
 #include "stm32f4xx.h"
 #include <stdbool.h>
-#include "RTE_Device.h"
-#include "common.h"
 #include <stdio.h>
+#include <string.h>
+#include "common.h"
 #include "assert.h"
 #include "timer.h"
-#include <string.h>
 
 //********************************************************************************
 //Macros

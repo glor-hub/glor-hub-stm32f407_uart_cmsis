@@ -6,9 +6,8 @@
 #include "RTE_Device.h"
 #include "Driver_USART.h"
 #include "arm_gpio.h"
-#include "gpio.h"
-#include "usart.h"
 #include "arm_usart.h"
+#include "usart.h"
 
 //********************************************************************************
 //Macros

@@ -2,14 +2,12 @@
 //button.c
 //********************************************************************************
 #include "stm32f4xx.h"
+#include <stdbool.h>
 #include "common.h"
-#include "RTE_Device.h"
-#include "button.h"
 #include "arm_gpio.h"
-#include "gpio.h"
-#include "Driver_USART.h"
-#include "usart.h"
 #include "arm_clock.h"
+#include "button.h"
+#include "gpio.h"
 #include "exti.h"
 #include "led.h"
 
@@ -50,7 +48,7 @@ void Button_Test(void)
 void Button_Init(void)
 {
     ARM_RCC_Periph_ClockCmd(GPIO_PORT_A, ENABLE_CMD);
-    GPIO_SetData(GPIOA, GPIO_IO_0, ARM_GPIO_IO_MODE_INPUT, ARM_GPIO_IO_TYPE_NO,
+    GPIO_SetData(GPIOA, ARM_GPIO_IO_0, ARM_GPIO_IO_MODE_INPUT, ARM_GPIO_IO_TYPE_NO,
                  ARM_GPIO_IO_HI_Z, ARM_GPIO_IO_SPEED_FREQ_LOW, ARM_GPIO_IO_AF_0);
     EXTI_Init();
 }

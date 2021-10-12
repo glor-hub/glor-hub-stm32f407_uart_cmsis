@@ -2,13 +2,11 @@
 //gpio.c
 //********************************************************************************
 #include "stm32f4xx.h"
-#include "RTE_Device.h"
+#include <stdbool.h>
 #include "common.h"
 #include "arm_gpio.h"
-#include "Driver_USART.h"
-#include "gpio.h"
-#include "usart.h"
 #include "arm_clock.h"
+#include "gpio.h"
 
 //********************************************************************************
 //Macros
@@ -38,7 +36,7 @@ static ARM_GPIO_Cfg_t GPIO_Config;
 //Public
 //================================================================================
 
-void GPIO_SetData(GPIO_TypeDef *GPIOx, eGPIO_IONumbers io_num, uint32_t io_mode, uint32_t io_type,
+void GPIO_SetData(GPIO_TypeDef *GPIOx, eARM_GPIO_IONumbers io_num, uint32_t io_mode, uint32_t io_type,
                   uint32_t io_pull, uint32_t io_speed, uint32_t io_alt)
 
 {

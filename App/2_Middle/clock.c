@@ -2,17 +2,14 @@
 //clock.c
 //********************************************************************************
 #include "stm32f4xx.h"
-#include "RTE_Device.h"
-#include "common.h"
 #include <stdio.h>
+#include <stdbool.h>
+#include "common.h"
 #include "assert.h"
+#include "arm_clock.h"
 #include "arm_gpio.h"
 #include "gpio.h"
-#include "Driver_USART.h"
-#include "usart.h"
 #include "clock.h"
-#include "arm_clock.h"
-
 
 //********************************************************************************
 //Macros
@@ -55,7 +52,7 @@ void Clock_Test(void)
 
     ARM_RCC_Periph_ClockCmd(GPIO_PORT_C, ENABLE_CMD);
 //configure MCO2 pin for SYSCLOCK testing
-    GPIO_SetData(GPIOC, GPIO_IO_9, ARM_GPIO_IO_MODE_ALT_FUNC, ARM_GPIO_IO_TYPE_PUSH_PULL, ARM_GPIO_IO_PULL_UP,
+    GPIO_SetData(GPIOC, ARM_GPIO_IO_9, ARM_GPIO_IO_MODE_ALT_FUNC, ARM_GPIO_IO_TYPE_PUSH_PULL, ARM_GPIO_IO_PULL_UP,
                  ARM_GPIO_IO_SPEED_FREQ_HIGH, ARM_GPIO_IO_AF_0);
 //configure for output System clock divided by 5 (168/5=33,6 MHz) on MCO2 pin
     ARM_RCC_ConfigMCO2();

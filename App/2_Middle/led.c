@@ -2,16 +2,13 @@
 //.c
 //********************************************************************************
 #include "stm32f4xx.h"
-#include "RTE_Device.h"
+#include <stdbool.h>
 #include "common.h"
-#include "led.h"
+#include "arm_clock.h"
 #include "arm_gpio.h"
 #include "gpio.h"
-#include "Driver_USART.h"
-#include "usart.h"
-
-#include "arm_clock.h"
 #include "timer.h"
+#include "led.h"
 
 //********************************************************************************
 //Macros
@@ -37,7 +34,7 @@ typedef struct {
     eLED_Colors color;
     GPIO_TypeDef *GPIOx;
     ePeriphTypes port;
-    eGPIO_IONumbers pin;
+    eARM_GPIO_IONumbers pin;
     uint32_t pin_mask;
     uint32_t pin_active_state;
 } LED_Cfg_t;
@@ -93,28 +90,28 @@ static void LED_SetCfg(void)
     LED_Cfg[ORANGE].color = ORANGE;
     LED_Cfg[ORANGE].GPIOx = GPIOD;
     LED_Cfg[ORANGE].port = GPIO_PORT_D;
-    LED_Cfg[ORANGE].pin = GPIO_IO_13;
+    LED_Cfg[ORANGE].pin = ARM_GPIO_IO_13;
     LED_Cfg[ORANGE].pin_mask = ARM_GPIO_IO_13_MASK;
     LED_Cfg[ORANGE].pin_active_state = ARM_GPIO_IO_SET;
 
     LED_Cfg[RED].color = RED;
     LED_Cfg[RED].GPIOx = GPIOD;
     LED_Cfg[RED].port = GPIO_PORT_D;
-    LED_Cfg[RED].pin = GPIO_IO_14;
+    LED_Cfg[RED].pin = ARM_GPIO_IO_14;
     LED_Cfg[RED].pin_mask = ARM_GPIO_IO_14_MASK;
     LED_Cfg[RED].pin_active_state = ARM_GPIO_IO_SET;
 
     LED_Cfg[BLUE].color = BLUE;
     LED_Cfg[BLUE].GPIOx = GPIOD;
     LED_Cfg[BLUE].port = GPIO_PORT_D;
-    LED_Cfg[BLUE].pin = GPIO_IO_15;
+    LED_Cfg[BLUE].pin = ARM_GPIO_IO_15;
     LED_Cfg[BLUE].pin_mask = ARM_GPIO_IO_15_MASK;
     LED_Cfg[BLUE].pin_active_state = ARM_GPIO_IO_SET;
 
     LED_Cfg[GREEN].color = GREEN;
     LED_Cfg[GREEN].GPIOx = GPIOD;
     LED_Cfg[GREEN].port = GPIO_PORT_D;
-    LED_Cfg[GREEN].pin = GPIO_IO_12;
+    LED_Cfg[GREEN].pin = ARM_GPIO_IO_12;
     LED_Cfg[GREEN].pin_mask = ARM_GPIO_IO_12_MASK;
     LED_Cfg[GREEN].pin_active_state = ARM_GPIO_IO_SET;
 }
