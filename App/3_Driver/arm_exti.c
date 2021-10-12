@@ -3,9 +3,9 @@
 //********************************************************************************
 #include "stm32f4xx.h"
 #include "common.h"
-#include "RTE_Device.h"
+#include "arm_gpio.h"
 #include "gpio.h"
-#include "exti.h"
+//#include "exti.h"
 #include "arm_exti.h"
 
 
@@ -33,7 +33,7 @@
 //Public
 //================================================================================
 void ARM_EXTI_SetPinCfg(ePeriphTypes port_name, eGPIO_IONumbers pin_num,
-                        eEXTI_TriggerModes trigger_mode)
+                        eARM_EXTI_TriggerModes trigger_mode)
 {
     SYSCFG_TypeDef *p_cfgReg = SYSCFG;
     EXTI_TypeDef *p_reg = EXTI;
@@ -77,17 +77,17 @@ void ARM_EXTI_SetPinCfg(ePeriphTypes port_name, eGPIO_IONumbers pin_num,
 
     }
     switch(trigger_mode) {
-        case EXTI_FALLING_TRIGGER_MODE: {
+        case ARM_EXTI_FALLING_TRIGGER_MODE: {
             p_reg->RTSR &= ~(EXTI_RTSR_TR0_Msk << (uint32_t)pin_num);
             p_reg->FTSR |= EXTI_FTSR_TR0_Msk << (uint32_t)pin_num;
             break;
         }
-        case EXTI_RISING_TRIGGER_MODE: {
+        case ARM_EXTI_RISING_TRIGGER_MODE: {
             p_reg->RTSR |= EXTI_RTSR_TR0_Msk << (uint32_t)pin_num;
             p_reg->FTSR &= ~(EXTI_FTSR_TR0_Msk << (uint32_t)pin_num);
             break;
         }
-        case EXTI_FALLING_RISING_TRIGGER_MODE: {
+        case ARM_EXTI_FALLING_RISING_TRIGGER_MODE: {
             p_reg->RTSR |= EXTI_RTSR_TR0_Msk << (uint32_t)pin_num;
             p_reg->FTSR |= EXTI_FTSR_TR0_Msk << (uint32_t)pin_num;
             break;

@@ -3,15 +3,10 @@
 //********************************************************************************
 #include "stm32f4xx.h"
 #include <stdbool.h>
-#include "RTE_Device.h"
-#include "common.h"
 #include <stdio.h>
-#include "gpio.h"
-#include "Driver_USART.h"
-#include "usart.h"
-#include "arm_clock.h"
+#include "common.h"
 #include "arm_flash.h"
-
+#include "arm_clock.h"
 
 //********************************************************************************
 //Macros

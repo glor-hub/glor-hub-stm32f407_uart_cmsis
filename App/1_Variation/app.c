@@ -8,6 +8,7 @@
 #include "app.h"
 #include "clock.h"
 #include "led.h"
+#include "arm_gpio.h"
 #include "gpio.h"
 #include "timer.h"
 #include "button.h"

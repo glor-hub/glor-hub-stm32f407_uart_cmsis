@@ -6,11 +6,12 @@
 #include "RTE_Device.h"
 #include "RTE_Components.h"
 #include "Driver_USART.h"
+#include "arm_gpio.h"
+#include "arm_usart.h"
+#include "arm_clock.h"
 #include "gpio.h"
 #include "usart.h"
-#include "arm_usart.h"
-#include "arm_gpio.h"
-#include "arm_clock.h"
+
 
 //********************************************************************************
 //Macros
@@ -146,17 +147,15 @@ static int32_t ARM_USART_Initialize(ARM_USART_SignalEvent_t  cb_event,
 
 // Configure CTS pin
     if(usart->capabilities.cts) {
-        GPIO_SetCfg(usart-> p_pin[CTS_PIN].GPIOx, usart-> p_pin[CTS_PIN].pin,
-                    GPIO_IO_MODE_INPUT, GPIO_IO_TYPE_OPEN_DRAIN , GPIO_IO_HI_Z, GPIO_IO_SPEED_FREQ_LOW,
-                    usart-> p_pin[CTS_PIN].alt_func);
-        ARM_GPIO_Config();
+        GPIO_SetData(usart-> p_pin[CTS_PIN].GPIOx, usart-> p_pin[CTS_PIN].pin,
+                     ARM_GPIO_IO_MODE_INPUT, ARM_GPIO_IO_TYPE_OPEN_DRAIN , ARM_GPIO_IO_HI_Z, ARM_GPIO_IO_SPEED_FREQ_LOW,
+                     usart-> p_pin[CTS_PIN].alt_func);
     }
 // Configure RTS pin
     if(usart->capabilities.rts) {
-        GPIO_SetCfg(usart-> p_pin[RTS_PIN].GPIOx, usart-> p_pin[RTS_PIN].pin,
-                    GPIO_IO_MODE_OUTPUT, GPIO_IO_TYPE_PUSH_PULL, GPIO_IO_HI_Z, GPIO_IO_SPEED_FREQ_LOW,
-                    usart-> p_pin[RTS_PIN].alt_func);
-        ARM_GPIO_Config();
+        GPIO_SetData(usart-> p_pin[RTS_PIN].GPIOx, usart-> p_pin[RTS_PIN].pin,
+                     ARM_GPIO_IO_MODE_OUTPUT, ARM_GPIO_IO_TYPE_PUSH_PULL, ARM_GPIO_IO_HI_Z, ARM_GPIO_IO_SPEED_FREQ_LOW,
+                     usart-> p_pin[RTS_PIN].alt_func);
     }
 // DMA Initialize
     //unsupported in Version 1.0
@@ -167,20 +166,16 @@ static int32_t ARM_USART_Initialize(ARM_USART_SignalEvent_t  cb_event,
 static int32_t ARM_USART_Uninitialize(ARM_USART_RESOURCES *usart)
 {
 // Reset TX pin configuration
-    GPIO_SetCfg(usart-> p_pin[TX_PIN].GPIOx, usart-> p_pin[TX_PIN].pin, 0U, 0U, 0U, 0U, 0U);
-    ARM_GPIO_Config();
+    GPIO_SetData(usart-> p_pin[TX_PIN].GPIOx, usart-> p_pin[TX_PIN].pin, 0U, 0U, 0U, 0U, 0U);
 // Reset RX pin configuration
-    GPIO_SetCfg(usart-> p_pin[RX_PIN].GPIOx, usart-> p_pin[RX_PIN].pin, 0U, 0U, 0U, 0U, 0U);
-    ARM_GPIO_Config();
+    GPIO_SetData(usart-> p_pin[RX_PIN].GPIOx, usart-> p_pin[RX_PIN].pin, 0U, 0U, 0U, 0U, 0U);
 // Unconfigure CTS pin
     if(usart->capabilities.cts) {
-        GPIO_SetCfg(usart-> p_pin[CTS_PIN].GPIOx, usart-> p_pin[CTS_PIN].pin, 0U, 0U, 0U, 0U, 0U);
-        ARM_GPIO_Config();
+        GPIO_SetData(usart-> p_pin[CTS_PIN].GPIOx, usart-> p_pin[CTS_PIN].pin, 0U, 0U, 0U, 0U, 0U);
     }
 // Unconfigure RTS pin
     if(usart->capabilities.rts) {
-        GPIO_SetCfg(usart-> p_pin[RTS_PIN].GPIOx, usart-> p_pin[RTS_PIN].pin, 0U, 0U, 0U, 0U, 0U);
-        ARM_GPIO_Config();
+        GPIO_SetData(usart-> p_pin[RTS_PIN].GPIOx, usart-> p_pin[RTS_PIN].pin, 0U, 0U, 0U, 0U, 0U);
     }
 // DMA Uninitialize function
     //unsupported in Version 1.0
@@ -326,10 +321,9 @@ static int32_t ARM_USART_Control(uint32_t control, uint32_t arg,
             if(arg) {
                 if(usart->p_info->mode != ARM_USART_MODE_SMART_CARD) {
                     // USART TX pin function selected
-                    GPIO_SetCfg(usart-> p_pin[TX_PIN].GPIOx, usart-> p_pin[TX_PIN].pin,
-                                GPIO_IO_MODE_INPUT, GPIO_IO_TYPE_OPEN_DRAIN , GPIO_IO_HI_Z, GPIO_IO_SPEED_FREQ_LOW,
-                                usart-> p_pin[TX_PIN].alt_func);
-                    ARM_GPIO_Config();
+                    GPIO_SetData(usart-> p_pin[TX_PIN].GPIOx, usart-> p_pin[TX_PIN].pin,
+                                 ARM_GPIO_IO_MODE_INPUT, ARM_GPIO_IO_TYPE_OPEN_DRAIN , ARM_GPIO_IO_HI_Z, ARM_GPIO_IO_SPEED_FREQ_LOW,
+                                 usart-> p_pin[TX_PIN].alt_func);
                     usart->p_reg->CR1 |= USART_CR1_TE;
                     usart->p_info->flags |= ARM_USART_FLAG_TX_ENABLED;
                 }
@@ -337,9 +331,8 @@ static int32_t ARM_USART_Control(uint32_t control, uint32_t arg,
                 usart->p_reg->CR1 &= ~USART_CR1_TE;
                 if(usart->p_info->mode != ARM_USART_MODE_SMART_CARD) {
                     // SPIO default pin function selected
-                    GPIO_SetCfg(usart-> p_pin[TX_PIN].GPIOx, usart-> p_pin[TX_PIN].pin,
-                                0U, 0U, 0U, 0U, 0U);
-                    ARM_GPIO_Config();
+                    GPIO_SetData(usart-> p_pin[TX_PIN].GPIOx, usart-> p_pin[TX_PIN].pin,
+                                 0U, 0U, 0U, 0U, 0U);
                 }
                 usart->p_info->flags &= ~ARM_USART_FLAG_TX_ENABLED;
 

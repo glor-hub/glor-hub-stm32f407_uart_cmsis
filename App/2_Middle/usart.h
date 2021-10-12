@@ -15,7 +15,7 @@ typedef struct {
     GPIO_TypeDef *GPIOx;
     ePeriphTypes port;
     eGPIO_IONumbers pin;
-    eGPIO_IOAltFunc alt_func; //used only for alternate mode
+    eARM_GPIO_IOAltFunc alt_func; //used only for alternate mode
 } USART_PinCfg_t;
 
 // USART Transfer Information (Run-Time)

@@ -5,10 +5,11 @@
 #include "RTE_Device.h"
 #include "common.h"
 #include "led.h"
+#include "arm_gpio.h"
 #include "gpio.h"
 #include "Driver_USART.h"
 #include "usart.h"
-#include "arm_gpio.h"
+
 #include "arm_clock.h"
 #include "timer.h"
 
@@ -39,17 +40,17 @@ typedef struct {
     eGPIO_IONumbers pin;
     uint32_t pin_mask;
     uint32_t pin_active_state;
-} LED_Data_t;
+} LED_Cfg_t;
 
 //********************************************************************************
 //Variables
 //********************************************************************************
-static LED_Data_t LED_Data[MAX_LED_COLORS];
+static LED_Cfg_t LED_Cfg[MAX_LED_COLORS];
 //********************************************************************************
 //Prototypes
 //********************************************************************************
 static void LED_Set(eLED_Colors led_color, uint32_t state);
-static void LED_SetData(void);
+static void LED_SetCfg(void);
 //================================================================================
 //Public
 //================================================================================
@@ -75,62 +76,62 @@ void LED_Test(void)
 
 void LED_Init(void)
 {
-    LED_SetData();
+    LED_SetCfg();
     for(eLED_Colors led_color = ORANGE; led_color < MAX_LED_COLORS; led_color++) {
-        ARM_RCC_Periph_ClockCmd(LED_Data[led_color].port, ENABLE_CMD);
-        GPIO_SetCfg(LED_Data[led_color].GPIOx, LED_Data[led_color].pin,
-                    GPIO_IO_MODE_OUTPUT, GPIO_IO_TYPE_PUSH_PULL, GPIO_IO_HI_Z, GPIO_IO_SPEED_FREQ_LOW, GPIO_IO_AF_0);
-        ARM_GPIO_Config();
+        ARM_RCC_Periph_ClockCmd(LED_Cfg[led_color].port, ENABLE_CMD);
+        GPIO_SetData(LED_Cfg[led_color].GPIOx, LED_Cfg[led_color].pin,
+                     ARM_GPIO_IO_MODE_OUTPUT, ARM_GPIO_IO_TYPE_PUSH_PULL,
+                     ARM_GPIO_IO_HI_Z, ARM_GPIO_IO_SPEED_FREQ_LOW, ARM_GPIO_IO_AF_0);
     }
 }
 
 //================================================================================
 //Private
 //================================================================================
-static void LED_SetData(void)
+static void LED_SetCfg(void)
 {
-    LED_Data[ORANGE].color = ORANGE;
-    LED_Data[ORANGE].GPIOx = GPIOD;
-    LED_Data[ORANGE].port = GPIO_PORT_D;
-    LED_Data[ORANGE].pin = GPIO_IO_13;
-    LED_Data[ORANGE].pin_mask = GPIO_IO_13_MASK;
-    LED_Data[ORANGE].pin_active_state = GPIO_IO_SET;
+    LED_Cfg[ORANGE].color = ORANGE;
+    LED_Cfg[ORANGE].GPIOx = GPIOD;
+    LED_Cfg[ORANGE].port = GPIO_PORT_D;
+    LED_Cfg[ORANGE].pin = GPIO_IO_13;
+    LED_Cfg[ORANGE].pin_mask = ARM_GPIO_IO_13_MASK;
+    LED_Cfg[ORANGE].pin_active_state = ARM_GPIO_IO_SET;
 
-    LED_Data[RED].color = RED;
-    LED_Data[RED].GPIOx = GPIOD;
-    LED_Data[RED].port = GPIO_PORT_D;
-    LED_Data[RED].pin = GPIO_IO_14;
-    LED_Data[RED].pin_mask = GPIO_IO_14_MASK;
-    LED_Data[RED].pin_active_state = GPIO_IO_SET;
+    LED_Cfg[RED].color = RED;
+    LED_Cfg[RED].GPIOx = GPIOD;
+    LED_Cfg[RED].port = GPIO_PORT_D;
+    LED_Cfg[RED].pin = GPIO_IO_14;
+    LED_Cfg[RED].pin_mask = ARM_GPIO_IO_14_MASK;
+    LED_Cfg[RED].pin_active_state = ARM_GPIO_IO_SET;
 
-    LED_Data[BLUE].color = BLUE;
-    LED_Data[BLUE].GPIOx = GPIOD;
-    LED_Data[BLUE].port = GPIO_PORT_D;
-    LED_Data[BLUE].pin = GPIO_IO_15;
-    LED_Data[BLUE].pin_mask = GPIO_IO_15_MASK;
-    LED_Data[BLUE].pin_active_state = GPIO_IO_SET;
+    LED_Cfg[BLUE].color = BLUE;
+    LED_Cfg[BLUE].GPIOx = GPIOD;
+    LED_Cfg[BLUE].port = GPIO_PORT_D;
+    LED_Cfg[BLUE].pin = GPIO_IO_15;
+    LED_Cfg[BLUE].pin_mask = ARM_GPIO_IO_15_MASK;
+    LED_Cfg[BLUE].pin_active_state = ARM_GPIO_IO_SET;
 
-    LED_Data[GREEN].color = GREEN;
-    LED_Data[GREEN].GPIOx = GPIOD;
-    LED_Data[GREEN].port = GPIO_PORT_D;
-    LED_Data[GREEN].pin = GPIO_IO_12;
-    LED_Data[GREEN].pin_mask = GPIO_IO_12_MASK;
-    LED_Data[GREEN].pin_active_state = GPIO_IO_SET;
+    LED_Cfg[GREEN].color = GREEN;
+    LED_Cfg[GREEN].GPIOx = GPIOD;
+    LED_Cfg[GREEN].port = GPIO_PORT_D;
+    LED_Cfg[GREEN].pin = GPIO_IO_12;
+    LED_Cfg[GREEN].pin_mask = ARM_GPIO_IO_12_MASK;
+    LED_Cfg[GREEN].pin_active_state = ARM_GPIO_IO_SET;
 }
 
 static void LED_Set(eLED_Colors led_color, uint32_t state)
 {
     if(state) {
-        if(LED_Data[led_color].pin_active_state == GPIO_IO_SET) {
-            ARM_GPIO_SetIO(LED_Data[led_color].GPIOx, LED_Data[led_color].pin_mask);
+        if(LED_Cfg[led_color].pin_active_state == ARM_GPIO_IO_SET) {
+            ARM_GPIO_SetIO(LED_Cfg[led_color].GPIOx, LED_Cfg[led_color].pin_mask);
         } else {
-            ARM_GPIO_ResetIO(LED_Data[led_color].GPIOx, LED_Data[led_color].pin_mask);
+            ARM_GPIO_ResetIO(LED_Cfg[led_color].GPIOx, LED_Cfg[led_color].pin_mask);
         }
     } else {
-        if(LED_Data[led_color].pin_active_state == GPIO_IO_SET) {
-            ARM_GPIO_ResetIO(LED_Data[led_color].GPIOx, LED_Data[led_color].pin_mask);
+        if(LED_Cfg[led_color].pin_active_state == ARM_GPIO_IO_SET) {
+            ARM_GPIO_ResetIO(LED_Cfg[led_color].GPIOx, LED_Cfg[led_color].pin_mask);
         } else {
-            ARM_GPIO_SetIO(LED_Data[led_color].GPIOx, LED_Data[led_color].pin_mask);
+            ARM_GPIO_SetIO(LED_Cfg[led_color].GPIOx, LED_Cfg[led_color].pin_mask);
         }
     }
 }

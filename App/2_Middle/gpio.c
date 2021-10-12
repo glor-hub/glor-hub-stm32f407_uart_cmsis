@@ -4,10 +4,10 @@
 #include "stm32f4xx.h"
 #include "RTE_Device.h"
 #include "common.h"
-#include "gpio.h"
-#include "Driver_USART.h"
-#include "usart.h"
 #include "arm_gpio.h"
+#include "Driver_USART.h"
+#include "gpio.h"
+#include "usart.h"
 #include "arm_clock.h"
 
 //********************************************************************************
@@ -27,7 +27,7 @@
 //********************************************************************************
 //Variables
 //********************************************************************************
-static GPIO_Cfg_t GPIO_Config;
+static ARM_GPIO_Cfg_t GPIO_Config;
 
 
 //********************************************************************************
@@ -38,8 +38,8 @@ static GPIO_Cfg_t GPIO_Config;
 //Public
 //================================================================================
 
-void GPIO_SetCfg(GPIO_TypeDef *GPIOx, eGPIO_IONumbers io_num, uint32_t io_mode, uint32_t io_type,
-                 uint32_t io_pull, uint32_t io_speed, uint32_t io_alt)
+void GPIO_SetData(GPIO_TypeDef *GPIOx, eGPIO_IONumbers io_num, uint32_t io_mode, uint32_t io_type,
+                  uint32_t io_pull, uint32_t io_speed, uint32_t io_alt)
 
 {
 
@@ -50,16 +50,12 @@ void GPIO_SetCfg(GPIO_TypeDef *GPIOx, eGPIO_IONumbers io_num, uint32_t io_mode, 
     GPIO_Config.Pull = io_pull;
     GPIO_Config.Speed = io_speed;
     GPIO_Config.AltFunc = io_alt; //used only for alternate mode
+    ARM_GPIO_SetCfg(&GPIO_Config);
 }
 
 void GPIO_Init(void)
 {
 
-}
-
-GPIO_Cfg_t *GPIO_GetConfig(void)
-{
-    return &GPIO_Config;
 }
 
 //================================================================================
