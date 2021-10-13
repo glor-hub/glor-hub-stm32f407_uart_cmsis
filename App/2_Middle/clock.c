@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include "common.h"
+#include "app.h"
 #include "assert.h"
 #include "arm_clock.h"
 #include "arm_gpio.h"

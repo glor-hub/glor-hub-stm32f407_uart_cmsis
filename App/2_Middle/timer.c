@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "common.h"
+#include "app.h"
 #include "assert.h"
 #include "timer.h"
 
