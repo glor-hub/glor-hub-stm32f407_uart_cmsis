@@ -439,7 +439,7 @@ static void ARM_USART1_Resources_Struct_Init(void)
     p_str->capabilities.reserved =  0;                  // Reserved (must be zero)
     p_str->usart_name = USART_1;                        //Interface name
     p_str->p_reg = USART1;                              // Pointer to USART peripheral registers
-    p_str->p_pin = USART_GetPinConfig(USART_1);         // Pointer to USART pins configuration
+    p_str->p_pin = USART_GetPinCfg(USART_1);         // Pointer to USART pins configuration
     p_str->irq_num = USART1_IRQn;
     p_str->p_info = &USART1_Info;
 }

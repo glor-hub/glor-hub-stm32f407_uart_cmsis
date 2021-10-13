@@ -90,7 +90,7 @@ Multibuffer communication using DMA
 
 
 void USART_Init(void);
-USART_PinCfg_t *USART_GetPinConfig(ePeriphTypes usart_name);
+USART_PinCfg_t *USART_GetPinCfg(ePeriphTypes usart_name);
 
 #if (RTE_USART1==1)
 void USART1_cb(uint32_t event);
