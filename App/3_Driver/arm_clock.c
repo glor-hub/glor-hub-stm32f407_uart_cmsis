@@ -386,8 +386,8 @@ void ARM_RCC_ConfigMCO2(void)
 
 static uint32_t ARM_RCC_ClockSourceCmd(eARM_RCC_ClockSources source, ePeriphCmd cmd)
 {
-    uint32_t counter, status;
-    status = ARM_RCC_STA_READY;
+    uint32_t counter = 0;
+    uint32_t status = ARM_RCC_STA_READY;
     switch(source) {
         case ARM_RCC_HSI: {
             if(cmd == ENABLE_CMD) {
@@ -465,6 +465,9 @@ static uint32_t ARM_RCC_ClockSourceCmd(eARM_RCC_ClockSources source, ePeriphCmd 
 //disable HSE with external clock
                 RCC->CR &= ~RCC_CR_HSEBYP;
             }
+            break;
+        }
+        default: {
             break;
         }
     }
