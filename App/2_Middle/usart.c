@@ -46,7 +46,7 @@ static USART_PinCfg_t UART5_PinConfig[MAX_USART_PIN_NAMES];
 #endif //(RTE_UART5==1)
 
 #if (RTE_USART6==1)
-static USART_PinCfg_t USART6_PinConfig[MAX_UART_PIN_NAMES];
+static USART_PinCfg_t USART6_PinConfig[MAX_USART_PIN_NAMES];
 #endif //(RTE_USART6==1)
 
 //********************************************************************************
@@ -97,13 +97,13 @@ USART_PinCfg_t *USART_GetPinConfig(ePeriphTypes usart_name)
 
 #ifdef USART5_ENABLE
         case UART_5: {
-            pUSART_PinCfg = USART5_PinConfig;
+            pUSART_PinCfg = UART5_PinConfig;
         }
 #endif //USART5_ENABLE
 
 #ifdef UART6_ENABLE
         case USART_6: {
-            pUSART_PinCfg = UART6_PinConfig;
+            pUSART_PinCfg = USART6_PinConfig;
         }
 #endif //UART6_ENABLE
 
@@ -147,14 +147,14 @@ static void USART_SetPinConfig(void)
 #if (RTE_USART1==1)
 
 #if (RTE_USART1_TX_ID == 0)
-#error "The USART1_TX Pin Configuration not used"
+#error "The USART1_TX Pin not used"
 #elif (RTE_USART1_TX_ID == 1)
     USART1_PinConfig[TX_PIN].GPIOx = RTE_USART1_TX_PORT;
     USART1_PinConfig[TX_PIN].port = GPIO_PORT_A;
     USART1_PinConfig[TX_PIN].pin = RTE_USART1_TX_BIT;
     USART1_PinConfig[TX_PIN].alt_func = ARM_GPIO_IO_AF_7;
 #elif (RTE_USART1_TX_ID == 2)
-#error "The USART1_TX Pin Configuration not used"
+#error "Invalid USART1_TX Pin Configuration"
 #elif (RTE_USART1_TX_ID == 3)
     USART1_PinConfig[TX_PIN].GPIOx = RTE_USART1_TX_PORT;
     USART1_PinConfig[TX_PIN].port = GPIO_PORT_B;
@@ -165,14 +165,14 @@ static void USART_SetPinConfig(void)
 #endif //(RTE_USART1_TX_ID == 0)
 
 #if (RTE_USART1_RX_ID == 0)
-#error "The USART1_RX Pin Configuration not used"
+#error "The USART1_RX Pin not used"
 #elif (RTE_USART1_RX_ID == 1)
     USART1_PinConfig[RX_PIN].GPIOx = RTE_USART1_RX_PORT;
     USART1_PinConfig[RX_PIN].port = GPIO_PORT_A;
     USART1_PinConfig[RX_PIN].pin = RTE_USART1_RX_BIT;
     USART1_PinConfig[RX_PIN].alt_func = ARM_GPIO_IO_AF_7;
 #elif (RTE_USART1_RX_ID == 2)
-#error "The USART1_RX Pin Configuration not used"
+#error "Invalid USART1_RX Pin Configuration"
 #elif (RTE_USART1_RX_ID == 3)
     USART1_PinConfig[RX_PIN].GPIOx = RTE_USART1_RX_PORT;
     USART1_PinConfig[RX_PIN].port = GPIO_PORT_B;
@@ -183,7 +183,7 @@ static void USART_SetPinConfig(void)
 #endif //(RTE_USART1_RX_ID == 0)
 
 #if (RTE_USART1_CK_ID == 0)
-#error "The USART1_CK Pin Configuration not used"
+#error "The USART1_CK Pin not used"
 #elif (RTE_USART1_CK_ID == 1)
     USART1_PinConfig[CK_PIN].GPIOx = RTE_USART1_CK_PORT;
     USART1_PinConfig[CK_PIN].port = GPIO_PORT_A;
@@ -194,7 +194,7 @@ static void USART_SetPinConfig(void)
 #endif //(RTE_USART1_CK_ID == 0)
 
 #if (RTE_USART1_CTS_ID == 0)
-#error "The USART1_CTS Pin Configuration not used"
+#error "The USART1_CTS Pin not used"
 #elif (RTE_USART1_CTS_ID == 1)
     USART1_PinConfig[CTS_PIN].GPIOx = RTE_USART1_CTS_PORT;
     USART1_PinConfig[CTS_PIN].port = GPIO_PORT_A;
@@ -205,7 +205,7 @@ static void USART_SetPinConfig(void)
 #endif //(RTE_USART1_CTS_ID == 0)
 
 #if (RTE_USART1_RTS_ID == 0)
-#error "The USART1_RTS Pin Configuration not used"
+#error "The USART1_RTS Pin not used"
 #elif (RTE_USART1_RTS_ID == 1)
     USART1_PinConfig[RTS_PIN].GPIOx = RTE_USART1_RTS_PORT;
     USART1_PinConfig[RTS_PIN].port = GPIO_PORT_A;
@@ -220,7 +220,7 @@ static void USART_SetPinConfig(void)
 #if (RTE_USART2 == 1)
 
 #if (RTE_USART2_TX_ID == 0)
-#error "The USART2_TX Pin Configuration not used"
+#error "The USART2_TX Pin not used"
 #elif (RTE_USART2_TX_ID == 1)
     USART2_PinConfig[TX_PIN].GPIOx = RTE_USART2_TX_PORT;
     USART2_PinConfig[TX_PIN].port = GPIO_PORT_A;
@@ -236,7 +236,7 @@ static void USART_SetPinConfig(void)
 #endif //(RTE_USART2_TX_ID == 0)
 
 #if (RTE_USART2_RX_ID == 0)
-#error "The USART2_RX Pin Configuration not used"
+#error "The USART2_RX Pin not used"
 #elif (RTE_USART2_RX_ID == 1)
     USART2_PinConfig[RX_PIN].GPIOx = RTE_USART2_RX_PORT;
     USART2_PinConfig[RX_PIN].port = GPIO_PORT_A;
@@ -252,7 +252,7 @@ static void USART_SetPinConfig(void)
 #endif //(RTE_USART2_RX_ID == 0)
 
 #if (RTE_USART2_CK_ID == 0)
-#error "The USART2_CK Pin Configuration not used"
+#error "The USART2_CK Pin not used"
 #elif (RTE_USART2_CK_ID == 1)
     USART2_PinConfig[CK_PIN].GPIOx = RTE_USART2_CK_PORT;
     USART2_PinConfig[CK_PIN].port = GPIO_PORT_A;
@@ -268,7 +268,7 @@ static void USART_SetPinConfig(void)
 #endif //(RTE_USART2_CK_ID == 0)
 
 #if (RTE_USART2_CTS_ID == 0)
-#error "The USART2_CTS Pin Configuration not used"
+#error "The USART2_CTS Pin not used"
 #elif (RTE_USART2_CTS_ID == 1)
     USART2_PinConfig[CTS_PIN].GPIOx = RTE_USART2_CTS_PORT;
     USART2_PinConfig[CTS_PIN].port = GPIO_PORT_A;
@@ -284,7 +284,7 @@ static void USART_SetPinConfig(void)
 #endif //(RTE_USART2_CTS_ID == 0)
 
 #if (RTE_USART2_RTS_ID == 0)
-#error "The USART2_RTS Pin Configuration not used"
+#error "The USART2_RTS Pin not used"
 #elif (RTE_USART2_RTS_ID == 1)
     USART2_PinConfig[RTS_PIN].GPIOx = RTE_USART2_RTS_PORT;
     USART2_PinConfig[RTS_PIN].port = GPIO_PORT_A;
@@ -304,7 +304,7 @@ static void USART_SetPinConfig(void)
 #if (RTE_USART3 == 1)
 
 #if (RTE_USART3_TX_ID == 0)
-#error "The USART3_TX Pin Configuration not used"
+#error "The USART3_TX Pin not used"
 #elif (RTE_USART3_TX_ID == 1)
     USART3_PinConfig[TX_PIN].GPIOx = RTE_USART3_TX_PORT;
     USART3_PinConfig[TX_PIN].port = GPIO_PORT_A;
@@ -325,7 +325,7 @@ static void USART_SetPinConfig(void)
 #endif //(RTE_USART3_TX_ID == 0)
 
 #if (RTE_USART3_RX_ID == 0)
-#error "The USART3_RX Pin Configuration not used"
+#error "The USART3_RX Pin not used"
 #elif (RTE_USART3_RX_ID == 1)
     USART3_PinConfig[RX_PIN].GPIOx = RTE_USART3_RX_PORT;
     USART3_PinConfig[RX_PIN].port = GPIO_PORT_B;
@@ -342,13 +342,13 @@ static void USART_SetPinConfig(void)
     USART3_PinConfig[RX_PIN].pin = RTE_USART3_RX_BIT;
     USART3_PinConfig[RX_PIN].alt_func = ARM_GPIO_IO_AF_7;
 #elif (RTE_USART3_RX_ID == 4)
-#error "The USART3_RX Pin Configuration not used"
+#error "Invalid USART3_RX Pin Configuration"
 #else
 #error "Invalid USART3_RX Pin Configuration"
 #endif // (RTE_USART3_RX_ID == 0)
 
 #if (RTE_USART3_CK_ID == 0)
-#error "The USART3_CK Pin Configuration not used"
+#error "The USART3_CK Pin not used"
 #elif (RTE_USART3_CK_ID == 1)
     USART3_PinConfig[CK_PIN].GPIOx = RTE_USART3_CK_PORT;
     USART3_PinConfig[CK_PIN].port = GPIO_PORT_B;
@@ -369,7 +369,7 @@ static void USART_SetPinConfig(void)
 #endif //(RTE_USART3_CK_ID == 0)
 
 #if (RTE_USART3_CTS_ID == 0)
-#error "The USART3_CTS Pin Configuration not used"
+#error "The USART3_CTS Pin not used"
 #elif (RTE_USART3_CTS_ID == 1)
     USART3_PinConfig[CTS_PIN].GPIOx = RTE_USART3_CTS_PORT;
     USART3_PinConfig[CTS_PIN].port = GPIO_PORT_B;
@@ -385,7 +385,7 @@ static void USART_SetPinConfig(void)
 #endif //(RTE_USART3_CTS_ID == 0)
 
 #if (RTE_USART3_RTS_ID == 0)
-#error "The USART3_RTS Pin Configuration not used"
+#error "The USART3_RTS Pin not used"
 #elif (RTE_USART3_RTS_ID == 1)
     USART3_PinConfig[RTS_PIN].GPIOx = RTE_USART3_RTS_PORT;
     USART3_PinConfig[RTS_PIN].port = GPIO_PORT_B;
@@ -405,7 +405,7 @@ static void USART_SetPinConfig(void)
 #if (RTE_UART4==1)
 
 #if (RTE_UART4_TX_ID == 0)
-#error "The UART4_TX Pin Configuration not used"
+#error "The UART4_TX Pin not used"
 #elif (RTE_UART4_TX_ID == 1)
     UART4_PinConfig[TX_PIN].GPIOx = RTE_UART4_TX_PORT;
     UART4_PinConfig[TX_PIN].port = GPIO_PORT_A;
@@ -417,17 +417,17 @@ static void USART_SetPinConfig(void)
     UART4_PinConfig[TX_PIN].pin = RTE_UART4_TX_BIT;
     UART4_PinConfig[TX_PIN].alt_func = ARM_GPIO_IO_AF_7;
 #elif (RTE_UART4_TX_ID == 3)
-#error "The UART4_TX Pin Configuration not used"
+#error "Invalid UART4_TX Pin Configuration"
 #elif (RTE_UART4_TX_ID == 4)
-#error "The UART4_TX Pin Configuration not used"
+#error "Invalid UART4_TX Pin Configuration"
 #elif (RTE_UART4_TX_ID == 5)
-#error "The UART4_TX Pin Configuration not used"
+#error "Invalid UART4_TX Pin Configuration"
 #else
 #error "Invalid UART4_TX Pin Configuration"
 #endif //(RTE_UART4_TX_ID == 0)
 
 #if (RTE_UART4_RX_ID == 0)
-#error "The UART4_RX Pin Configuration not used"
+#error "The UART4_RX Pin not used"
 #elif (RTE_UART4_RX_ID == 1)
     UART4_PinConfig[RX_PIN].GPIOx = RTE_UART4_RX_PORT;
     UART4_PinConfig[RX_PIN].port = GPIO_PORT_A;
@@ -439,9 +439,9 @@ static void USART_SetPinConfig(void)
     UART4_PinConfig[RX_PIN].pin = RTE_UART4_RX_BIT;
     UART4_PinConfig[RX_PIN].alt_func = ARM_GPIO_IO_AF_7;
 #elif (RTE_UART4_RX_ID == 3)
-#error "The UART4_RX Pin Configuration not used"
+#error "Invalid UART4_RX Pin Configuration"
 #elif (RTE_UART4_RX_ID == 4)
-#error "The UART4_RX Pin Configuration not used"
+#error "Invalid UART4_RX Pin Configuration"
 #else
 #error "Invalid UART4_RX Pin Configuration"
 #endif //(RTE_UART4_RX_ID == 0)
@@ -451,35 +451,35 @@ static void USART_SetPinConfig(void)
 #if (RTE_UART5==1)
 
 #if (RTE_UART5_TX_ID == 0)
-#error "The UART5_TX Pin Configuration not used"
+#error "The UART5_TX Pin not used"
 #elif (RTE_UART5_TX_ID == 1)
     UART5_PinConfig[TX_PIN].GPIOx = RTE_UART5_TX_PORT;
     UART5_PinConfig[TX_PIN].port = GPIO_PORT_C;
     UART5_PinConfig[TX_PIN].pin = RTE_UART5_TX_BIT;
     UART5_PinConfig[TX_PIN].alt_func = ARM_GPIO_IO_AF_7;
 #elif (RTE_UART5_TX_ID == 2)
-#error "The UART5_TX Pin Configuration not used"
+#error "Invalid UART5_TX Pin Configuration"
 #elif (RTE_UART5_TX_ID == 3)
-#error "The UART5_TX Pin Configuration not used"
+#error "Invalid UART5_TX Pin Configuration"
 #elif (RTE_UART5_TX_ID == 4)
-#error "The UART5_TX Pin Configuration not used"
+#error "Invalid UART5_TX Pin Configuration"
 #else
 #error "Invalid UART5_TX Pin Configuration"
 #endif // (RTE_UART5_TX_ID == 0)
 
 #if (RTE_UART5_RX_ID == 0)
-#error "The UART5_RX Pin Configuration not used"
+#error "The UART5_RX Pin not used"
 #elif (RTE_UART5_RX_ID == 1)
     UART5_PinConfig[RX_PIN].GPIOx = RTE_UART5_RX_PORT;
     UART5_PinConfig[RX_PIN].port = GPIO_PORT_D;
     UART5_PinConfig[RX_PIN].pin = RTE_UART5_RX_BIT;
     UART5_PinConfig[RX_PIN].alt_func = ARM_GPIO_IO_AF_7;
 #elif (RTE_UART5_RX_ID == 2)
-#error "The UART5_RX Pin Configuration not used"
+#error "Invalid UART5_RX Pin Configuration"
 #elif (RTE_UART5_RX_ID == 3)
-#error "The UART5_RX Pin Configuration not used"
+#error "Invalid UART5_RX Pin Configuration"
 #elif (RTE_UART5_RX_ID == 4)
-#error "The UART5_RX Pin Configuration not used"
+#error "Invalid UART5_RX Pin Configuration"
 #else
 #error "Invalid UART5_RX Pin Configuration"
 #endif // (RTE_UART5_RX_ID == 0)
@@ -489,9 +489,9 @@ static void USART_SetPinConfig(void)
 #if (RTE_USART6 == 1)
 
 #if (RTE_USART6_TX_ID == 0)
-#error "The USART6_TX Pin Configuration not used"
+#error "The USART6_TX Pin not used"
 #elif (RTE_USART6_TX_ID == 1)
-#error "The USART6_TX Pin Configuration not used"
+#error "Invalid USART6_TX Pin Configuration"
 #elif (RTE_USART6_TX_ID == 2)
     USART6_PinConfig[TX_PIN].GPIOx = RTE_USART6_TX_PORT;
     USART6_PinConfig[TX_PIN].port = GPIO_PORT_C;
@@ -507,9 +507,9 @@ static void USART_SetPinConfig(void)
 #endif //(RTE_USART6_TX_ID == 0)
 
 #if (RTE_USART6_RX_ID == 0)
-#error "The USART6_RX Pin Configuration not used"
+#error "The USART6_RX Pin not used"
 #elif (RTE_USART6_RX_ID == 1)
-#error "The USART6_RX Pin Configuration not used"
+#error "Invalid USART6_RX Pin Configuration"
 #elif (RTE_USART6_RX_ID == 2)
     USART6_PinConfig[RX_PIN].GPIOx = RTE_USART6_RX_PORT;
     USART6_PinConfig[RX_PIN].port = GPIO_PORT_C;
@@ -525,7 +525,7 @@ static void USART_SetPinConfig(void)
 #endif //(RTE_USART6_RX_ID == 0)
 
 #if (RTE_USART6_CK_ID == 0)
-#error "The USART6_CK Pin Configuration not used"
+#error "The USART6_CK Pin not used"
 #elif (RTE_USART6_CK_ID == 1)
     USART6_PinConfig[CK_PIN].GPIOx = RTE_USART6_CK_PORT;
     USART6_PinConfig[CK_PIN].port = GPIO_PORT_Ñ;
@@ -541,7 +541,7 @@ static void USART_SetPinConfig(void)
 #endif //(RTE_USART6_CK_ID == 0)
 
 #if (RTE_USART6_CTS_ID == 0)
-#error "The USART6_CTS Pin Configuration not used"
+#error "The USART6_CTS Pin not used"
 #elif (RTE_USART6_CTS_ID == 1)
     USART6_PinConfig[CTS_PIN].GPIOx = RTE_USART6_CTS_PORT;
     USART6_PinConfig[CTS_PIN].port = GPIO_PORT_G;
@@ -557,7 +557,7 @@ static void USART_SetPinConfig(void)
 #endif //(RTE_USART6_CTS_ID == 0)
 
 #if (RTE_USART6_RTS_ID == 0)
-#error "The USART6_RTS Pin Configuration not used"
+#error "The USART6_RTS Pin not used"
 #elif (RTE_USART6_RTS_ID == 1)
     USART6_PinConfig[RTS_PIN].GPIOx = RTE_USART6_RTS_PORT;
     USART6_PinConfig[RTS_PIN].port = GPIO_PORT_G;

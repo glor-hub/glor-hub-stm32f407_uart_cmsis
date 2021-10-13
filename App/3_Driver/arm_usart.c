@@ -376,70 +376,70 @@ static void ARM_USART1_Resources_Struct_Init(void)
 {
 
     ARM_USART_RESOURCES *p_str = &ARM_USART1_Resources;
-    ARM_USART1_Resources.capabilities.asynchronous = 1U; // supports UART (Asynchronous) mode
+    ARM_USART1_Resources.capabilities.asynchronous = 1U;// supports UART (Asynchronous) mode
 
 #ifdef USART1_SCLK_PIN_ENABLE
-    p_str->capabilities.synchronous_master = 1; // supports Synchronous Master mode
+    p_str->capabilities.synchronous_master = 1;         // supports Synchronous Master mode
 #else
-    p_str->capabilities.synchronous_master = 0; // supports Synchronous Master mode
+    p_str->capabilities.synchronous_master = 0;         // supports Synchronous Master mode
 #endif //USART1_SCLK_PIN_ENABLE        
 
-    p_str->capabilities.synchronous_slave = 0;  // supports Synchronous Slave mode
-    p_str->capabilities.single_wire = 1;        // supports UART Single-wire mode
-    p_str->capabilities.irda = 1;               // supports UART IrDA mode
+    p_str->capabilities.synchronous_slave = 0;          // supports Synchronous Slave mode
+    p_str->capabilities.single_wire = 1;                // supports UART Single-wire mode
+    p_str->capabilities.irda = 1;                       // supports UART IrDA mode
 
 #ifdef USART1_SCLK_PIN_ENABLE
-    p_str->capabilities.smart_card =  1;        // supports UART Smart Card mode
-    p_str->capabilities.smart_card_clock =  1;  // Smart Card Clock generator available
+    p_str->capabilities.smart_card =  1;                // supports UART Smart Card mode
+    p_str->capabilities.smart_card_clock =  1;          // Smart Card Clock generator available
 #else
-    p_str->capabilities.smart_card =  0;        // supports UART Smart Card mode
-    p_str->capabilities.smart_card_clock =  0;  // Smart Card Clock generator available
+    p_str->capabilities.smart_card =  0;                // supports UART Smart Card mode
+    p_str->capabilities.smart_card_clock =  0;          // Smart Card Clock generator available
 #endif //USART1_SCLK_PIN_ENABLE
 
 #ifdef USART1_RTS_PIN_ENABLE
-    p_str->capabilities.flow_control_rts =  1;   // RTS Flow Control available
+    p_str->capabilities.flow_control_rts =  1;          // RTS Flow Control available
 #else
-    p_str->capabilities.flow_control_rts =  0;   // RTS Flow Control available
+    p_str->capabilities.flow_control_rts =  0;          // RTS Flow Control available
 #endif //USART1_RTS_PIN_ENABLE 
 
 #ifdef USART1_CTS_PIN_ENABLE
-    p_str->capabilities.flow_control_cts =  1;   // CTS Flow Control available
+    p_str->capabilities.flow_control_cts =  1;          // CTS Flow Control available
 #else
-    p_str->capabilities.flow_control_cts =  0;   // CTS Flow Control available
+    p_str->capabilities.flow_control_cts =  0;          // CTS Flow Control available
 #endif //USART1_CTS_PIN_ENABLE               
 
-    p_str->capabilities.event_tx_complete =  1;  // Transmit completed event: \ref ARM_USART_EVENT_TX_COMPLETE
-    p_str->capabilities.event_rx_timeout =  0;   // Signal receive character timeout event: \ref ARM_USART_EVENT_RX_TIMEOUT
+    p_str->capabilities.event_tx_complete =  1;         // Transmit completed event: \ref ARM_USART_EVENT_TX_COMPLETE
+    p_str->capabilities.event_rx_timeout =  0;          // Signal receive character timeout event: \ref ARM_USART_EVENT_RX_TIMEOUT
 
 #ifdef USART1_RTS_PIN_ENABLE
-    p_str->capabilities.rts =  1;                // RTS Line: 0=not available, 1=available
+    p_str->capabilities.rts =  1;                       // RTS Line: 0=not available, 1=available
 #else
-    p_str->capabilities.rts =  0;                // RTS Line: 0=not available, 1=available
+    p_str->capabilities.rts =  0;                       // RTS Line: 0=not available, 1=available
 #endif //USART1_RTS_PIN_ENABLE 
 
 #ifdef USART1_CTS_PIN_ENABLE
-    p_str->capabilities.cts =  1;                // CTS Line: 0=not available, 1=available
+    p_str->capabilities.cts =  1;                       // CTS Line: 0=not available, 1=available
 #else
-    p_str->capabilities.cts =  0;                // CTS Line: 0=not available, 1=available
+    p_str->capabilities.cts =  0;                       // CTS Line: 0=not available, 1=available
 #endif //USART1_CTS_PIN_ENABLE       
-    p_str->capabilities.dtr =  0;      // DTR Line: 0=not available, 1=available
-    p_str->capabilities.dsr =  0;      // DSR Line: 0=not available, 1=available
-    p_str->capabilities.dcd =  0;      // DCD Line: 0=not available, 1=available
-    p_str->capabilities.ri =  0;      // RI Line: 0=not available, 1=available
+    p_str->capabilities.dtr =  0;                       // DTR Line: 0=not available, 1=available
+    p_str->capabilities.dsr =  0;                       // DSR Line: 0=not available, 1=available
+    p_str->capabilities.dcd =  0;                       // DCD Line: 0=not available, 1=available
+    p_str->capabilities.ri =  0;                        // RI Line: 0=not available, 1=available
 
 #ifdef USART1_CTS_PIN_ENABLE
-    p_str->capabilities.event_cts = 1;     // Signal CTS change event: \ref ARM_USART_EVENT_CTS
+    p_str->capabilities.event_cts = 1;                  // Signal CTS change event: \ref ARM_USART_EVENT_CTS
 #else
-    p_str->capabilities.event_cts =  0;      // Signal CTS change event: \ref ARM_USART_EVENT_CTS
+    p_str->capabilities.event_cts =  0;                 // Signal CTS change event: \ref ARM_USART_EVENT_CTS
 #endif //USART1_CTS_PIN_ENABLE 
 
-    p_str->capabilities.event_dsr =  0;      // Signal DSR change event: \ref ARM_USART_EVENT_DSR
-    p_str->capabilities.event_dcd =  0;      // Signal DCD change event: \ref ARM_USART_EVENT_DCD
-    p_str->capabilities.event_ri =  0;      // Signal RI change event: \ref ARM_USART_EVENT_RI
-    p_str->capabilities.reserved =  0;      // Reserved (must be zero)
-    p_str->usart_name = USART_1;   //Interface name
-    p_str->p_reg = USART1;   // Pointer to USART peripheral registers
-    p_str->p_pin = USART_GetPinConfig(USART_1); // Pointer to USART pins configuration
+    p_str->capabilities.event_dsr =  0;                 // Signal DSR change event: \ref ARM_USART_EVENT_DSR
+    p_str->capabilities.event_dcd =  0;                 // Signal DCD change event: \ref ARM_USART_EVENT_DCD
+    p_str->capabilities.event_ri =  0;                  // Signal RI change event: \ref ARM_USART_EVENT_RI
+    p_str->capabilities.reserved =  0;                  // Reserved (must be zero)
+    p_str->usart_name = USART_1;                        //Interface name
+    p_str->p_reg = USART1;                              // Pointer to USART peripheral registers
+    p_str->p_pin = USART_GetPinConfig(USART_1);         // Pointer to USART pins configuration
     p_str->irq_num = USART1_IRQn;
     p_str->p_info = &USART1_Info;
 }

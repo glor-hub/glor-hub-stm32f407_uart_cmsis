@@ -79,7 +79,6 @@ void ARM_EXTI_SetCfg(ARM_EXTI_Cfg_t *pEXTI_Cfg)
                                    (4U * ((uint32_t)pin_num >> SYSCFG_EXTICR1_EXTI3_Pos));
             break;
         }
-
     }
     switch(mode) {
         case ARM_EXTI_FALLING_TRIGGER_MODE: {
