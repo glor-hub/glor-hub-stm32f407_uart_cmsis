@@ -46,8 +46,15 @@ using STM32F4DISCOVERY kit.
 
 int main(void)
 {
-    bool app_init_result = App_Init();
-    ASSERT(app_init_result == PASSED);
+    bool init_result = App_Init();
+
+#ifdef _APP_DEBUG_
+    ASSERT(init_result == PASSED);
+#endif//_APP_DEBUG_
+
+    if(init_result != PASSED) {
+        while(1);
+    }
 
     while(1) {
         App_IdleTask();

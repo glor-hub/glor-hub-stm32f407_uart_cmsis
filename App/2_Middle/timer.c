@@ -7,8 +7,13 @@
 #include <string.h>
 #include "common.h"
 #include "app.h"
-#include "assert.h"
 #include "timer.h"
+
+#define _TIMER_DEBUG_
+
+#ifdef _TIMER_DEBUG_
+#include "assert.h"
+#endif//_TIMER_DEBUG_
 
 //********************************************************************************
 //Macros
@@ -66,12 +71,17 @@ bool Timer_is_Ready(uint32_t status)
 
 uint32_t Timer_Init(void)
 {
-    uint32_t status = TIMER_STA_READY;
     memset(&Timer_Data, 0, sizeof(Timer_Data_t) * NUM_TIMERS);
+
+    uint32_t status = TIMER_STA_READY;
     if(SysTick_Config(SystemCoreClock / 1000 - 1)) {
         status = TIMER_STA_INIT_ERR;
     }
-    ASSERT(status == TIMER_STA_READY);
+
+#ifdef _TIMER_DEBUG_
+    ASSERT(Timer_is_Ready(status));
+#endif//_TIMER_DEBUG_
+
     return Timer_is_Ready(status) ? PASSED : FAILED;
 }
 

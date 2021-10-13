@@ -11,7 +11,7 @@
 #define _ARM_CLOCK_DEBUG_
 
 #ifdef _ARM_CLOCK_DEBUG_
-#define LOG_DBG_MSG(VAL) do{printf(VAL);printf(" in function %s, file %s on line %d\r\n", (uint8_t *)__FUNCTION__, (uint8_t *)__FILE__, __LINE__);}while(0)
+#include "assert.h"
 #endif//_ARM_CLOCK_DEBUG_
 
 //********************************************************************************
@@ -475,7 +475,7 @@ static uint32_t ARM_RCC_ClockSourceCmd(eARM_RCC_ClockSources source, ePeriphCmd 
         }
         default: {
 #ifdef _ARM_CLOCK_DEBUG_
-            LOG_DBG_MSG("Undefined switch-case value");
+            LOG("Warning! Undefined switch-case value!\r\n");
 #endif//_ARM_CLOCK_DEBUG_
             break;
         }

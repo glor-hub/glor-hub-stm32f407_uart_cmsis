@@ -34,9 +34,11 @@
 
 void assert_failed(uint8_t *func, uint8_t *file, uint32_t line)
 {
-    printf(" Wrong parameters value: in function %s, file %s on line %d\r\n", func, file, line);
-
-    while(1);
+#ifdef VERBOSE_OUTPUT
+    printf("Assertion failed: expression is false. Function %s, file %s on line %d\r\n", func, file, line);
+#else//Not defined VERBOSE_OUTPUT
+    printf("Assertion failed: expression is false.\r\n");
+#endif//VERBOSE_OUTPUT
 }
 
 //================================================================================

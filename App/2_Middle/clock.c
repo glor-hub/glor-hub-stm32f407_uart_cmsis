@@ -6,12 +6,16 @@
 #include <stdbool.h>
 #include "common.h"
 #include "app.h"
-#include "assert.h"
 #include "arm_clock.h"
 #include "arm_gpio.h"
 #include "gpio.h"
 #include "clock.h"
 
+#define _CLOCK_DEBUG_
+
+#ifdef _CLOCK_DEBUG_
+#include "assert.h"
+#endif//_CLOCK_DEBUG_
 //********************************************************************************
 //Macros
 //********************************************************************************
@@ -39,13 +43,17 @@
 
 uint32_t Clock_Init(void)
 {
-    uint32_t arm_status = 0UL;
-    arm_status |= ARM_RCC_Reset();
-    arm_status |= ARM_RCC_SetSysClockTo168();
-    arm_status |= ARM_RCC_NMI_HandlerErrCheck();
+    uint32_t status = ARM_RCC_Reset();
+    status |= ARM_RCC_SetSysClockTo168();
+    status |= ARM_RCC_NMI_HandlerErrCheck();
+
     SystemCoreClockUpdate();
-    ASSERT(arm_status == ARM_RCC_STA_READY);
-    return ARM_RCC_isReady(arm_status) ? PASSED : FAILED;
+
+#ifdef _CLOCK_DEBUG_
+    ASSERT(ARM_RCC_isReady(status));
+#endif//_CLOCK_DEBUG_
+
+    return ARM_RCC_isReady(status) ? PASSED : FAILED;
 }
 
 void Clock_Test(void)
