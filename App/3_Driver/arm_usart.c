@@ -550,8 +550,8 @@ static ARM_DRIVER_USART ARM_USART1_Driver = {
 
 void ARM_USART_Init(void)
 {
-    ARM_DRIVER_USART *p_drv;
 #if (RTE_USART1==1)
+	  ARM_DRIVER_USART *p_drv;
     p_drv = &ARM_USART1_Driver;
     ARM_USART1_Resources_Struct_Init();
     p_drv->Initialize(&USART1_cb);

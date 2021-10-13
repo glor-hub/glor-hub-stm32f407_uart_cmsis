@@ -135,4 +135,4 @@ static void ARM_EXTI_EventEnable(eARM_GPIO_IONumbers pin_num,
     }
 }
 
-#endif USE_EVENT_GENERATION
+#endif//USE_EVENT_GENERATION

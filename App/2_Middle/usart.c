@@ -63,7 +63,6 @@ void USART_Init(void)
 {
     USART_SetPinCfg();
     ARM_USART_Init();
-
 }
 
 USART_PinCfg_t *USART_GetPinCfg(ePeriphTypes usart_name)
