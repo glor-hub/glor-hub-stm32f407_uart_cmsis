@@ -34,14 +34,11 @@ static void ARM_EXTI_EventEnable(eARM_GPIO_IONumbers pin_num, ePeriphCmd cmd);
 //================================================================================
 void ARM_EXTI_SetCfg(ARM_EXTI_Cfg_t *pEXTI_Cfg)
 {
-    ePeriphTypes port_name;
-    eARM_GPIO_IONumbers pin_num;
-    eARM_EXTI_TriggerModes mode;
+    ePeriphTypes port_name = pEXTI_Cfg->Port;
+    eARM_GPIO_IONumbers pin_num = pEXTI_Cfg->Pin;
+    eARM_EXTI_TriggerModes mode = pEXTI_Cfg->Trigger_Mode;
     SYSCFG_TypeDef *p_cfgReg = SYSCFG;
     EXTI_TypeDef *p_reg = EXTI;
-    port_name = pEXTI_Cfg->Port;
-    pin_num = pEXTI_Cfg->Pin;
-    mode = pEXTI_Cfg->Trigger_Mode;
     switch(pin_num) {
         case ARM_GPIO_IO_0:
         case ARM_GPIO_IO_1:
