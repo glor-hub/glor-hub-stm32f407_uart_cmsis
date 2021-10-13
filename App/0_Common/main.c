@@ -12,9 +12,8 @@ using STM32F4DISCOVERY kit.
 #include <stdbool.h>
 #include <stdio.h>
 #include "common.h"
-#include "assert.h"
 #include "app.h"
-
+#include "assert.h"
 
 //********************************************************************************
 //Macros

@@ -3,6 +3,8 @@
 //********************************************************************************
 #include "stm32f4xx.h"
 #include <stdio.h>
+#include <stdbool.h>
+#include "app.h"
 #include "assert.h"
 
 

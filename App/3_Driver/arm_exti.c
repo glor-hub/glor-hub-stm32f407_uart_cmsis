@@ -121,6 +121,8 @@ void ARM_EXTI_ClearPendingIRQ(eARM_GPIO_IONumbers pin_num)
 //Private
 //================================================================================
 
+#ifdef USE_EVENT_GENERATION
+
 //event generation enable/disable
 static void ARM_EXTI_EventEnable(eARM_GPIO_IONumbers pin_num,
                                  ePeriphCmd cmd)
@@ -133,3 +135,5 @@ static void ARM_EXTI_EventEnable(eARM_GPIO_IONumbers pin_num,
         p_reg->EMR &= ~(EXTI_EMR_MR0_Msk << (uint32_t)pin_num);
     }
 }
+
+#endif USE_EVENT_GENERATION

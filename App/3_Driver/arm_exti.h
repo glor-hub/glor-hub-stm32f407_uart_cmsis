@@ -1,6 +1,8 @@
 #ifndef _ARM_EXTI_H_
 #define _ARM_EXTI_H_
 
+//#define USE_EVENT_GENERATION
+
 typedef enum {
     ARM_EXTI_NO_TRIGGER_MODE = 0,
     ARM_EXTI_FALLING_TRIGGER_MODE,

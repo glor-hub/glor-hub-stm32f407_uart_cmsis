@@ -1,7 +1,7 @@
 #ifndef _ASSERT_H_
 #define _ASSERT_H_
 
-#ifndef NDEBUG
+#ifdef _APP_DEBUG_
 
 void assert_failed(uint8_t *func, uint8_t *file, uint32_t line);
 
@@ -11,6 +11,6 @@ void assert_failed(uint8_t *func, uint8_t *file, uint32_t line);
 
 #define ASSERT(expr)
 
-#endif//NDEBUG
+#endif//_APP_DEBUG_
 
 #endif //_ASSERT_H_ 

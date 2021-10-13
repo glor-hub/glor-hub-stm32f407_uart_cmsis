@@ -7,7 +7,6 @@
 #define PASSED 0
 #define FAILED 1
 
-//#define NDEBUG
 #define HARDWARE_TESTING_MODE
 
 typedef enum {

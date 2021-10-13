@@ -68,8 +68,8 @@ void EXTI_ClearFlag(void)
 //Private
 //================================================================================
 
-void EXTI_SetData(ePeriphTypes port_name, eARM_GPIO_IONumbers pin_num,
-                  eARM_EXTI_TriggerModes mode)
+static void EXTI_SetData(ePeriphTypes port_name, eARM_GPIO_IONumbers pin_num,
+                         eARM_EXTI_TriggerModes mode)
 {
     EXTI_Config.Port = port_name;
     EXTI_Config.Pin = pin_num;
