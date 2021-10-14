@@ -481,7 +481,7 @@ static uint32_t ARM_RCC_ClockSourceCmd(eARM_RCC_ClockSources source, ePeriphCmd 
         }
         default: {
 #ifdef _ARM_CLOCK_DEBUG_
-            LOG("Warning! Undefined switch-case value!\r\n");
+            LOG("Warning! Undefined switch-case value");
 #endif//_ARM_CLOCK_DEBUG_
             break;
         }

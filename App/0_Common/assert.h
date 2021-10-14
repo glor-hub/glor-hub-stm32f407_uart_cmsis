@@ -13,7 +13,7 @@ void assert_failed(uint8_t *func, uint8_t *file, uint32_t line);
 
 #else//Not defined VERBOSE_OUTPUT
 
-#define LOG(VAL) do{printf(VAL);}while(0)
+#define LOG(VAL) do{printf(VAL);printf("!\r\n");}while(0)
 
 #endif//VERBOSE_OUTPUT
 
