@@ -5,7 +5,6 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include "common.h"
-#include "app.h"
 #include "arm_clock.h"
 #include "arm_gpio.h"
 #include "gpio.h"
@@ -16,6 +15,7 @@
 #ifdef _CLOCK_DEBUG_
 #include "assert.h"
 #endif//_CLOCK_DEBUG_
+
 //********************************************************************************
 //Macros
 //********************************************************************************

@@ -6,7 +6,6 @@
 #include <stdio.h>
 #include <string.h>
 #include "common.h"
-#include "app.h"
 #include "timer.h"
 
 #define _TIMER_DEBUG_

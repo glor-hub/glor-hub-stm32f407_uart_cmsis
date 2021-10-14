@@ -4,7 +4,6 @@
 #include "stm32f4xx.h"
 #include "common.h"
 #include "arm_gpio.h"
-//#include "gpio.h"
 #include "arm_exti.h"
 
 //********************************************************************************
