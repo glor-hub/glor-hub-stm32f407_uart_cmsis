@@ -32,10 +32,9 @@
 //================================================================================
 void ARM_GPIO_SetCfg(ARM_GPIO_Cfg_t *pGPIO_Cfg)
 {
-    uint32_t position, tmp;
-    GPIO_TypeDef *p_reg;
-    p_reg = pGPIO_Cfg->pReg;
-    position = pGPIO_Cfg->Pin;
+    uint32_t tmp;
+    uint32_t position = pGPIO_Cfg->Pin;
+    GPIO_TypeDef *p_reg = pGPIO_Cfg->pReg;
     p_reg->MODER &= ~(GPIO_MODER_MODER0 << (position * 2U));
     p_reg->MODER |= pGPIO_Cfg->Mode << (position * 2U);
     p_reg->OTYPER &= ~GPIO_OTYPER_OT0_Msk;

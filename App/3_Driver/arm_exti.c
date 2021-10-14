@@ -27,7 +27,11 @@
 //Prototypes
 //********************************************************************************
 
+#ifdef USE_EVENT_GENERATION
+
 static void ARM_EXTI_EventEnable(eARM_GPIO_IONumbers pin_num, ePeriphCmd cmd);
+
+#endif //USE_EVENT_GENERATION
 
 //================================================================================
 //Public
@@ -76,6 +80,9 @@ void ARM_EXTI_SetCfg(ARM_EXTI_Cfg_t *pEXTI_Cfg)
                                    (4U * ((uint32_t)pin_num >> SYSCFG_EXTICR1_EXTI3_Pos));
             break;
         }
+        default: {
+            break;
+        }
     }
     switch(mode) {
         case ARM_EXTI_FALLING_TRIGGER_MODE: {
@@ -91,6 +98,9 @@ void ARM_EXTI_SetCfg(ARM_EXTI_Cfg_t *pEXTI_Cfg)
         case ARM_EXTI_FALLING_RISING_TRIGGER_MODE: {
             p_reg->RTSR |= EXTI_RTSR_TR0_Msk << (uint32_t)pin_num;
             p_reg->FTSR |= EXTI_FTSR_TR0_Msk << (uint32_t)pin_num;
+            break;
+        }
+        default: {
             break;
         }
     }

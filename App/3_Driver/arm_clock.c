@@ -249,6 +249,9 @@ void ARM_RCC_Periph_ClockCmd(ePeriphTypes periph, ePeriphCmd cmd)
             }
             break;
         }
+        default: {
+            break;
+        }
     }
 }
 
@@ -373,6 +376,9 @@ void ARM_RCC_Periph_ResetCmd(ePeriphTypes periph, ePeriphCmd cmd)
             } else {
                 RCC->APB2RSTR &= ~RCC_APB2RSTR_USART6RST;
             }
+            break;
+        }
+        default: {
             break;
         }
     }
@@ -546,7 +552,9 @@ static uint32_t ARM_RCC_SysClockSwitchCmd(eARM_RCC_ClockSources source)
             while((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL);
             break;
         }
+        default: {
+            break;
+        }
     }
     return status;
-
 }

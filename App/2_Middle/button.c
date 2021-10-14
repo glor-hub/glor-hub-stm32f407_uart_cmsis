@@ -37,8 +37,7 @@
 
 void Button_Test(void)
 {
-    uint8_t flag;
-    flag = EXTI_GetFlag();
+    uint8_t flag = EXTI_GetFlag();
     if(flag) {
         LED_Test();
         EXTI_ClearFlag();
