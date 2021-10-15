@@ -115,9 +115,7 @@ USART_PinCfg_t *USART_GetPinCfg(ePeriphTypes usart_name)
         default: {
             break;
         }
-
     }
-
     return pUSART_PinCfg;
 }
 
@@ -152,22 +150,34 @@ static void USART_SetPinCfg(void)
 #if (RTE_USART1==1)
 
 #ifdef _USART_DEBUG_
+
+#if (RTE_USART1_TX_ID != 0)
     ASSERT(RTE_USART1_TX_BIT < NUM_ARM_GPIO_IO);
+#endif //(RTE_USART1_TX_ID != 0)
+#if (RTE_USART1_RX_ID != 0)
     ASSERT(RTE_USART1_RX_BIT < NUM_ARM_GPIO_IO);
+#endif //(RTE_USART1_RX_ID != 0)
+#if (RTE_USART1_CK_ID != 0)
     ASSERT(RTE_USART1_CK_BIT < NUM_ARM_GPIO_IO);
+#endif //(RTE_USART1_CK_ID != 0)
+#if (RTE_USART1_CTS_ID != 0)
     ASSERT(RTE_USART1_CTS_BIT < NUM_ARM_GPIO_IO);
+#endif //(RTE_USART1_CTS !=0 )  
+#if (RTE_USART1_RTS_ID != 0)
     ASSERT(RTE_USART1_RTS_BIT < NUM_ARM_GPIO_IO);
+#endif //(RTE_USART1_RTS_ID != 0)
+
 #endif//_USART_DEBUG_
 
 #if (RTE_USART1_TX_ID == 0)
-//if ID==0, then the USART1_TX Pin not used"
+#error "The USART1_TX Pin not used"
 #elif (RTE_USART1_TX_ID == 1)
     USART1_PinCfg[TX_PIN].GPIOx = RTE_USART1_TX_PORT;
     USART1_PinCfg[TX_PIN].port = GPIO_PORT_A;
     USART1_PinCfg[TX_PIN].pin = (eARM_GPIO_IONumbers)RTE_USART1_TX_BIT;
     USART1_PinCfg[TX_PIN].alt_func = ARM_GPIO_IO_AF_7;
 #elif (RTE_USART1_TX_ID == 2)
-#error "Invalid USART1_TX Pin Configuration"
+#error "Invalid USART1_RX Pin Configuration"
 #elif (RTE_USART1_TX_ID == 3)
     USART1_PinCfg[TX_PIN].GPIOx = RTE_USART1_TX_PORT;
     USART1_PinCfg[TX_PIN].port = GPIO_PORT_B;
@@ -178,7 +188,7 @@ static void USART_SetPinCfg(void)
 #endif //(RTE_USART1_TX_ID == 0)
 
 #if (RTE_USART1_RX_ID == 0)
-//if ID==0, then the USART1_RX Pin not used"
+#error "The USART1_RX Pin not used"
 #elif (RTE_USART1_RX_ID == 1)
     USART1_PinCfg[RX_PIN].GPIOx = RTE_USART1_RX_PORT;
     USART1_PinCfg[RX_PIN].port = GPIO_PORT_A;
@@ -233,15 +243,27 @@ static void USART_SetPinCfg(void)
 #if (RTE_USART2 == 1)
 
 #ifdef _USART_DEBUG_
+
+#if (RTE_USART2_TX_ID != 0)
     ASSERT(RTE_USART2_TX_BIT < NUM_ARM_GPIO_IO);
+#endif //(RTE_USART2_TX_ID != 0)
+#if (RTE_USART2_RX_ID != 0)
     ASSERT(RTE_USART2_RX_BIT < NUM_ARM_GPIO_IO);
+#endif //(RTE_USART2_RX_ID != 0)
+#if (RTE_USART2_CK_ID != 0)
     ASSERT(RTE_USART2_CK_BIT < NUM_ARM_GPIO_IO);
+#endif //(RTE_USART2_CK_ID != 0)
+#if (RTE_USART2_CTS_ID != 0)
     ASSERT(RTE_USART2_CTS_BIT < NUM_ARM_GPIO_IO);
+#endif //(RTE_USART2_CTS !=0 )  
+#if (RTE_USART2_RTS_ID != 0)
     ASSERT(RTE_USART2_RTS_BIT < NUM_ARM_GPIO_IO);
+#endif //(RTE_USART2_RTS_ID != 0)
+
 #endif//_USART_DEBUG_
 
 #if (RTE_USART2_TX_ID == 0)
-//if ID==0, then the USART2_TX Pin not used"
+#error "The USART2_TX Pin not used"
 #elif (RTE_USART2_TX_ID == 1)
     USART2_PinCfg[TX_PIN].GPIOx = RTE_USART2_TX_PORT;
     USART2_PinCfg[TX_PIN].port = GPIO_PORT_A;
@@ -257,7 +279,7 @@ static void USART_SetPinCfg(void)
 #endif //(RTE_USART2_TX_ID == 0)
 
 #if (RTE_USART2_RX_ID == 0)
-//if ID==0, then the USART2_RX Pin not used"
+#error "The USART2_RX Pin not used"
 #elif (RTE_USART2_RX_ID == 1)
     USART2_PinCfg[RX_PIN].GPIOx = RTE_USART2_RX_PORT;
     USART2_PinCfg[RX_PIN].port = GPIO_PORT_A;
@@ -325,15 +347,27 @@ static void USART_SetPinCfg(void)
 #if (RTE_USART3 == 1)
 
 #ifdef _USART_DEBUG_
+
+#if (RTE_USART3_TX_ID != 0)
     ASSERT(RTE_USART3_TX_BIT < NUM_ARM_GPIO_IO);
+#endif //(RTE_USART3_TX_ID != 0)
+#if (RTE_USART3_RX_ID != 0)
     ASSERT(RTE_USART3_RX_BIT < NUM_ARM_GPIO_IO);
+#endif //(RTE_USART3_RX_ID != 0)
+#if (RTE_USART3_CK_ID != 0)
     ASSERT(RTE_USART3_CK_BIT < NUM_ARM_GPIO_IO);
+#endif //(RTE_USART3_CK_ID != 0)
+#if (RTE_USART3_CTS_ID != 0)
     ASSERT(RTE_USART3_CTS_BIT < NUM_ARM_GPIO_IO);
+#endif //(RTE_USART3_CTS !=0 )  
+#if (RTE_USART3_RTS_ID != 0)
     ASSERT(RTE_USART3_RTS_BIT < NUM_ARM_GPIO_IO);
+#endif //(RTE_USART3_RTS_ID != 0)
+
 #endif//_USART_DEBUG_
 
 #if (RTE_USART3_TX_ID == 0)
-//if ID==0, then the USART3_TX Pin not used"
+#error "The USART3_TX Pin not used"
 #elif (RTE_USART3_TX_ID == 1)
     USART3_PinCfg[TX_PIN].GPIOx = RTE_USART3_TX_PORT;
     USART3_PinCfg[TX_PIN].port = GPIO_PORT_A;
@@ -354,7 +388,7 @@ static void USART_SetPinCfg(void)
 #endif //(RTE_USART3_TX_ID == 0)
 
 #if (RTE_USART3_RX_ID == 0)
-//if ID==0, then the USART3_RX Pin not used"
+#error "The USART3_RX Pin not used"
 #elif (RTE_USART3_RX_ID == 1)
     USART3_PinCfg[RX_PIN].GPIOx = RTE_USART3_RX_PORT;
     USART3_PinCfg[RX_PIN].port = GPIO_PORT_B;
@@ -434,11 +468,14 @@ static void USART_SetPinCfg(void)
 #if (RTE_UART4==1)
 
 #ifdef _USART_DEBUG_
-    ASSERT(RTE_USART4_TX_BIT < NUM_ARM_GPIO_IO);
-    ASSERT(RTE_USART4_RX_BIT < NUM_ARM_GPIO_IO);
-    ASSERT(RTE_USART4_CK_BIT < NUM_ARM_GPIO_IO);
-    ASSERT(RTE_USART4_CTS_BIT < NUM_ARM_GPIO_IO);
-    ASSERT(RTE_USART4_RTS_BIT < NUM_ARM_GPIO_IO);
+
+#if (RTE_UART4_TX_ID != 0)
+    ASSERT(RTE_UART4_TX_BIT < NUM_ARM_GPIO_IO);
+#endif //(RTE_UART4_TX_ID != 0)
+#if (RTE_UART4_RX_ID != 0)
+    ASSERT(RTE_UART4_RX_BIT < NUM_ARM_GPIO_IO);
+#endif //(RTE_UART4_RX_ID != 0)
+
 #endif//_USART_DEBUG_
 
 #if (RTE_UART4_TX_ID == 0)
@@ -487,13 +524,13 @@ static void USART_SetPinCfg(void)
 
 #if (RTE_UART5==1)
 
-#ifdef _USART_DEBUG_
-    ASSERT(RTE_USART5_TX_BIT < NUM_ARM_GPIO_IO);
-    ASSERT(RTE_USART5_RX_BIT < NUM_ARM_GPIO_IO);
-    ASSERT(RTE_USART5_CK_BIT < NUM_ARM_GPIO_IO);
-    ASSERT(RTE_USART5_CTS_BIT < NUM_ARM_GPIO_IO);
-    ASSERT(RTE_USART5_RTS_BIT < NUM_ARM_GPIO_IO);
-#endif//_USART_DEBUG_
+
+#if (RTE_UART5_TX_ID != 0)
+    ASSERT(RTE_UART5_TX_BIT < NUM_ARM_GPIO_IO);
+#endif //(RTE_UART5_TX_ID != 0)
+#if (RTE_UART5_RX_ID != 0)
+    ASSERT(RTE_UART5_RX_BIT < NUM_ARM_GPIO_IO);
+#endif //(RTE_UART5_RX_ID != 0)
 
 #if (RTE_UART5_TX_ID == 0)
 #error "The UART5_TX Pin not used"
@@ -534,15 +571,27 @@ static void USART_SetPinCfg(void)
 #if (RTE_USART6 == 1)
 
 #ifdef _USART_DEBUG_
+
+#if (RTE_USART6_TX_ID != 0)
     ASSERT(RTE_USART6_TX_BIT < NUM_ARM_GPIO_IO);
+#endif //(RTE_USART6_TX_ID != 0)
+#if (RTE_USART6_RX_ID != 0)
     ASSERT(RTE_USART6_RX_BIT < NUM_ARM_GPIO_IO);
+#endif //(RTE_USART6_RX_ID != 0)
+#if (RTE_USART6_CK_ID != 0)
     ASSERT(RTE_USART6_CK_BIT < NUM_ARM_GPIO_IO);
+#endif //(RTE_USART6_CK_ID != 0)
+#if (RTE_USART6_CTS_ID != 0)
     ASSERT(RTE_USART6_CTS_BIT < NUM_ARM_GPIO_IO);
+#endif //(RTE_USART6_CTS !=0 )  
+#if (RTE_USART6_RTS_ID != 0)
     ASSERT(RTE_USART6_RTS_BIT < NUM_ARM_GPIO_IO);
+#endif //(RTE_USART6_RTS_ID != 0)
+
 #endif//_USART_DEBUG_
 
 #if (RTE_USART6_TX_ID == 0)
-//if ID==0, then the USART6_TX Pin not used"
+#error "The USART6_TX Pin not used"
 #elif (RTE_USART6_TX_ID == 1)
 #error "Invalid USART6_TX Pin Configuration"
 #elif (RTE_USART6_TX_ID == 2)
@@ -560,7 +609,7 @@ static void USART_SetPinCfg(void)
 #endif //(RTE_USART6_TX_ID == 0)
 
 #if (RTE_USART6_RX_ID == 0)
-//if ID==0, then the USART6_RX Pin not used"
+#error "The USART6_RX Pin not used"
 #elif (RTE_USART6_RX_ID == 1)
 #error "Invalid USART6_RX Pin Configuration"
 #elif (RTE_USART6_RX_ID == 2)
