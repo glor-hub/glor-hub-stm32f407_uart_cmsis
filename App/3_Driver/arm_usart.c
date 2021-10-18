@@ -66,7 +66,10 @@ static ARM_USART_RESOURCES ARM_USART1_Resources;
 static USART_INFO USART1_Info = {0};
 #endif//(RTE_USART1==1)
 
-
+#if (RTE_UART4==1)
+static ARM_USART_RESOURCES ARM_UART4_Resources;
+static USART_INFO UART4_Info = {0};
+#endif//(RTE_UART4==1)
 
 //********************************************************************************
 //Prototypes
@@ -99,16 +102,18 @@ static int32_t ARM_USART1_Uninitialize(void);
 static int32_t ARM_USART1_PowerControl(ARM_POWER_STATE state);
 static int32_t ARM_USART1_Send(const void *data, uint32_t num);
 static int32_t ARM_USART1_Receive(void *data, uint32_t num);
-static int32_t ARM_USART1_Transfer(const void      *data_out,
-                                   void      *data_in,
-                                   uint32_t   num);
+static int32_t ARM_USART1_Transfer(const void *data_out, void *data_in, uint32_t num);
 static uint32_t ARM_USART1_GetTxCount(void);
 static uint32_t ARM_USART1_GetRxCount(void);
 static int32_t ARM_USART1_Control(uint32_t control, uint32_t arg);;
 static ARM_USART_STATUS ARM_USART1_GetStatus(void);
 static int32_t ARM_USART1_SetModemControl(ARM_USART_MODEM_CONTROL control);
 static ARM_USART_MODEM_STATUS ARM_USART1_GetModemStatus(void);
-#endif//(RTE_USART1==1)
+#endif //(RTE_USART1==1)
+
+#if (RTE_UART4==1)
+static void ARM_USART4_Resources_Struct_Init(void)
+#endif //(RTE_UART4==1)
 
 //================================================================================
 //Private
@@ -368,70 +373,72 @@ static void USART_IRQHandler(ARM_USART_RESOURCES *usart)
 //to do
 }
 
-
-
+/*************************************************
+Driver capabilities of USART2, USART3, USART6 are completely
+similar to USART1 driver capabilities.
+***************************************************/
 #if (RTE_USART1==1)
 
 static void ARM_USART1_Resources_Struct_Init(void)
 {
-
     ARM_USART_RESOURCES *p_str = &ARM_USART1_Resources;
-    ARM_USART1_Resources.capabilities.asynchronous = 1U;// supports UART (Asynchronous) mode
+    ARM_USART1_Resources.capabilities.asynchronous = 1;// supports UART (Asynchronous) mode
 
-#ifdef USART1_SCLK_PIN_ENABLE
+#if (RTE_USART1_CK_ID != 0)
     p_str->capabilities.synchronous_master = 1;         // supports Synchronous Master mode
 #else
     p_str->capabilities.synchronous_master = 0;         // supports Synchronous Master mode
-#endif //USART1_SCLK_PIN_ENABLE        
+#endif //(RTE_USART1_CK_ID != 0)
 
     p_str->capabilities.synchronous_slave = 0;          // supports Synchronous Slave mode
     p_str->capabilities.single_wire = 1;                // supports UART Single-wire mode
     p_str->capabilities.irda = 1;                       // supports UART IrDA mode
 
-#ifdef USART1_SCLK_PIN_ENABLE
+#if (RTE_USART1_CK_ID != 0)
     p_str->capabilities.smart_card =  1;                // supports UART Smart Card mode
     p_str->capabilities.smart_card_clock =  1;          // Smart Card Clock generator available
 #else
     p_str->capabilities.smart_card =  0;                // supports UART Smart Card mode
     p_str->capabilities.smart_card_clock =  0;          // Smart Card Clock generator available
-#endif //USART1_SCLK_PIN_ENABLE
+#endif //(RTE_USART1_CK_ID != 0)
 
-#ifdef USART1_RTS_PIN_ENABLE
+#if (RTE_USART1_CTS_ID !=0)
     p_str->capabilities.flow_control_rts =  1;          // RTS Flow Control available
 #else
     p_str->capabilities.flow_control_rts =  0;          // RTS Flow Control available
-#endif //USART1_RTS_PIN_ENABLE 
+#endif //(RTE_USART1_CTS_ID !=0) 
 
-#ifdef USART1_CTS_PIN_ENABLE
+#if RTE_USART1_CTS_ID
     p_str->capabilities.flow_control_cts =  1;          // CTS Flow Control available
 #else
     p_str->capabilities.flow_control_cts =  0;          // CTS Flow Control available
-#endif //USART1_CTS_PIN_ENABLE               
+#endif //(RTE_USART1_CTS_ID != 0)               
 
     p_str->capabilities.event_tx_complete =  1;         // Transmit completed event: \ref ARM_USART_EVENT_TX_COMPLETE
     p_str->capabilities.event_rx_timeout =  0;          // Signal receive character timeout event: \ref ARM_USART_EVENT_RX_TIMEOUT
 
-#ifdef USART1_RTS_PIN_ENABLE
+#if (RTE_USART1_CTS_ID !=0)
     p_str->capabilities.rts =  1;                       // RTS Line: 0=not available, 1=available
 #else
     p_str->capabilities.rts =  0;                       // RTS Line: 0=not available, 1=available
-#endif //USART1_RTS_PIN_ENABLE 
+#endif //(RTE_USART1_CTS_ID !=0) 
 
-#ifdef USART1_CTS_PIN_ENABLE
+#if (RTE_USART1_CTS_ID != 0)
     p_str->capabilities.cts =  1;                       // CTS Line: 0=not available, 1=available
 #else
     p_str->capabilities.cts =  0;                       // CTS Line: 0=not available, 1=available
-#endif //USART1_CTS_PIN_ENABLE       
+#endif //(RTE_USART1_CTS_ID != 0)       
+
     p_str->capabilities.dtr =  0;                       // DTR Line: 0=not available, 1=available
     p_str->capabilities.dsr =  0;                       // DSR Line: 0=not available, 1=available
     p_str->capabilities.dcd =  0;                       // DCD Line: 0=not available, 1=available
     p_str->capabilities.ri =  0;                        // RI Line: 0=not available, 1=available
 
-#ifdef USART1_CTS_PIN_ENABLE
+#if (RTE_USART1_CTS_ID != 0)
     p_str->capabilities.event_cts = 1;                  // Signal CTS change event: \ref ARM_USART_EVENT_CTS
 #else
     p_str->capabilities.event_cts =  0;                 // Signal CTS change event: \ref ARM_USART_EVENT_CTS
-#endif //USART1_CTS_PIN_ENABLE 
+#endif //(RTE_USART1_CTS_ID != 0) 
 
     p_str->capabilities.event_dsr =  0;                 // Signal DSR change event: \ref ARM_USART_EVENT_DSR
     p_str->capabilities.event_dcd =  0;                 // Signal DCD change event: \ref ARM_USART_EVENT_DCD
@@ -450,11 +457,6 @@ static void ARM_USART1_Resources_Struct_Init(void)
     }
 
 */
-
-/*************************************************
-Driver capabilities of USART2, USART3, USART6 are completely
-similar to USART1 driver capabilities.
-***************************************************/
 
 static ARM_USART_CAPABILITIES ARM_USART1_GetCapabilities(void)
 {
@@ -544,15 +546,55 @@ static ARM_DRIVER_USART ARM_USART1_Driver = {
 };
 #endif //(RTE_USART1==1)
 
+/*************************************************
+Driver capabilities of UART5 are completely
+similar to UART4 driver capabilities.
+***************************************************/
+#if (RTE_UART4==1)
+
+static void ARM_USART4_Resources_Struct_Init(void)
+{
+    ARM_USART_RESOURCES *p_str = &ARM_USART4_Resources;
+    ARM_USART1_Resources.capabilities.asynchronous = 1;// supports UART (Asynchronous) mode
+    p_str->capabilities.synchronous_master = 0;         // supports Synchronous Master mode
+    p_str->capabilities.synchronous_slave = 0;          // supports Synchronous Slave mode
+    p_str->capabilities.single_wire = 1;                // supports UART Single-wire mode
+    p_str->capabilities.irda = 1;                       // supports UART IrDA mode
+    p_str->capabilities.smart_card =  0;                // supports UART Smart Card mode
+    p_str->capabilities.smart_card_clock =  0;          // Smart Card Clock generator available
+    p_str->capabilities.flow_control_rts =  0;          // RTS Flow Control available
+    p_str->capabilities.flow_control_cts =  0;          // CTS Flow Control available
+    p_str->capabilities.event_tx_complete =  1;         // Transmit completed event: \ref ARM_USART_EVENT_TX_COMPLETE
+    p_str->capabilities.event_rx_timeout =  0;          // Signal receive character timeout event: \ref ARM_USART_EVENT_RX_TIMEOUT
+    p_str->capabilities.rts =  0;                       // RTS Line: 0=not available, 1=available
+    p_str->capabilities.cts =  0;                       // CTS Line: 0=not available, 1=available
+    p_str->capabilities.dtr =  0;                       // DTR Line: 0=not available, 1=available
+    p_str->capabilities.dsr =  0;                       // DSR Line: 0=not available, 1=available
+    p_str->capabilities.dcd =  0;                       // DCD Line: 0=not available, 1=available
+    p_str->capabilities.ri =  0;                        // RI Line: 0=not available, 1=available
+    p_str->capabilities.event_cts =  0;                 // Signal CTS change event: \ref ARM_USART_EVENT_CTS
+    p_str->capabilities.event_dsr =  0;                 // Signal DSR change event: \ref ARM_USART_EVENT_DSR
+    p_str->capabilities.event_dcd =  0;                 // Signal DCD change event: \ref ARM_USART_EVENT_DCD
+    p_str->capabilities.event_ri =  0;                  // Signal RI change event: \ref ARM_USART_EVENT_RI
+    p_str->capabilities.reserved =  0;                  // Reserved (must be zero)
+    p_str->usart_name = UART_4;                        //Interface name
+    p_str->p_reg = UART4;                              // Pointer to USART peripheral registers
+    p_str->p_pin = USART_GetPinCfg(UART_4);         // Pointer to USART pins configuration
+    p_str->irq_num = UART4_IRQn;
+    p_str->p_info = &UART4_Info;
+}
+#endif //(RTE_UART4==1)
+
 //================================================================================
 //Public
 //================================================================================
 
 void ARM_USART_Init(void)
 {
+
 #if (RTE_USART1==1)
-	  ARM_DRIVER_USART *p_drv;
-    p_drv = &ARM_USART1_Driver;
+
+    ARM_DRIVER_USART *p_drv = &ARM_USART1_Driver;
     ARM_USART1_Resources_Struct_Init();
     p_drv->Initialize(&USART1_cb);
     p_drv->PowerControl(ARM_POWER_FULL);

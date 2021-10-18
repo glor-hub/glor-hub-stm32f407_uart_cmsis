@@ -50,45 +50,6 @@ typedef struct _USART_INFO {
     uint32_t                baudrate;      // Baudrate
 } USART_INFO;
 
-#if (RTE_USART6==1)
-/***************************************************
-//configure USART6:
-****************************************************/
-
-/***************************************************
-for multiple USARTx outputs options
-****************************************************/
-//#define USART6_PIN_ID USART_PIN_ID0
-//#define USART6_PIN_ID USART_PIN_ID1
-
-/***************************************************
-Transmitter clock output for synchronous transmission
-(unsupported in Version 1.0)
-****************************************************/
-//#define USART6_SCLK_PIN_ENABLE
-
-/***************************************************
-RTS Flow Control
-(unsupported in Version 1.0)
-****************************************************/
-//#define USART6_RTS_PIN_ENABLE
-
-/***************************************************
-CTS Flow Control
-(unsupported in Version 1.0)
-****************************************************/
-//#define USART6_CTS_PIN_ENABLE
-
-/***************************************************
-Multibuffer communication using DMA
-(unsupported in Version 1.0)
-****************************************************/
-//#define USART6_DMA_TX_ENABLE //DMA for transmission
-//#define USART6_DMA_RX_ENABLE //DMA for reception
-
-#endif //(RTE_USART6==1)
-
-
 void USART_Init(void);
 USART_PinCfg_t *USART_GetPinCfg(ePeriphTypes usart_name);
 
@@ -99,4 +60,5 @@ void USART1_cb(uint32_t event);
 #if (RTE_UART4==1)
 void UART4_cb(uint32_t event);
 #endif //(RTE_UART4==1)
+
 #endif //_USART_H_
