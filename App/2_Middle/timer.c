@@ -68,7 +68,7 @@ bool Timer_is_Ready(uint32_t status)
     return (status == TIMER_STA_READY);
 }
 
-uint32_t Timer_Init(void)
+bool Timer_Init(void)
 {
     memset(&Timer_Data, 0, sizeof(Timer_Data_t) * NUM_TIMERS);
 

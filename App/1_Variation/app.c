@@ -57,7 +57,7 @@ bool App_Init(void)
     init_result |= Timer_Init();
     LED_Init();
     Button_Init();
-    USART_Init();
+    init_result |= USART_Init();
     return init_result;
 }
 

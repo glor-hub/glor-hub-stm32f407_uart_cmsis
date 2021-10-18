@@ -50,7 +50,7 @@ typedef struct _USART_INFO {
     uint32_t                baudrate;      // Baudrate
 } USART_INFO;
 
-void USART_Init(void);
+bool USART_Init(void);
 USART_PinCfg_t *USART_GetPinCfg(ePeriphTypes usart_name);
 
 #if (RTE_USART1==1)

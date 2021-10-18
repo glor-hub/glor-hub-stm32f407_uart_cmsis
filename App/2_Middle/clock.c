@@ -41,7 +41,7 @@
 //Public
 //================================================================================
 
-uint32_t Clock_Init(void)
+bool Clock_Init(void)
 {
     uint32_t status = ARM_RCC_Reset();
     status |= ARM_RCC_SetSysClockTo168();

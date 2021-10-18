@@ -2,6 +2,7 @@
 //arm_usart.c
 //********************************************************************************
 #include "stm32f4xx.h"
+#include <stdbool.h>
 #include "common.h"
 #include "RTE_Device.h"
 #include "RTE_Components.h"
@@ -133,11 +134,11 @@ static int32_t ARM_USART_Initialize(ARM_USART_SignalEvent_t  cb_event,
                                     ARM_USART_RESOURCES         *usart)
 {
 
+    int32_t status = ARM_DRIVER_OK;
     if(usart->p_info->flags & ARM_USART_FLAG_INITIALIZED) {
         // Driver is already initialized
-        return ARM_DRIVER_OK;
+        return status;
     }
-
     // Initialize USART Run-time Resources
     usart->p_info->cb_event = cb_event;
 
@@ -165,7 +166,7 @@ static int32_t ARM_USART_Initialize(ARM_USART_SignalEvent_t  cb_event,
 // DMA Initialize
     //unsupported in Version 1.0
     usart->p_info->flags = ARM_USART_FLAG_INITIALIZED;
-    return ARM_DRIVER_OK;
+    return status;
 }
 
 static int32_t ARM_USART_Uninitialize(ARM_USART_RESOURCES *usart)
@@ -589,15 +590,23 @@ static void ARM_USART4_Resources_Struct_Init(void)
 //Public
 //================================================================================
 
-void ARM_USART_Init(void)
+bool ARM_USART_isReady(int32_t status)
+{
+    return(status == ARM_DRIVER_OK);
+}
+
+int32_t ARM_USART_Init(void)
 {
 
 #if (RTE_USART1==1)
 
+    int32_t status = ARM_DRIVER_OK;
     ARM_DRIVER_USART *p_drv = &ARM_USART1_Driver;
     ARM_USART1_Resources_Struct_Init();
-    p_drv->Initialize(&USART1_cb);
-    p_drv->PowerControl(ARM_POWER_FULL);
+    status |= p_drv->Initialize(&USART1_cb);
+    status |= p_drv->PowerControl(ARM_POWER_FULL);
+    return status;
+
 #endif//(RTE_USART1==1)
 
 }

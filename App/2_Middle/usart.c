@@ -2,6 +2,7 @@
 //usart.c
 //********************************************************************************
 #include "stm32f4xx.h"
+#include <stdbool.h>
 #include "common.h"
 #include "RTE_Device.h"
 #include "Driver_USART.h"
@@ -65,10 +66,11 @@ static void USART_SetPinCfg(void);
 
 
 
-void USART_Init(void)
+bool USART_Init(void)
 {
     USART_SetPinCfg();
-    ARM_USART_Init();
+    int32_t status = ARM_USART_Init();
+    return ARM_USART_isReady(status) ? PASSED : FAILED;
 }
 
 USART_PinCfg_t *USART_GetPinCfg(ePeriphTypes usart_name)
