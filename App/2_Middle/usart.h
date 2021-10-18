@@ -4,7 +4,7 @@
 typedef enum {
     TX_PIN = 0,
     RX_PIN,
-    SCLK_PIN, // CK pin in datasheet
+    CK_PIN,
     CTS_PIN,
     RTS_PIN,
     MAX_USART_PIN_NAMES
