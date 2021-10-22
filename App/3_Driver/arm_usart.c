@@ -39,20 +39,41 @@
 //Typedefs
 //********************************************************************************
 
-// USART Resources definitions
+// ARM USART Transfer Information (Run-Time)
 typedef struct {
-    ARM_USART_CAPABILITIES  capabilities;  // Capabilities
-    ePeriphTypes   usart_name;
-    USART_TypeDef           *p_reg;          // Pointer to USART peripheral registers
-    USART_PinCfg_t          *p_pin;          // Pointer to USART pins configuration
-//    USART_CLOCKS            clk;           // USART clocks configuration
-    IRQn_Type               irq_num;       // USART IRQ Number
-//    uint32_t                trig_lvl;      // FIFO Trigger level
+    uint32_t                rx_num;        // Total number of data to be received
+    uint32_t                tx_num;        // Total number of data to be send
+    uint8_t                *p_rx_buf;      // Pointer to in data buffer
+    uint8_t                *p_tx_buf;      // Pointer to out data buffer
+    uint32_t                rx_cnt;        // Number of data received
+    uint32_t                tx_cnt;        // Number of data sent
+    uint8_t                 tx_def_val;    // Transmit default value (used in USART_SYNC_MASTER_MODE_RX)
+    uint8_t                 rx_dump_val;   // Receive dump value (used in USART_SYNC_MASTER_MODE_TX)
+    uint8_t                 sync_mode;     // Synchronous mode
+} ARM_USART_TransferInfo_t;
 
-//    USART_DMA              *dma_tx;
-//    USART_DMA              *dma_rx;
-    USART_INFO             *p_info;          // Run-Time Information
-} ARM_USART_RESOURCES;
+// ARM USART Information (Run-Time)
+typedef struct {
+    ARM_USART_SignalEvent_t  cb_event;        // Event callback
+    uint16_t                 drv_status;      // USART driver flags
+    uint8_t                  mode;            // USART mode
+    uint32_t                 baudrate;        // Baudrate
+    ARM_USART_STATUS         xfer_status;     // USART transfer status
+    ARM_USART_TransferInfo_t xfer_info;       // Transfer information
+} ARM_USART_Info_t;
+
+// ARM USART Resources definitions
+typedef struct {
+    ARM_USART_CAPABILITIES capabilities;  // Capabilities
+    ePeriphTypes           usart_name;
+    USART_TypeDef          *p_reg;        // Pointer to USART peripheral registers
+    USART_PinCfg_t         *p_pin;        // Pointer to USART pins configuration
+    IRQn_Type              irq_num;       // USART IRQ Number
+//    uint32_t                trig_lvl;      // FIFO Trigger level
+//    USART_DMA              *p_dma_tx;
+//    USART_DMA              *p_dma_rx;
+    ARM_USART_Info_t    *p_info;          // Run-Time Information
+} ARM_USART_Resources_t;
 
 //********************************************************************************
 //Variables
@@ -62,40 +83,40 @@ typedef struct {
 static const ARM_DRIVER_VERSION ARM_USART_Driver_Version =
 { ARM_USART_API_VERSION, ARM_USART_DRV_VERSION };
 
-#if (RTE_USART1==1)
-static ARM_USART_RESOURCES ARM_USART1_Resources;
-static USART_INFO USART1_Info = {0};
-#endif//(RTE_USART1==1)
+#if (RTE_USART1 == 1)
+static ARM_USART_Resources_t ARM_USART1_Resources;
+static ARM_USART_Info_t USART1_Info = {0};
+#endif //(RTE_USART1 == 1)
 
-#if (RTE_UART4==1)
-static ARM_USART_RESOURCES ARM_UART4_Resources;
-static USART_INFO UART4_Info = {0};
-#endif//(RTE_UART4==1)
+#if (RTE_UART4 == 1)
+static ARM_USART_Resources_t ARM_UART4_Resources;
+static ARM_USART_Info_t UART4_Info = {0};
+#endif //(RTE_UART4 == 1)
 
 //********************************************************************************
 //Prototypes
 //********************************************************************************
 
 static ARM_DRIVER_VERSION ARM_USARTx_GetVersion(void);
-static ARM_USART_CAPABILITIES ARM_USART_GetCapabilities(ARM_USART_RESOURCES *usart);
+static ARM_USART_CAPABILITIES ARM_USART_GetCapabilities(ARM_USART_Resources_t *usart);
 static int32_t ARM_USART_Initialize(ARM_USART_SignalEvent_t  cb_event,
-                                    ARM_USART_RESOURCES *usart);
-static int32_t ARM_USART_Uninitialize(ARM_USART_RESOURCES *usart);
+                                    ARM_USART_Resources_t *usart);
+static int32_t ARM_USART_Uninitialize(ARM_USART_Resources_t *usart);
 static int32_t ARM_USART_PowerControl(ARM_POWER_STATE  state,
-                                      ARM_USART_RESOURCES *usart);
-static int32_t ARM_USART_Send(const void *data, uint32_t num, ARM_USART_RESOURCES *usart);
-static int32_t ARM_USART_Receive(void *data, uint32_t num, ARM_USART_RESOURCES *usart);
-static int32_t ARM_USART_Transfer(const void *data_out, void *data_in, uint32_t num, ARM_USART_RESOURCES *usart);
-static uint32_t ARM_USART_GetTxCount(ARM_USART_RESOURCES *usart);
-static uint32_t ARM_USART_GetRxCount(ARM_USART_RESOURCES *usart);
+                                      ARM_USART_Resources_t *usart);
+static int32_t ARM_USART_Send(const void *data, uint32_t num, ARM_USART_Resources_t *usart);
+static int32_t ARM_USART_Receive(void *data, uint32_t num, ARM_USART_Resources_t *usart);
+static int32_t ARM_USART_Transfer(const void *data_out, void *data_in, uint32_t num, ARM_USART_Resources_t *usart);
+static uint32_t ARM_USART_GetTxCount(ARM_USART_Resources_t *usart);
+static uint32_t ARM_USART_GetRxCount(ARM_USART_Resources_t *usart);
 static int32_t ARM_USART_Control(uint32_t control, uint32_t arg,
-                                 ARM_USART_RESOURCES *usart);
-static ARM_USART_STATUS ARM_USART_GetStatus(ARM_USART_RESOURCES *usart);
-static int32_t ARM_USART_SetModemControl(ARM_USART_MODEM_CONTROL control, ARM_USART_RESOURCES *usart);
-static ARM_USART_MODEM_STATUS ARM_USART_GetModemStatus(ARM_USART_RESOURCES *usart);
-static void USART_IRQHandler(ARM_USART_RESOURCES *usart);
+                                 ARM_USART_Resources_t *usart);
+static ARM_USART_STATUS ARM_USART_GetStatus(ARM_USART_Resources_t *usart);
+static int32_t ARM_USART_SetModemControl(ARM_USART_MODEM_CONTROL control, ARM_USART_Resources_t *usart);
+static ARM_USART_MODEM_STATUS ARM_USART_GetModemStatus(ARM_USART_Resources_t *usart);
+static void USART_IRQHandler(ARM_USART_Resources_t *usart);
 
-#if (RTE_USART1==1)
+#if (RTE_USART1 == 1)
 static void ARM_USART1_Resources_Struct_Init(void);
 static ARM_USART_CAPABILITIES ARM_USART1_GetCapabilities(void);
 static int32_t ARM_USART1_Initialize(ARM_USART_SignalEvent_t cb_event);
@@ -110,11 +131,11 @@ static int32_t ARM_USART1_Control(uint32_t control, uint32_t arg);;
 static ARM_USART_STATUS ARM_USART1_GetStatus(void);
 static int32_t ARM_USART1_SetModemControl(ARM_USART_MODEM_CONTROL control);
 static ARM_USART_MODEM_STATUS ARM_USART1_GetModemStatus(void);
-#endif //(RTE_USART1==1)
+#endif //(RTE_USART1 == 1)
 
-#if (RTE_UART4==1)
+#if (RTE_UART4 == 1)
 static void ARM_USART4_Resources_Struct_Init(void)
-#endif //(RTE_UART4==1)
+#endif //(RTE_UART4 == 1)
 
 //================================================================================
 //Private
@@ -125,31 +146,37 @@ static ARM_DRIVER_VERSION ARM_USARTx_GetVersion(void)
     return ARM_USART_Driver_Version;
 }
 
-static ARM_USART_CAPABILITIES ARM_USART_GetCapabilities(ARM_USART_RESOURCES *usart)
+static ARM_USART_CAPABILITIES ARM_USART_GetCapabilities(ARM_USART_Resources_t *usart)
 {
     return usart->capabilities;
 }
 
 static int32_t ARM_USART_Initialize(ARM_USART_SignalEvent_t  cb_event,
-                                    ARM_USART_RESOURCES         *usart)
+                                    ARM_USART_Resources_t         *usart)
 {
 
-    int32_t status = ARM_DRIVER_OK;
-    if(usart->p_info->flags & ARM_USART_FLAG_INITIALIZED) {
+    if(usart->p_info->drv_status & ARM_USART_FLAG_INITIALIZED) {
         // Driver is already initialized
-        return status;
+        return ARM_DRIVER_OK;
     }
     // Initialize USART Run-time Resources
     usart->p_info->cb_event = cb_event;
 
-    usart->p_info->rx_status.rx_busy          = 0U;//надо
-    usart->p_info->rx_status.rx_overflow      = 0U;//надо
-    usart->p_info->rx_status.rx_break         = 0U;
-    usart->p_info->rx_status.rx_framing_error = 0U;//надо
-    usart->p_info->rx_status.rx_parity_error  = 0U;//надо
 
-    usart->p_info->xfer.send_active           = 0U;
-    usart->p_info->xfer.tx_def_val            = 0U;
+    // Clear driver variables
+    usart->p_info->drv_status                 = 0U;
+    usart->p_info->mode                       = 0U;
+    usart->p_info->baudrate                   = 0U;
+    usart->p_info->xfer_status.tx_busy          = 0U;
+    usart->p_info->xfer_status.rx_busy          = 0U;
+    usart->p_info->xfer_status.tx_underflow     = 0U;
+    usart->p_info->xfer_status.rx_overflow      = 0U;
+    usart->p_info->xfer_status.rx_break         = 0U;
+    usart->p_info->xfer_status.rx_framing_error = 0U;
+    usart->p_info->xfer_status.rx_parity_error  = 0U;
+    usart->p_info->xfer_info.tx_def_val         = 0U;
+    usart->p_info->xfer_info.rx_dump_val        = 0U;
+    usart->p_info->xfer_info.sync_mode          = 0U;
 
 // Configure CTS pin
     if(usart->capabilities.cts) {
@@ -165,12 +192,13 @@ static int32_t ARM_USART_Initialize(ARM_USART_SignalEvent_t  cb_event,
     }
 // DMA Initialize
     //unsupported in Version 1.0
-    usart->p_info->flags = ARM_USART_FLAG_INITIALIZED;
-    return status;
+    usart->p_info->drv_status = ARM_USART_FLAG_INITIALIZED;
+    return ARM_DRIVER_OK;
 }
 
-static int32_t ARM_USART_Uninitialize(ARM_USART_RESOURCES *usart)
+static int32_t ARM_USART_Uninitialize(ARM_USART_Resources_t *usart)
 {
+
 // Reset TX pin configuration
     GPIO_SetData(usart-> p_pin[TX_PIN].GPIOx, usart-> p_pin[TX_PIN].pin, 0U, 0U, 0U, 0U, 0U);
 // Reset RX pin configuration
@@ -187,7 +215,7 @@ static int32_t ARM_USART_Uninitialize(ARM_USART_RESOURCES *usart)
     //unsupported in Version 1.0
 
 // Reset USART status flags
-    usart->p_info->flags = 0UL;
+    usart->p_info->drv_status = 0UL;
     return ARM_DRIVER_OK;
 }
 
@@ -199,7 +227,7 @@ drv->Uninitialize (...);               // Release I/O pins
 ************************************************************************************/
 
 static int32_t ARM_USART_PowerControl(ARM_POWER_STATE  state,
-                                      ARM_USART_RESOURCES *usart)
+                                      ARM_USART_Resources_t *usart)
 {
     switch(state) {
         case ARM_POWER_OFF: {
@@ -215,26 +243,17 @@ static int32_t ARM_USART_PowerControl(ARM_POWER_STATE  state,
             ARM_RCC_Periph_ClockCmd(usart->usart_name, DISABLE_CMD);
             // Clear pending USART interrupts in NVIC
             NVIC_ClearPendingIRQ(usart->irq_num);
-
-            // Clear driver flag variables
-            usart->p_info->rx_status.rx_busy          = 0U;
-            usart->p_info->rx_status.rx_overflow      = 0U;
-            usart->p_info->rx_status.rx_break         = 0U;
-            usart->p_info->rx_status.rx_framing_error = 0U;
-            usart->p_info->rx_status.rx_parity_error  = 0U;
-            usart->p_info->xfer.send_active           = 0U;
-
-            usart->p_info->flags &= ~ARM_USART_FLAG_POWERED;
+            usart->p_info->drv_status &= ~ARM_USART_FLAG_POWERED;
             break;
         }
         case ARM_POWER_LOW: {
             return ARM_DRIVER_ERROR_UNSUPPORTED;
         }
         case ARM_POWER_FULL: {
-            if((usart->p_info->flags & ARM_USART_FLAG_INITIALIZED) == 0U) {
+            if((usart->p_info->drv_status & ARM_USART_FLAG_INITIALIZED) == 0U) {
                 return ARM_DRIVER_ERROR;
             }
-            if((usart->p_info->flags & ARM_USART_FLAG_POWERED)     != 0U) {
+            if((usart->p_info->drv_status & ARM_USART_FLAG_POWERED)     != 0U) {
                 return ARM_DRIVER_OK;
             }
 
@@ -247,20 +266,7 @@ static int32_t ARM_USART_PowerControl(ARM_POWER_STATE  state,
             // Disable clock to UARTx block
             ARM_RCC_Periph_ClockCmd(usart->usart_name, DISABLE_CMD);
 
-            // Clear driver variables
-            usart->p_info->rx_status.rx_busy          = 0U;
-            usart->p_info->rx_status.rx_overflow      = 0U;
-            usart->p_info->rx_status.rx_break         = 0U;
-            usart->p_info->rx_status.rx_framing_error = 0U;
-            usart->p_info->rx_status.rx_parity_error  = 0U;
-
-            usart->p_info->xfer.send_active           = 0U;
-
-            usart->p_info->mode                       = 0U;
-            usart->p_info->flags                      = 0U;
-            usart->p_info->baudrate                   = 0U;//я добавила
-
-            usart->p_info->flags = ARM_USART_FLAG_POWERED | ARM_USART_FLAG_INITIALIZED;
+            usart->p_info->drv_status |= ARM_USART_FLAG_POWERED;
 
             // Clear and Enable USART IRQ
             NVIC_ClearPendingIRQ(usart->irq_num);
@@ -275,34 +281,34 @@ static int32_t ARM_USART_PowerControl(ARM_POWER_STATE  state,
 }
 
 static int32_t ARM_USART_Send(const void *data, uint32_t num,
-                              ARM_USART_RESOURCES *usart)
+                              ARM_USART_Resources_t *usart)
 {
 //to do
     return ARM_DRIVER_OK;
 }
 
 static int32_t ARM_USART_Receive(void *data, uint32_t num,
-                                 ARM_USART_RESOURCES *usart)
+                                 ARM_USART_Resources_t *usart)
 {
 //to do
     return ARM_DRIVER_OK;
 }
 
 static int32_t ARM_USART_Transfer(const void *data_out, void *data_in,
-                                  uint32_t num, ARM_USART_RESOURCES *usart)
+                                  uint32_t num, ARM_USART_Resources_t *usart)
 {
 //to do
     return ARM_DRIVER_OK;
 }
 
-static uint32_t ARM_USART_GetTxCount(ARM_USART_RESOURCES *usart)
+static uint32_t ARM_USART_GetTxCount(ARM_USART_Resources_t *usart)
 {
     uint32_t cnt;
 // to do
     return cnt;
 }
 
-static uint32_t ARM_USART_GetRxCount(ARM_USART_RESOURCES *usart)
+static uint32_t ARM_USART_GetRxCount(ARM_USART_Resources_t *usart)
 
 {
     uint32_t cnt;
@@ -311,9 +317,9 @@ static uint32_t ARM_USART_GetRxCount(ARM_USART_RESOURCES *usart)
 }
 
 static int32_t ARM_USART_Control(uint32_t control, uint32_t arg,
-                                 ARM_USART_RESOURCES *usart)
+                                 ARM_USART_Resources_t *usart)
 {
-    if((usart->p_info->flags & ARM_USART_FLAG_POWERED) == 0U) {
+    if((usart->p_info->drv_status & ARM_USART_FLAG_POWERED) == 0U) {
         // USART not powered
         return ARM_DRIVER_ERROR;
     }
@@ -331,7 +337,7 @@ static int32_t ARM_USART_Control(uint32_t control, uint32_t arg,
                                  ARM_GPIO_IO_MODE_INPUT, ARM_GPIO_IO_TYPE_OPEN_DRAIN , ARM_GPIO_IO_HI_Z, ARM_GPIO_IO_SPEED_FREQ_LOW,
                                  usart-> p_pin[TX_PIN].alt_func);
                     usart->p_reg->CR1 |= USART_CR1_TE;
-                    usart->p_info->flags |= ARM_USART_FLAG_TX_ENABLED;
+                    usart->p_info->drv_status |= ARM_USART_FLAG_TX_ENABLED;
                 }
             } else {
                 usart->p_reg->CR1 &= ~USART_CR1_TE;
@@ -340,7 +346,7 @@ static int32_t ARM_USART_Control(uint32_t control, uint32_t arg,
                     GPIO_SetData(usart-> p_pin[TX_PIN].GPIOx, usart-> p_pin[TX_PIN].pin,
                                  0U, 0U, 0U, 0U, 0U);
                 }
-                usart->p_info->flags &= ~ARM_USART_FLAG_TX_ENABLED;
+                usart->p_info->drv_status &= ~ARM_USART_FLAG_TX_ENABLED;
 
             }
         }
@@ -349,27 +355,27 @@ static int32_t ARM_USART_Control(uint32_t control, uint32_t arg,
     return ARM_DRIVER_OK;
 }
 
-static ARM_USART_STATUS ARM_USART_GetStatus(ARM_USART_RESOURCES *usart)
+static ARM_USART_STATUS ARM_USART_GetStatus(ARM_USART_Resources_t *usart)
 {
     ARM_USART_STATUS status;
 // to do
     return status;
 }
 
-static int32_t ARM_USART_SetModemControl(ARM_USART_MODEM_CONTROL control, ARM_USART_RESOURCES *usart)
+static int32_t ARM_USART_SetModemControl(ARM_USART_MODEM_CONTROL control, ARM_USART_Resources_t *usart)
 {
 //to do
     return ARM_DRIVER_OK;
 }
 
-static ARM_USART_MODEM_STATUS ARM_USART_GetModemStatus(ARM_USART_RESOURCES *usart)
+static ARM_USART_MODEM_STATUS ARM_USART_GetModemStatus(ARM_USART_Resources_t *usart)
 {
     ARM_USART_MODEM_STATUS modem_status;
 //to do
     return modem_status;
 }
 
-static void USART_IRQHandler(ARM_USART_RESOURCES *usart)
+static void USART_IRQHandler(ARM_USART_Resources_t *usart)
 {
 //to do
 }
@@ -378,11 +384,11 @@ static void USART_IRQHandler(ARM_USART_RESOURCES *usart)
 Driver capabilities of USART2, USART3, USART6 are completely
 similar to USART1 driver capabilities.
 ***************************************************/
-#if (RTE_USART1==1)
+#if (RTE_USART1 == 1)
 
 static void ARM_USART1_Resources_Struct_Init(void)
 {
-    ARM_USART_RESOURCES *p_str = &ARM_USART1_Resources;
+    ARM_USART_Resources_t *p_str = &ARM_USART1_Resources;
     ARM_USART1_Resources.capabilities.asynchronous = 1;// supports UART (Asynchronous) mode
 
 #if (RTE_USART1_CK_ID != 0)
@@ -545,17 +551,17 @@ static ARM_DRIVER_USART ARM_USART1_Driver = {
     ARM_USART1_GetModemStatus
 
 };
-#endif //(RTE_USART1==1)
+#endif //(RTE_USART1 == 1)
 
 /*************************************************
 Driver capabilities of UART5 are completely
 similar to UART4 driver capabilities.
 ***************************************************/
-#if (RTE_UART4==1)
+#if (RTE_UART4 == 1)
 
 static void ARM_USART4_Resources_Struct_Init(void)
 {
-    ARM_USART_RESOURCES *p_str = &ARM_USART4_Resources;
+    ARM_USART_Resources_t *p_str = &ARM_USART4_Resources;
     ARM_USART1_Resources.capabilities.asynchronous = 1;// supports UART (Asynchronous) mode
     p_str->capabilities.synchronous_master = 0;         // supports Synchronous Master mode
     p_str->capabilities.synchronous_slave = 0;          // supports Synchronous Slave mode
@@ -584,7 +590,7 @@ static void ARM_USART4_Resources_Struct_Init(void)
     p_str->irq_num = UART4_IRQn;
     p_str->p_info = &UART4_Info;
 }
-#endif //(RTE_UART4==1)
+#endif //(RTE_UART4 == 1)
 
 //================================================================================
 //Public
@@ -598,15 +604,15 @@ bool ARM_USART_isReady(int32_t status)
 int32_t ARM_USART_Init(void)
 {
 
-#if (RTE_USART1==1)
+#if (RTE_USART1 == 1)
 
-    int32_t status = ARM_DRIVER_OK;
     ARM_DRIVER_USART *p_drv = &ARM_USART1_Driver;
     ARM_USART1_Resources_Struct_Init();
+    int32_t status = ARM_DRIVER_OK;
     status |= p_drv->Initialize(&USART1_cb);
     status |= p_drv->PowerControl(ARM_POWER_FULL);
     return status;
 
-#endif//(RTE_USART1==1)
+#endif //(RTE_USART1 == 1)
 
 }
