@@ -83,15 +83,15 @@ typedef struct {
 static const ARM_DRIVER_VERSION ARM_USART_Driver_Version =
 { ARM_USART_API_VERSION, ARM_USART_DRV_VERSION };
 
-#if (RTE_USART1 == 1)
+#if (RTE_USART1)
 static ARM_USART_Resources_t ARM_USART1_Resources;
 static ARM_USART_Info_t USART1_Info = {0};
-#endif //(RTE_USART1 == 1)
+#endif //(RTE_USART1)
 
-#if (RTE_UART4 == 1)
+#if (RTE_UART4)
 static ARM_USART_Resources_t ARM_UART4_Resources;
 static ARM_USART_Info_t UART4_Info = {0};
-#endif //(RTE_UART4 == 1)
+#endif //(RTE_UART4)
 
 //********************************************************************************
 //Prototypes
@@ -116,7 +116,7 @@ static int32_t ARM_USART_SetModemControl(ARM_USART_MODEM_CONTROL control, ARM_US
 static ARM_USART_MODEM_STATUS ARM_USART_GetModemStatus(ARM_USART_Resources_t *usart);
 static void USART_IRQHandler(ARM_USART_Resources_t *usart);
 
-#if (RTE_USART1 == 1)
+#if (RTE_USART1)
 static void ARM_USART1_Resources_Struct_Init(void);
 static ARM_USART_CAPABILITIES ARM_USART1_GetCapabilities(void);
 static int32_t ARM_USART1_Initialize(ARM_USART_SignalEvent_t cb_event);
@@ -131,11 +131,11 @@ static int32_t ARM_USART1_Control(uint32_t control, uint32_t arg);;
 static ARM_USART_STATUS ARM_USART1_GetStatus(void);
 static int32_t ARM_USART1_SetModemControl(ARM_USART_MODEM_CONTROL control);
 static ARM_USART_MODEM_STATUS ARM_USART1_GetModemStatus(void);
-#endif //(RTE_USART1 == 1)
+#endif //(RTE_USART1)
 
-#if (RTE_UART4 == 1)
-static void ARM_USART4_Resources_Struct_Init(void)
-#endif //(RTE_UART4 == 1)
+#if (RTE_UART4)
+static void ARM_UART4_Resources_Struct_Init(void);
+#endif //(RTE_UART4)
 
 //================================================================================
 //Private
@@ -378,7 +378,7 @@ static void USART_IRQHandler(ARM_USART_Resources_t *usart)
 Driver capabilities of USART2, USART3, USART6 are completely
 similar to USART1 driver capabilities.
 ***************************************************/
-#if (RTE_USART1 == 1)
+#if (RTE_USART1)
 
 static void ARM_USART1_Resources_Struct_Init(void)
 {
@@ -545,17 +545,17 @@ static ARM_DRIVER_USART ARM_USART1_Driver = {
     ARM_USART1_GetModemStatus
 
 };
-#endif //(RTE_USART1 == 1)
+#endif //(RTE_USART1)
 
 /*************************************************
 Driver capabilities of UART5 are completely
 similar to UART4 driver capabilities.
 ***************************************************/
-#if (RTE_UART4 == 1)
+#if (RTE_UART4)
 
-static void ARM_USART4_Resources_Struct_Init(void)
+static void ARM_UART4_Resources_Struct_Init(void)
 {
-    ARM_USART_Resources_t *p_str = &ARM_USART4_Resources;
+    ARM_USART_Resources_t *p_str = &ARM_UART4_Resources;
     ARM_USART1_Resources.capabilities.asynchronous = 1;// supports UART (Asynchronous) mode
     p_str->capabilities.synchronous_master = 0;         // supports Synchronous Master mode
     p_str->capabilities.synchronous_slave = 0;          // supports Synchronous Slave mode
@@ -584,7 +584,7 @@ static void ARM_USART4_Resources_Struct_Init(void)
     p_str->irq_num = UART4_IRQn;
     p_str->p_info = &UART4_Info;
 }
-#endif //(RTE_UART4 == 1)
+#endif //(RTE_UART4)
 
 //================================================================================
 //Public
@@ -598,7 +598,7 @@ bool ARM_USART_isReady(int32_t status)
 int32_t ARM_USART_Init(void)
 {
 
-#if (RTE_USART1 == 1)
+#if (RTE_USART1)
 
     ARM_DRIVER_USART *p_drv = &ARM_USART1_Driver;
     ARM_USART1_Resources_Struct_Init();
@@ -607,6 +607,6 @@ int32_t ARM_USART_Init(void)
     status |= p_drv->PowerControl(ARM_POWER_FULL);
     return status;
 
-#endif //(RTE_USART1 == 1)
+#endif //(RTE_USART1)
 
 }
