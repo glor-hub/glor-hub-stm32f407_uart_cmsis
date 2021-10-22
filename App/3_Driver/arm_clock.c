@@ -135,7 +135,7 @@ void ARM_RCC_Periph_ClockCmd(ePeriphTypes periph, ePeriphCmd cmd)
 //disable GPIOA clock
                 RCC->AHB1ENR &= ~RCC_AHB1ENR_GPIOAEN;
             }
-
+            break;
         }
         case GPIO_PORT_B: {
             if(cmd == ENABLE_CMD) {
@@ -250,6 +250,9 @@ void ARM_RCC_Periph_ClockCmd(ePeriphTypes periph, ePeriphCmd cmd)
             break;
         }
         default: {
+#ifdef _ARM_CLOCK_DEBUG_
+            LOG("Warning! Undefined switch-case value");
+#endif//_ARM_CLOCK_DEBUG_
             break;
         }
     }
@@ -264,7 +267,7 @@ void ARM_RCC_Periph_ResetCmd(ePeriphTypes periph, ePeriphCmd cmd)
             } else {
                 RCC->AHB1RSTR &= ~RCC_AHB1RSTR_GPIOARST;
             }
-
+            break;
         }
         case GPIO_PORT_B: {
             if(cmd == ENABLE_CMD) {
@@ -379,6 +382,9 @@ void ARM_RCC_Periph_ResetCmd(ePeriphTypes periph, ePeriphCmd cmd)
             break;
         }
         default: {
+#ifdef _ARM_CLOCK_DEBUG_
+            LOG("Warning! Undefined switch-case value");
+#endif//_ARM_CLOCK_DEBUG_
             break;
         }
     }

@@ -3,6 +3,7 @@
 //********************************************************************************
 #include "stm32f4xx.h"
 #include <stdbool.h>
+#include <stdio.h>
 #include "common.h"
 #include "RTE_Device.h"
 #include "Driver_USART.h"
@@ -32,29 +33,12 @@
 //Variables
 //********************************************************************************
 
-#if (RTE_USART1==1)
-static USART_PinCfg_t USART1_PinCfg[MAX_USART_PIN_NAMES];
-#endif //(RTE_USART1==1)
-
-#if (RTE_USART2==1)
-static USART_PinCfg_t USART2_PinCfg[MAX_USART_PIN_NAMES];
-#endif //(RTE_USART2==1)
-
-#if (RTE_USART3==1)
-static USART_PinCfg_t USART3_PinCfg[MAX_USART_PIN_NAMES];
-#endif //(RTE_USART3==1)
-
-#if (RTE_UART4==1)
-static USART_PinCfg_t UART4_PinCfg[MAX_USART_PIN_NAMES];
-#endif //(RTE_UART4==1)
-
-#if (RTE_UART5==1)
-static USART_PinCfg_t UART5_PinCfg[MAX_USART_PIN_NAMES];
-#endif //(RTE_UART5==1)
-
-#if (RTE_USART6==1)
-static USART_PinCfg_t USART6_PinCfg[MAX_USART_PIN_NAMES];
-#endif //(RTE_USART6==1)
+static USART_PinCfg_t USART1_PinCfg[MAX_USART_PIN_NAMES] = {0};
+static USART_PinCfg_t USART2_PinCfg[MAX_USART_PIN_NAMES] = {0};
+static USART_PinCfg_t USART3_PinCfg[MAX_USART_PIN_NAMES] = {0};
+static USART_PinCfg_t UART4_PinCfg[MAX_USART_PIN_NAMES] =  {0};
+static USART_PinCfg_t UART5_PinCfg[MAX_USART_PIN_NAMES] =  {0};
+static USART_PinCfg_t USART6_PinCfg[MAX_USART_PIN_NAMES] = {0};
 
 //********************************************************************************
 //Prototypes
@@ -76,52 +60,42 @@ bool USART_Init(void)
 USART_PinCfg_t *USART_GetPinCfg(ePeriphTypes usart_name)
 {
     USART_PinCfg_t *pUSART_PinCfg;
-
     switch(usart_name) {
-#if (RTE_USART1==1)
         case USART_1: {
             pUSART_PinCfg = USART1_PinCfg;
+            break;
         }
-#endif //(RTE_USART1==1)
-
-#if (RTE_USART2==1)
         case USART_2: {
             pUSART_PinCfg = USART2_PinCfg;
+            break;
         }
-#endif //(RTE_USART2==1)
-
-#if (RTE_USART3==1)
         case USART_3: {
             pUSART_PinCfg = USART3_PinCfg;
+            break;
         }
-#endif //(RTE_USART3==1)
-
-#if (RTE_UART4==1)
         case UART_4: {
             pUSART_PinCfg = UART4_PinCfg;
+            break;
         }
-#endif //(RTE_UART4==1)
-
-#ifdef USART5_ENABLE
         case UART_5: {
             pUSART_PinCfg = UART5_PinCfg;
+            break;
         }
-#endif //USART5_ENABLE
-
-#ifdef UART6_ENABLE
         case USART_6: {
             pUSART_PinCfg = USART6_PinCfg;
+            break;
         }
-#endif //UART6_ENABLE
-
         default: {
+#ifdef _USART_DEBUG_
+            LOG("Warning! Undefined switch-case value");
+#endif //_USART_DEBUG_
             break;
         }
     }
     return pUSART_PinCfg;
 }
 
-#if (RTE_USART1==1)
+#if (RTE_USART1)
 void USART1_IRQHandler(void)
 {
 //    USART_IRQHandler(&USART1_Resources);
@@ -130,9 +104,9 @@ void USART1_cb(uint32_t event)
 {
 
 }
-#endif //(RTE_USART1==1)
+#endif //(RTE_USART1)
 
-#if (RTE_UART4==1)
+#if (RTE_UART4)
 void UART4_IRQHandler(void)
 {
 //    USART_IRQHandler(&UART4_Resources);
@@ -141,7 +115,7 @@ void UART4_cb(uint32_t event)
 {
 
 }
-#endif //(RTE_UART4==1)
+#endif //(RTE_UART4)
 
 //================================================================================
 //Private
@@ -149,23 +123,23 @@ void UART4_cb(uint32_t event)
 
 static void USART_SetPinCfg(void)
 {
-#if (RTE_USART1==1)
+#if (RTE_USART1)
 
 #ifdef _USART_DEBUG_
 
-#if (RTE_USART1_TX_ID != 0)
+#if (RTE_USART1_TX_ID)
     ASSERT(RTE_USART1_TX_BIT < NUM_ARM_GPIO_IO);
-#endif //(RTE_USART1_TX_ID != 0)
-#if (RTE_USART1_RX_ID != 0)
+#endif //(RTE_USART1_TX_ID)
+#if (RTE_USART1_RX_ID)
     ASSERT(RTE_USART1_RX_BIT < NUM_ARM_GPIO_IO);
-#endif //(RTE_USART1_RX_ID != 0)
-#if (RTE_USART1_CK_ID != 0)
+#endif //(RTE_USART1_RX_ID)
+#if (RTE_USART1_CK_ID)
     ASSERT(RTE_USART1_CK_BIT < NUM_ARM_GPIO_IO);
-#endif //(RTE_USART1_CK_ID != 0)
-#if (RTE_USART1_CTS_ID != 0)
+#endif //(RTE_USART1_CK_ID)
+#if (RTE_USART1_CTS_ID)
     ASSERT(RTE_USART1_CTS_BIT < NUM_ARM_GPIO_IO);
-#endif //(RTE_USART1_CTS !=0 )  
-#if (RTE_USART1_RTS_ID != 0)
+#endif //(RTE_USART1_CTS)  
+#if (RTE_USART1_RTS_ID)
     ASSERT(RTE_USART1_RTS_BIT < NUM_ARM_GPIO_IO);
 #endif //(RTE_USART1_RTS_ID != 0)
 
@@ -240,27 +214,27 @@ static void USART_SetPinCfg(void)
 #error "Invalid USART1_RTS Pin Configuration"
 #endif //(RTE_USART1_RTS_ID == 0)
 
-#endif //(RTE_USART1 == 1)
+#endif //(RTE_USART1)
 
-#if (RTE_USART2 == 1)
+#if (RTE_USART2)
 
 #ifdef _USART_DEBUG_
 
-#if (RTE_USART2_TX_ID != 0)
+#if (RTE_USART2_TX_ID)
     ASSERT(RTE_USART2_TX_BIT < NUM_ARM_GPIO_IO);
-#endif //(RTE_USART2_TX_ID != 0)
-#if (RTE_USART2_RX_ID != 0)
+#endif //(RTE_USART2_TX_ID)
+#if (RTE_USART2_RX_ID)
     ASSERT(RTE_USART2_RX_BIT < NUM_ARM_GPIO_IO);
-#endif //(RTE_USART2_RX_ID != 0)
-#if (RTE_USART2_CK_ID != 0)
+#endif //(RTE_USART2_RX_ID)
+#if (RTE_USART2_CK_ID)
     ASSERT(RTE_USART2_CK_BIT < NUM_ARM_GPIO_IO);
-#endif //(RTE_USART2_CK_ID != 0)
-#if (RTE_USART2_CTS_ID != 0)
+#endif //(RTE_USART2_CK_ID)
+#if (RTE_USART2_CTS_ID)
     ASSERT(RTE_USART2_CTS_BIT < NUM_ARM_GPIO_IO);
 #endif //(RTE_USART2_CTS !=0 )  
-#if (RTE_USART2_RTS_ID != 0)
+#if (RTE_USART2_RTS_ID)
     ASSERT(RTE_USART2_RTS_BIT < NUM_ARM_GPIO_IO);
-#endif //(RTE_USART2_RTS_ID != 0)
+#endif //(RTE_USART2_RTS_ID)
 
 #endif//_USART_DEBUG_
 
@@ -344,9 +318,9 @@ static void USART_SetPinCfg(void)
 #error "Invalid USART2_RTS Pin Configuration"
 #endif //(RTE_USART2_RTS_ID == 0)
 
-#endif //(RTE_USART2==1)
+#endif //(RTE_USART2)
 
-#if (RTE_USART3 == 1)
+#if (RTE_USART3)
 
 #ifdef _USART_DEBUG_
 
@@ -465,9 +439,9 @@ static void USART_SetPinCfg(void)
 #error "Invalid USART3_RTS Pin Configuration"
 #endif //(RTE_USART3_RTS_ID == 0)
 
-#endif //(RTE_USART3==1)
+#endif //(RTE_USART3)
 
-#if (RTE_UART4==1)
+#if (RTE_UART4)
 
 #ifdef _USART_DEBUG_
 
@@ -522,10 +496,9 @@ static void USART_SetPinCfg(void)
 #error "Invalid UART4_RX Pin Configuration"
 #endif //(RTE_UART4_RX_ID == 0)
 
-#endif //(RTE_UART4==1)
+#endif //(RTE_UART4)
 
-#if (RTE_UART5==1)
-
+#if (RTE_UART5)
 
 #if (RTE_UART5_TX_ID != 0)
     ASSERT(RTE_UART5_TX_BIT < NUM_ARM_GPIO_IO);
@@ -568,9 +541,9 @@ static void USART_SetPinCfg(void)
 #error "Invalid UART5_RX Pin Configuration"
 #endif // (RTE_UART5_RX_ID == 0)
 
-#endif //(RTE_UART5==1)
+#endif //(RTE_UART5)
 
-#if (RTE_USART6 == 1)
+#if (RTE_USART6)
 
 #ifdef _USART_DEBUG_
 
@@ -676,6 +649,6 @@ static void USART_SetPinCfg(void)
 #error "Invalid USART6_RTS Pin Configuration"
 #endif //(RTE_USART6_RTS_ID == 0)
 
-#endif //(RTE_USART6==1)
+#endif //(RTE_USART6)
 
 }

@@ -154,7 +154,6 @@ static ARM_USART_CAPABILITIES ARM_USART_GetCapabilities(ARM_USART_Resources_t *u
 static int32_t ARM_USART_Initialize(ARM_USART_SignalEvent_t  cb_event,
                                     ARM_USART_Resources_t         *usart)
 {
-
     if(usart->p_info->drv_status & ARM_USART_FLAG_INITIALIZED) {
         // Driver is already initialized
         return ARM_DRIVER_OK;
@@ -162,11 +161,10 @@ static int32_t ARM_USART_Initialize(ARM_USART_SignalEvent_t  cb_event,
     // Initialize USART Run-time Resources
     usart->p_info->cb_event = cb_event;
 
-
     // Clear driver variables
-    usart->p_info->drv_status                 = 0U;
-    usart->p_info->mode                       = 0U;
-    usart->p_info->baudrate                   = 0U;
+    usart->p_info->drv_status                   = 0U;
+    usart->p_info->mode                         = 0U;
+    usart->p_info->baudrate                     = 0U;
     usart->p_info->xfer_status.tx_busy          = 0U;
     usart->p_info->xfer_status.rx_busy          = 0U;
     usart->p_info->xfer_status.tx_underflow     = 0U;
@@ -198,7 +196,6 @@ static int32_t ARM_USART_Initialize(ARM_USART_SignalEvent_t  cb_event,
 
 static int32_t ARM_USART_Uninitialize(ARM_USART_Resources_t *usart)
 {
-
 // Reset TX pin configuration
     GPIO_SetData(usart-> p_pin[TX_PIN].GPIOx, usart-> p_pin[TX_PIN].pin, 0U, 0U, 0U, 0U, 0U);
 // Reset RX pin configuration
@@ -256,7 +253,6 @@ static int32_t ARM_USART_PowerControl(ARM_POWER_STATE  state,
             if((usart->p_info->drv_status & ARM_USART_FLAG_POWERED)     != 0U) {
                 return ARM_DRIVER_OK;
             }
-
             // Enable clock to UARTx block
             ARM_RCC_Periph_ClockCmd(usart->usart_name, ENABLE_CMD);
             // Reset USART registers
@@ -265,9 +261,7 @@ static int32_t ARM_USART_PowerControl(ARM_POWER_STATE  state,
             ARM_RCC_Periph_ResetCmd(usart->usart_name, DISABLE_CMD);
             // Disable clock to UARTx block
             ARM_RCC_Periph_ClockCmd(usart->usart_name, DISABLE_CMD);
-
             usart->p_info->drv_status |= ARM_USART_FLAG_POWERED;
-
             // Clear and Enable USART IRQ
             NVIC_ClearPendingIRQ(usart->irq_num);
             NVIC_EnableIRQ(usart->irq_num);
