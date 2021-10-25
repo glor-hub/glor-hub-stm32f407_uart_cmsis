@@ -127,21 +127,21 @@ static void USART_SetPinCfg(void)
 
 #ifdef _USART_DEBUG_
 
-#if (RTE_USART1_TX_ID)
+#if (RTE_USART1_TX_ID > 0)
     ASSERT(RTE_USART1_TX_BIT < NUM_ARM_GPIO_IO);
-#endif //(RTE_USART1_TX_ID)
-#if (RTE_USART1_RX_ID)
+#endif //(RTE_USART1_TX_ID > 0)
+#if (RTE_USART1_RX_ID > 0)
     ASSERT(RTE_USART1_RX_BIT < NUM_ARM_GPIO_IO);
-#endif //(RTE_USART1_RX_ID)
-#if (RTE_USART1_CK_ID)
+#endif //(RTE_USART1_RX_ID > 0)
+#if (RTE_USART1_CK_ID > 0)
     ASSERT(RTE_USART1_CK_BIT < NUM_ARM_GPIO_IO);
-#endif //(RTE_USART1_CK_ID)
-#if (RTE_USART1_CTS_ID)
+#endif //(RTE_USART1_CK_ID > 0)
+#if (RTE_USART1_CTS_ID > 0)
     ASSERT(RTE_USART1_CTS_BIT < NUM_ARM_GPIO_IO);
 #endif //(RTE_USART1_CTS)  
-#if (RTE_USART1_RTS_ID)
+#if (RTE_USART1_RTS_ID > 0)
     ASSERT(RTE_USART1_RTS_BIT < NUM_ARM_GPIO_IO);
-#endif //(RTE_USART1_RTS_ID != 0)
+#endif //(RTE_USART1_RTS_ID > 0)
 
 #endif//_USART_DEBUG_
 
@@ -220,21 +220,21 @@ static void USART_SetPinCfg(void)
 
 #ifdef _USART_DEBUG_
 
-#if (RTE_USART2_TX_ID)
+#if (RTE_USART2_TX_ID > 0)
     ASSERT(RTE_USART2_TX_BIT < NUM_ARM_GPIO_IO);
-#endif //(RTE_USART2_TX_ID)
-#if (RTE_USART2_RX_ID)
+#endif //(RTE_USART2_TX_ID > 0)
+#if (RTE_USART2_RX_ID > 0)
     ASSERT(RTE_USART2_RX_BIT < NUM_ARM_GPIO_IO);
-#endif //(RTE_USART2_RX_ID)
-#if (RTE_USART2_CK_ID)
+#endif //(RTE_USART2_RX_ID > 0)
+#if (RTE_USART2_CK_ID > 0)
     ASSERT(RTE_USART2_CK_BIT < NUM_ARM_GPIO_IO);
-#endif //(RTE_USART2_CK_ID)
-#if (RTE_USART2_CTS_ID)
+#endif //(RTE_USART2_CK_ID > 0)
+#if (RTE_USART2_CTS_ID > 0)
     ASSERT(RTE_USART2_CTS_BIT < NUM_ARM_GPIO_IO);
-#endif //(RTE_USART2_CTS !=0 )  
-#if (RTE_USART2_RTS_ID)
+#endif //(RTE_USART2_CTS > 0 )  
+#if (RTE_USART2_RTS_ID > 0)
     ASSERT(RTE_USART2_RTS_BIT < NUM_ARM_GPIO_IO);
-#endif //(RTE_USART2_RTS_ID)
+#endif //(RTE_USART2_RTS_ID > 0)
 
 #endif//_USART_DEBUG_
 
@@ -324,21 +324,21 @@ static void USART_SetPinCfg(void)
 
 #ifdef _USART_DEBUG_
 
-#if (RTE_USART3_TX_ID != 0)
+#if (RTE_USART3_TX_ID > 0)
     ASSERT(RTE_USART3_TX_BIT < NUM_ARM_GPIO_IO);
-#endif //(RTE_USART3_TX_ID != 0)
-#if (RTE_USART3_RX_ID != 0)
+#endif //(RTE_USART3_TX_ID > 0)
+#if (RTE_USART3_RX_ID > 0)
     ASSERT(RTE_USART3_RX_BIT < NUM_ARM_GPIO_IO);
-#endif //(RTE_USART3_RX_ID != 0)
-#if (RTE_USART3_CK_ID != 0)
+#endif //(RTE_USART3_RX_ID > 0)
+#if (RTE_USART3_CK_ID > 0)
     ASSERT(RTE_USART3_CK_BIT < NUM_ARM_GPIO_IO);
-#endif //(RTE_USART3_CK_ID != 0)
-#if (RTE_USART3_CTS_ID != 0)
+#endif //(RTE_USART3_CK_ID > 0)
+#if (RTE_USART3_CTS_ID > 0)
     ASSERT(RTE_USART3_CTS_BIT < NUM_ARM_GPIO_IO);
-#endif //(RTE_USART3_CTS !=0 )  
-#if (RTE_USART3_RTS_ID != 0)
+#endif //(RTE_USART3_CTS > 0)  
+#if (RTE_USART3_RTS_ID > 0)
     ASSERT(RTE_USART3_RTS_BIT < NUM_ARM_GPIO_IO);
-#endif //(RTE_USART3_RTS_ID != 0)
+#endif //(RTE_USART3_RTS_ID > 0)
 
 #endif//_USART_DEBUG_
 
@@ -445,12 +445,12 @@ static void USART_SetPinCfg(void)
 
 #ifdef _USART_DEBUG_
 
-#if (RTE_UART4_TX_ID != 0)
+#if (RTE_UART4_TX_ID > 0)
     ASSERT(RTE_UART4_TX_BIT < NUM_ARM_GPIO_IO);
-#endif //(RTE_UART4_TX_ID != 0)
-#if (RTE_UART4_RX_ID != 0)
+#endif //(RTE_UART4_TX_ID > 0)
+#if (RTE_UART4_RX_ID > 0)
     ASSERT(RTE_UART4_RX_BIT < NUM_ARM_GPIO_IO);
-#endif //(RTE_UART4_RX_ID != 0)
+#endif //(RTE_UART4_RX_ID > 0)
 
 #endif//_USART_DEBUG_
 
@@ -500,12 +500,12 @@ static void USART_SetPinCfg(void)
 
 #if (RTE_UART5)
 
-#if (RTE_UART5_TX_ID != 0)
+#if (RTE_UART5_TX_ID > 0)
     ASSERT(RTE_UART5_TX_BIT < NUM_ARM_GPIO_IO);
-#endif //(RTE_UART5_TX_ID != 0)
-#if (RTE_UART5_RX_ID != 0)
+#endif //(RTE_UART5_TX_ID > 0)
+#if (RTE_UART5_RX_ID > 0)
     ASSERT(RTE_UART5_RX_BIT < NUM_ARM_GPIO_IO);
-#endif //(RTE_UART5_RX_ID != 0)
+#endif //(RTE_UART5_RX_ID > 0)
 
 #if (RTE_UART5_TX_ID == 0)
 #error "The UART5_TX Pin not used"
@@ -547,21 +547,21 @@ static void USART_SetPinCfg(void)
 
 #ifdef _USART_DEBUG_
 
-#if (RTE_USART6_TX_ID != 0)
+#if (RTE_USART6_TX_ID > 0)
     ASSERT(RTE_USART6_TX_BIT < NUM_ARM_GPIO_IO);
-#endif //(RTE_USART6_TX_ID != 0)
-#if (RTE_USART6_RX_ID != 0)
+#endif //(RTE_USART6_TX_ID > 0)
+#if (RTE_USART6_RX_ID > 0)
     ASSERT(RTE_USART6_RX_BIT < NUM_ARM_GPIO_IO);
-#endif //(RTE_USART6_RX_ID != 0)
-#if (RTE_USART6_CK_ID != 0)
+#endif //(RTE_USART6_RX_ID > 0)
+#if (RTE_USART6_CK_ID > 0)
     ASSERT(RTE_USART6_CK_BIT < NUM_ARM_GPIO_IO);
-#endif //(RTE_USART6_CK_ID != 0)
-#if (RTE_USART6_CTS_ID != 0)
+#endif //(RTE_USART6_CK_ID > 0)
+#if (RTE_USART6_CTS_ID > 0)
     ASSERT(RTE_USART6_CTS_BIT < NUM_ARM_GPIO_IO);
-#endif //(RTE_USART6_CTS !=0 )  
-#if (RTE_USART6_RTS_ID != 0)
+#endif //(RTE_USART6_CTS > 0 )  
+#if (RTE_USART6_RTS_ID > 0)
     ASSERT(RTE_USART6_RTS_BIT < NUM_ARM_GPIO_IO);
-#endif //(RTE_USART6_RTS_ID != 0)
+#endif //(RTE_USART6_RTS_ID > 0)
 
 #endif//_USART_DEBUG_
 

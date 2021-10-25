@@ -190,7 +190,7 @@ static int32_t ARM_USART_Initialize(ARM_USART_SignalEvent_t  cb_event,
     }
 // DMA Initialize
     //unsupported in Version 1.0
-    usart->p_info->drv_status = ARM_USART_FLAG_INITIALIZED;
+    usart->p_info->drv_status |= ARM_USART_FLAG_INITIALIZED;
     return ARM_DRIVER_OK;
 }
 
@@ -240,6 +240,20 @@ static int32_t ARM_USART_PowerControl(ARM_POWER_STATE  state,
             ARM_RCC_Periph_ClockCmd(usart->usart_name, DISABLE_CMD);
             // Clear pending USART interrupts in NVIC
             NVIC_ClearPendingIRQ(usart->irq_num);
+            // Clear driver variables
+            usart->p_info->drv_status                   = 0U;
+            usart->p_info->mode                         = 0U;
+            usart->p_info->baudrate                     = 0U;
+            usart->p_info->xfer_status.tx_busy          = 0U;
+            usart->p_info->xfer_status.rx_busy          = 0U;
+            usart->p_info->xfer_status.tx_underflow     = 0U;
+            usart->p_info->xfer_status.rx_overflow      = 0U;
+            usart->p_info->xfer_status.rx_break         = 0U;
+            usart->p_info->xfer_status.rx_framing_error = 0U;
+            usart->p_info->xfer_status.rx_parity_error  = 0U;
+            usart->p_info->xfer_info.tx_def_val         = 0U;
+            usart->p_info->xfer_info.rx_dump_val        = 0U;
+            usart->p_info->xfer_info.sync_mode          = 0U;
             usart->p_info->drv_status &= ~ARM_USART_FLAG_POWERED;
             break;
         }
@@ -259,8 +273,6 @@ static int32_t ARM_USART_PowerControl(ARM_POWER_STATE  state,
             ARM_RCC_Periph_ResetCmd(usart->usart_name, ENABLE_CMD);
             // Release reset signal from USART
             ARM_RCC_Periph_ResetCmd(usart->usart_name, DISABLE_CMD);
-            // Disable clock to UARTx block
-            ARM_RCC_Periph_ClockCmd(usart->usart_name, DISABLE_CMD);
             usart->p_info->drv_status |= ARM_USART_FLAG_POWERED;
             // Clear and Enable USART IRQ
             NVIC_ClearPendingIRQ(usart->irq_num);
@@ -385,61 +397,61 @@ static void ARM_USART1_Resources_Struct_Init(void)
     ARM_USART_Resources_t *p_str = &ARM_USART1_Resources;
     ARM_USART1_Resources.capabilities.asynchronous = 1;// supports UART (Asynchronous) mode
 
-#if (RTE_USART1_CK_ID)
+#if (RTE_USART1_CK_ID > 0)
     p_str->capabilities.synchronous_master = 1;         // supports Synchronous Master mode
 #else
     p_str->capabilities.synchronous_master = 0;         // supports Synchronous Master mode
-#endif //(RTE_USART1_CK_ID)
+#endif //(RTE_USART1_CK_ID > 0)
 
     p_str->capabilities.synchronous_slave = 0;          // supports Synchronous Slave mode
     p_str->capabilities.single_wire = 1;                // supports UART Single-wire mode
     p_str->capabilities.irda = 1;                       // supports UART IrDA mode
 
-#if (RTE_USART1_CK_ID)
+#if (RTE_USART1_CK_ID > 0)
     p_str->capabilities.smart_card =  1;                // supports UART Smart Card mode
     p_str->capabilities.smart_card_clock =  1;          // Smart Card Clock generator available
 #else
     p_str->capabilities.smart_card =  0;                // supports UART Smart Card mode
     p_str->capabilities.smart_card_clock =  0;          // Smart Card Clock generator available
-#endif //(RTE_USART1_CK_ID)
+#endif //(RTE_USART1_CK_ID > 0)
 
-#if (RTE_USART1_CTS_ID !=0)
+#if (RTE_USART1_CTS_ID > 0)
     p_str->capabilities.flow_control_rts =  1;          // RTS Flow Control available
 #else
     p_str->capabilities.flow_control_rts =  0;          // RTS Flow Control available
-#endif //(RTE_USART1_CTS_ID !=0) 
+#endif //(RTE_USART1_CTS_ID > 0) 
 
 #if RTE_USART1_CTS_ID
     p_str->capabilities.flow_control_cts =  1;          // CTS Flow Control available
 #else
     p_str->capabilities.flow_control_cts =  0;          // CTS Flow Control available
-#endif //(RTE_USART1_CTS_ID)               
+#endif //(RTE_USART1_CTS_ID > 0)               
 
     p_str->capabilities.event_tx_complete =  1;         // Transmit completed event: \ref ARM_USART_EVENT_TX_COMPLETE
     p_str->capabilities.event_rx_timeout =  0;          // Signal receive character timeout event: \ref ARM_USART_EVENT_RX_TIMEOUT
 
-#if (RTE_USART1_CTS_ID !=0)
+#if (RTE_USART1_CTS_ID > 0)
     p_str->capabilities.rts =  1;                       // RTS Line: 0=not available, 1=available
 #else
     p_str->capabilities.rts =  0;                       // RTS Line: 0=not available, 1=available
-#endif //(RTE_USART1_CTS_ID !=0) 
+#endif //(RTE_USART1_CTS_ID > 0) 
 
-#if (RTE_USART1_CTS_ID)
+#if (RTE_USART1_CTS_ID > 0)
     p_str->capabilities.cts =  1;                       // CTS Line: 0=not available, 1=available
 #else
     p_str->capabilities.cts =  0;                       // CTS Line: 0=not available, 1=available
-#endif //(RTE_USART1_CTS_ID)       
+#endif //(RTE_USART1_CTS_ID > 0)       
 
     p_str->capabilities.dtr =  0;                       // DTR Line: 0=not available, 1=available
     p_str->capabilities.dsr =  0;                       // DSR Line: 0=not available, 1=available
     p_str->capabilities.dcd =  0;                       // DCD Line: 0=not available, 1=available
     p_str->capabilities.ri =  0;                        // RI Line: 0=not available, 1=available
 
-#if (RTE_USART1_CTS_ID)
+#if (RTE_USART1_CTS_ID > 0)
     p_str->capabilities.event_cts = 1;                  // Signal CTS change event: \ref ARM_USART_EVENT_CTS
 #else
     p_str->capabilities.event_cts =  0;                 // Signal CTS change event: \ref ARM_USART_EVENT_CTS
-#endif //(RTE_USART1_CTS_ID) 
+#endif //(RTE_USART1_CTS_ID > 0) 
 
     p_str->capabilities.event_dsr =  0;                 // Signal DSR change event: \ref ARM_USART_EVENT_DSR
     p_str->capabilities.event_dcd =  0;                 // Signal DCD change event: \ref ARM_USART_EVENT_DCD
