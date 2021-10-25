@@ -329,9 +329,155 @@ static int32_t ARM_USART_Control(uint32_t control, uint32_t arg,
         // USART not powered
         return ARM_DRIVER_ERROR;
     }
+    //USART Mode
+    uint16_t mode;
     switch(control & ARM_USART_CONTROL_Msk) {
-        // Control TX
-        case  ARM_USART_CONTROL_TX: {
+        case ARM_USART_MODE_ASYNCHRONOUS: {
+            mode = ARM_USART_MODE_ASYNCHRONOUS;
+            break;
+        }
+        case ARM_USART_MODE_SYNCHRONOUS_MASTER: {
+            //unsupported in Version 1.0
+            return ARM_DRIVER_ERROR_UNSUPPORTED;
+        }
+        case ARM_USART_MODE_SYNCHRONOUS_SLAVE: {
+            //unsupported in STM32F407
+            return ARM_USART_ERROR_MODE;
+        }
+        case ARM_USART_MODE_SINGLE_WIRE: {
+            //unsupported in Version 1.0
+            return ARM_DRIVER_ERROR_UNSUPPORTED;
+        }
+        case ARM_USART_MODE_IRDA: {
+            // unsupported in Version 1.0
+            return ARM_DRIVER_ERROR_UNSUPPORTED;
+        }
+        case ARM_USART_MODE_SMART_CARD: {
+            // unsupported in Version 1.0
+            return ARM_DRIVER_ERROR_UNSUPPORTED;
+        }
+        default: {
+            break;
+        }
+    }
+
+    //USART Data Bits
+    switch(control & ARM_USART_DATA_BITS_Msk) {
+        case ARM_USART_DATA_BITS_5: {
+            break;
+        }
+        case ARM_USART_DATA_BITS_6: {
+            break;
+        }
+        case ARM_USART_DATA_BITS_7: {
+            break;
+        }
+        case ARM_USART_DATA_BITS_8: {
+            break;
+        }
+        case ARM_USART_DATA_BITS_9: {
+            break;
+        }
+        default: {
+            break;
+        }
+    }
+
+    //USART Parity
+    switch(control & ARM_USART_PARITY_Msk) {
+        case ARM_USART_PARITY_NONE: {
+            break;
+        }
+        case ARM_USART_PARITY_EVEN: {
+            break;
+        }
+        case ARM_USART_PARITY_ODD: {
+            break;
+        }
+        default: {
+            break;
+        }
+    }
+
+    //USART Stop Bits
+    switch(control & ARM_USART_STOP_BITS_Msk) {
+        case ARM_USART_STOP_BITS_1: {
+            break;
+        }
+        case ARM_USART_STOP_BITS_2: {
+            break;
+        }
+        case ARM_USART_STOP_BITS_1_5: {
+            break;
+        }
+        case ARM_USART_STOP_BITS_0_5: {
+            break;
+        }
+        default: {
+            break;
+        }
+    }
+
+//USART Flow Control
+    switch(control & ARM_USART_FLOW_CONTROL_Msk) {
+        case ARM_USART_FLOW_CONTROL_NONE: {
+            break;
+        }
+        case ARM_USART_FLOW_CONTROL_RTS: {
+            break;
+        }
+        case ARM_USART_FLOW_CONTROL_CTS: {
+            break;
+        }
+        case ARM_USART_FLOW_CONTROL_RTS_CTS: {
+            break;
+        }
+        default: {
+            break;
+        }
+    }
+
+    switch(control & ARM_USART_CPOL_Msk) {
+//USART Clock Polarity (Synchronous mode)
+        case ARM_USART_CPOL0: {
+            break;
+        }
+        case ARM_USART_CPOL1: {
+            break;
+        }
+    }
+
+    switch(control & ARM_USART_CPHA_Msk) {
+//USART Clock Phase (Synchronous mode)
+        case ARM_USART_CPHA0: {
+            break;
+        }
+        case ARM_USART_CPHA1: {
+            break;
+        }
+        default: {
+            break;
+        }
+    }
+
+//Miscellaneous Controls
+    switch(control & ARM_USART_CONTROL_Msk) {
+        case ARM_USART_SET_DEFAULT_TX_VALUE: {
+            break;
+        }
+        case ARM_USART_SET_IRDA_PULSE: {
+            break;
+        }
+        case ARM_USART_SET_SMART_CARD_GUARD_TIME: {
+            break;
+        }
+        case ARM_USART_SET_SMART_CARD_CLOCK: {
+            break;
+        }
+        case ARM_USART_CONTROL_SMART_CARD_NACK: {
+            break;
+        }
+        case ARM_USART_CONTROL_TX: {
             //Check if pin configure available
             if(usart->p_pin == NULL) {
                 return ARM_DRIVER_ERROR;
@@ -355,9 +501,59 @@ static int32_t ARM_USART_Control(uint32_t control, uint32_t arg,
                 usart->p_info->drv_status &= ~ARM_USART_FLAG_TX_ENABLED;
 
             }
+            //to do
+            break;
+        }
+        case ARM_USART_CONTROL_RX: {
+            break;
+        }
+        case ARM_USART_CONTROL_BREAK: {
+            break;
+        }
+        case ARM_USART_ABORT_SEND: {
+            break;
+        }
+        case ARM_USART_ABORT_RECEIVE: {
+            break;
+        }
+        case ARM_USART_ABORT_TRANSFER: {
+            break;
+        }
+        default: {
+            break;
+        }
+    }
+
+    /*
+    // Control TX
+    case  ARM_USART_CONTROL_TX:
+    {
+        //Check if pin configure available
+        if(usart->p_pin == NULL) {
+            return ARM_DRIVER_ERROR;
+        }
+        if(arg) {
+            if(usart->p_info->mode != ARM_USART_MODE_SMART_CARD) {
+                // USART TX pin function selected
+                GPIO_SetData(usart-> p_pin[TX_PIN].GPIOx, usart-> p_pin[TX_PIN].pin,
+                             ARM_GPIO_IO_MODE_INPUT, ARM_GPIO_IO_TYPE_OPEN_DRAIN , ARM_GPIO_IO_HI_Z, ARM_GPIO_IO_SPEED_FREQ_LOW,
+                             usart-> p_pin[TX_PIN].alt_func);
+                usart->p_reg->CR1 |= USART_CR1_TE;
+                usart->p_info->drv_status |= ARM_USART_FLAG_TX_ENABLED;
+            }
+        } else {
+            usart->p_reg->CR1 &= ~USART_CR1_TE;
+            if(usart->p_info->mode != ARM_USART_MODE_SMART_CARD) {
+                // SPIO default pin function selected
+                GPIO_SetData(usart-> p_pin[TX_PIN].GPIOx, usart-> p_pin[TX_PIN].pin,
+                             0U, 0U, 0U, 0U, 0U);
+            }
+            usart->p_info->drv_status &= ~ARM_USART_FLAG_TX_ENABLED;
+
         }
     }
     //to do
+    */
     return ARM_DRIVER_OK;
 }
 
