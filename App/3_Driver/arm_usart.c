@@ -49,16 +49,16 @@ typedef struct {
     uint32_t                tx_cnt;        // Number of data sent
     uint8_t                 tx_def_val;    // Transmit default value (used in USART_SYNC_MASTER_MODE_RX)
     uint8_t                 rx_dump_val;   // Receive dump value (used in USART_SYNC_MASTER_MODE_TX)
-    uint8_t                 sync_mode;     // Synchronous mode
 } ARM_USART_TransferInfo_t;
 
 // ARM USART Information (Run-Time)
 typedef struct {
     ARM_USART_SignalEvent_t  cb_event;        // Event callback
-    uint16_t                 drv_status;      // USART driver flags
+    uint16_t                 flags;          // USART driver flags
     uint8_t                  mode;            // USART mode
     uint32_t                 baudrate;        // Baudrate
     ARM_USART_STATUS         xfer_status;     // USART transfer status
+    ARM_USART_MODEM_STATUS   modem_status;     // USART modem status
     ARM_USART_TransferInfo_t xfer_info;       // Transfer information
 } ARM_USART_Info_t;
 
@@ -111,6 +111,7 @@ static uint32_t ARM_USART_GetTxCount(ARM_USART_Resources_t *usart);
 static uint32_t ARM_USART_GetRxCount(ARM_USART_Resources_t *usart);
 static int32_t ARM_USART_Control(uint32_t control, uint32_t arg,
                                  ARM_USART_Resources_t *usart);
+static int32_t ARM_USART_SetBaudrate(uint32_t arg);
 static ARM_USART_STATUS ARM_USART_GetStatus(ARM_USART_Resources_t *usart);
 static int32_t ARM_USART_SetModemControl(ARM_USART_MODEM_CONTROL control, ARM_USART_Resources_t *usart);
 static ARM_USART_MODEM_STATUS ARM_USART_GetModemStatus(ARM_USART_Resources_t *usart);
@@ -154,7 +155,7 @@ static ARM_USART_CAPABILITIES ARM_USART_GetCapabilities(ARM_USART_Resources_t *u
 static int32_t ARM_USART_Initialize(ARM_USART_SignalEvent_t  cb_event,
                                     ARM_USART_Resources_t         *usart)
 {
-    if(usart->p_info->drv_status & ARM_USART_FLAG_INITIALIZED) {
+    if(usart->p_info->flags & ARM_USART_FLAG_INITIALIZED) {
         // Driver is already initialized
         return ARM_DRIVER_OK;
     }
@@ -162,7 +163,7 @@ static int32_t ARM_USART_Initialize(ARM_USART_SignalEvent_t  cb_event,
     usart->p_info->cb_event = cb_event;
 
     // Clear driver variables
-    usart->p_info->drv_status                   = 0U;
+    usart->p_info->flags                        = 0U;
     usart->p_info->mode                         = 0U;
     usart->p_info->baudrate                     = 0U;
     usart->p_info->xfer_status.tx_busy          = 0U;
@@ -174,23 +175,27 @@ static int32_t ARM_USART_Initialize(ARM_USART_SignalEvent_t  cb_event,
     usart->p_info->xfer_status.rx_parity_error  = 0U;
     usart->p_info->xfer_info.tx_def_val         = 0U;
     usart->p_info->xfer_info.rx_dump_val        = 0U;
-    usart->p_info->xfer_info.sync_mode          = 0U;
 
 // Configure CTS pin
     if(usart->capabilities.cts) {
+        ARM_RCC_Periph_ClockCmd(usart-> p_pin[CTS_PIN].port, ENABLE_CMD);
         GPIO_SetData(usart-> p_pin[CTS_PIN].GPIOx, usart-> p_pin[CTS_PIN].pin,
                      ARM_GPIO_IO_MODE_INPUT, ARM_GPIO_IO_TYPE_OPEN_DRAIN , ARM_GPIO_IO_HI_Z, ARM_GPIO_IO_SPEED_FREQ_LOW,
                      usart-> p_pin[CTS_PIN].alt_func);
     }
 // Configure RTS pin
     if(usart->capabilities.rts) {
+        ARM_RCC_Periph_ClockCmd(usart-> p_pin[RTS_PIN].port, ENABLE_CMD);
         GPIO_SetData(usart-> p_pin[RTS_PIN].GPIOx, usart-> p_pin[RTS_PIN].pin,
                      ARM_GPIO_IO_MODE_OUTPUT, ARM_GPIO_IO_TYPE_PUSH_PULL, ARM_GPIO_IO_HI_Z, ARM_GPIO_IO_SPEED_FREQ_LOW,
                      usart-> p_pin[RTS_PIN].alt_func);
     }
+
+// TX, RX, CK pins are configurated in function ARM_USART_Control.
+
 // DMA Initialize
     //unsupported in Version 1.0
-    usart->p_info->drv_status |= ARM_USART_FLAG_INITIALIZED;
+    usart->p_info->flags |= ARM_USART_FLAG_INITIALIZED;
     return ARM_DRIVER_OK;
 }
 
@@ -212,7 +217,7 @@ static int32_t ARM_USART_Uninitialize(ARM_USART_Resources_t *usart)
     //unsupported in Version 1.0
 
 // Reset USART status flags
-    usart->p_info->drv_status = 0UL;
+    usart->p_info->flags = 0UL;
     return ARM_DRIVER_OK;
 }
 
@@ -241,7 +246,7 @@ static int32_t ARM_USART_PowerControl(ARM_POWER_STATE  state,
             // Clear pending USART interrupts in NVIC
             NVIC_ClearPendingIRQ(usart->irq_num);
             // Clear driver variables
-            usart->p_info->drv_status                   = 0U;
+            usart->p_info->flags                        = 0U;
             usart->p_info->mode                         = 0U;
             usart->p_info->baudrate                     = 0U;
             usart->p_info->xfer_status.tx_busy          = 0U;
@@ -253,18 +258,17 @@ static int32_t ARM_USART_PowerControl(ARM_POWER_STATE  state,
             usart->p_info->xfer_status.rx_parity_error  = 0U;
             usart->p_info->xfer_info.tx_def_val         = 0U;
             usart->p_info->xfer_info.rx_dump_val        = 0U;
-            usart->p_info->xfer_info.sync_mode          = 0U;
-            usart->p_info->drv_status &= ~ARM_USART_FLAG_POWERED;
+            usart->p_info->flags &= ~ARM_USART_FLAG_POWERED;
             break;
         }
         case ARM_POWER_LOW: {
             return ARM_DRIVER_ERROR_UNSUPPORTED;
         }
         case ARM_POWER_FULL: {
-            if((usart->p_info->drv_status & ARM_USART_FLAG_INITIALIZED) == 0U) {
+            if((usart->p_info->flags & ARM_USART_FLAG_INITIALIZED) == 0U) {
                 return ARM_DRIVER_ERROR;
             }
-            if((usart->p_info->drv_status & ARM_USART_FLAG_POWERED)     != 0U) {
+            if((usart->p_info->flags & ARM_USART_FLAG_POWERED)     != 0U) {
                 return ARM_DRIVER_OK;
             }
             // Enable clock to UARTx block
@@ -273,7 +277,7 @@ static int32_t ARM_USART_PowerControl(ARM_POWER_STATE  state,
             ARM_RCC_Periph_ResetCmd(usart->usart_name, ENABLE_CMD);
             // Release reset signal from USART
             ARM_RCC_Periph_ResetCmd(usart->usart_name, DISABLE_CMD);
-            usart->p_info->drv_status |= ARM_USART_FLAG_POWERED;
+            usart->p_info->flags |= ARM_USART_FLAG_POWERED;
             // Clear and Enable USART IRQ
             NVIC_ClearPendingIRQ(usart->irq_num);
             NVIC_EnableIRQ(usart->irq_num);
@@ -325,242 +329,418 @@ static uint32_t ARM_USART_GetRxCount(ARM_USART_Resources_t *usart)
 static int32_t ARM_USART_Control(uint32_t control, uint32_t arg,
                                  ARM_USART_Resources_t *usart)
 {
-    if((usart->p_info->drv_status & ARM_USART_FLAG_POWERED) == 0U) {
+    if((usart->p_info->flags & ARM_USART_FLAG_POWERED) == 0U) {
         // USART not powered
         return ARM_DRIVER_ERROR;
     }
-    //USART Mode
-    uint16_t mode;
+
+// Check if Receiver/Transmitter is busy
+    if((usart->p_info->xfer_status.tx_busy != 0U) ||
+       (usart->p_info->xfer_status.rx_busy != 0U)) {
+        return ARM_DRIVER_ERROR_BUSY;
+    }
+//Miscellaneous Controls
+//Attention!!! - Miscellaneous Controls Operations cannot be ORed!
+    switch(control & ARM_USART_CONTROL_Msk) {
+        //Synchronous Receive only
+        case ARM_USART_SET_DEFAULT_TX_VALUE: {
+            if((usart->p_info->mode == ARM_USART_MODE_SYNCHRONOUS_MASTER) ||
+               (usart->p_info->mode == ARM_USART_MODE_SYNCHRONOUS_SLAVE)) {
+                usart->p_info->xfer_info.tx_def_val = arg;
+                return ARM_DRIVER_OK;
+            } else {
+                return ARM_DRIVER_ERROR;
+            }
+        }
+        //IrDA Pulse
+        case ARM_USART_SET_IRDA_PULSE: {
+            if(usart->p_info->mode == ARM_USART_MODE_IRDA)  {
+                //the mode is unsupported in Version 1.0
+                return ARM_DRIVER_ERROR_UNSUPPORTED;
+            } else {
+                return ARM_DRIVER_ERROR;
+            }
+        }
+        //Smart Card Guard Time
+        case ARM_USART_SET_SMART_CARD_GUARD_TIME: {
+            if(usart->p_info->mode == ARM_USART_MODE_SMART_CARD)  {
+                //the mode is unsupported in Version 1.0
+                return ARM_DRIVER_ERROR_UNSUPPORTED;
+            } else {
+                return ARM_DRIVER_ERROR;
+            }
+        }
+        //Smart Card Clock
+        case ARM_USART_SET_SMART_CARD_CLOCK: {
+            if(usart->p_info->mode == ARM_USART_MODE_SMART_CARD)  {
+                //the mode is unsupported in Version 1.0
+                return ARM_DRIVER_ERROR_UNSUPPORTED;
+            } else {
+                return ARM_DRIVER_ERROR;
+            }
+        }
+        //Smart Card NACK generation
+        case ARM_USART_CONTROL_SMART_CARD_NACK: {
+            if(usart->p_info->mode == ARM_USART_MODE_SMART_CARD)  {
+                //the mode is unsupported in Version 1.0
+                return ARM_DRIVER_ERROR_UNSUPPORTED;
+            } else {
+                return ARM_DRIVER_ERROR;
+            }
+        }
+        //Control TX
+        case ARM_USART_CONTROL_TX: {
+            if(usart->p_info->mode != ARM_USART_MODE_SMART_CARD) {
+                if(arg) {
+                    if(usart->p_info->mode != ARM_USART_MODE_SMART_CARD) {
+                        ARM_RCC_Periph_ClockCmd(usart-> p_pin[TX_PIN].port, ENABLE_CMD);
+                        GPIO_SetData(usart-> p_pin[TX_PIN].GPIOx, usart-> p_pin[TX_PIN].pin,
+                                     ARM_GPIO_IO_MODE_OUTPUT, ARM_GPIO_IO_TYPE_PUSH_PULL ,
+                                     ARM_GPIO_IO_HI_Z, ARM_GPIO_IO_SPEED_FREQ_LOW,
+                                     usart-> p_pin[TX_PIN].alt_func);
+                    } else {
+                        ARM_RCC_Periph_ClockCmd(usart-> p_pin[TX_PIN].port, ENABLE_CMD);
+                        GPIO_SetData(usart-> p_pin[TX_PIN].GPIOx, usart-> p_pin[TX_PIN].pin,
+                                     ARM_GPIO_IO_MODE_OUTPUT, ARM_GPIO_IO_TYPE_OPEN_DRAIN ,
+                                     ARM_GPIO_IO_PULL_UP, ARM_GPIO_IO_SPEED_FREQ_LOW,
+                                     usart-> p_pin[TX_PIN].alt_func);
+                    }
+                    usart->p_reg->CR1 |= USART_CR1_TE;
+                    usart->p_info->flags |= ARM_USART_FLAG_TX_ENABLED;
+                } else {
+                    usart->p_reg->CR1 &= ~USART_CR1_TE;
+                    usart->p_info->flags &= ~ARM_USART_FLAG_TX_ENABLED;
+                    ARM_RCC_Periph_ClockCmd(usart-> p_pin[TX_PIN].port, ENABLE_CMD);
+                    GPIO_SetData(usart-> p_pin[TX_PIN].GPIOx, usart-> p_pin[TX_PIN].pin,
+                                 0U, 0U, 0U, 0U, 0U);
+                }
+            }
+            return ARM_DRIVER_OK;
+        }
+
+        //Control RX
+        case ARM_USART_CONTROL_RX: {
+            if(arg) {
+                if((usart->p_info->mode != ARM_USART_MODE_SMART_CARD) &&
+                   (usart->p_info->mode != ARM_USART_MODE_SINGLE_WIRE)) {
+                    ARM_RCC_Periph_ClockCmd(usart-> p_pin[RX_PIN].port, ENABLE_CMD);
+                    GPIO_SetData(usart-> p_pin[RX_PIN].GPIOx, usart-> p_pin[RX_PIN].pin,
+                                 ARM_GPIO_IO_MODE_INPUT, ARM_GPIO_IO_TYPE_OPEN_DRAIN ,
+                                 ARM_GPIO_IO_HI_Z, ARM_GPIO_IO_SPEED_FREQ_LOW,
+                                 usart-> p_pin[RX_PIN].alt_func);
+                } else {
+                    ARM_RCC_Periph_ClockCmd(usart-> p_pin[RX_PIN].port, ENABLE_CMD);
+                    GPIO_SetData(usart-> p_pin[RX_PIN].GPIOx, usart-> p_pin[RX_PIN].pin,
+                                 0U, 0U, 0U, 0U, 0U);
+                }
+                usart->p_reg->CR1 |= USART_CR1_RE;
+                usart->p_info->flags |= ARM_USART_FLAG_RX_ENABLED;
+            } else {
+                usart->p_reg->CR1 &= ~USART_CR1_RE;
+                usart->p_info->flags &= ~ARM_USART_FLAG_RX_ENABLED;
+                ARM_RCC_Periph_ClockCmd(usart-> p_pin[RX_PIN].port, ENABLE_CMD);
+                GPIO_SetData(usart-> p_pin[RX_PIN].GPIOx, usart-> p_pin[RX_PIN].pin,
+                             0U, 0U, 0U, 0U, 0U);
+            }
+            return ARM_DRIVER_OK;
+        }
+
+        //Control break
+        case ARM_USART_CONTROL_BREAK: {
+            if(arg) {
+                if(usart->p_info->xfer_status.tx_busy) {
+                    return ARM_DRIVER_ERROR_BUSY;
+                }
+                usart->p_info->xfer_status.tx_busy = 1UL;
+                usart->p_reg->CR1 |= USART_CR1_SBK;
+            } else {
+                usart->p_reg->CR1 &= ~USART_CR1_SBK;
+                usart->p_info->xfer_status.tx_busy = 0UL;
+            }
+            return ARM_DRIVER_OK;
+        }
+
+        //Abort Send
+        case ARM_USART_ABORT_SEND: {
+            //Disable TXE and TC interrupts
+            usart->p_reg->CR1 &= ~(USART_CR1_TXEIE | USART_CR1_TCIE);
+            usart->p_info->xfer_info.tx_cnt = 0UL;
+            usart->p_info->xfer_status.tx_busy = 0UL;
+            return ARM_DRIVER_OK;
+        }
+        case ARM_USART_ABORT_RECEIVE: {
+            //Disable RXNE interrupt
+            usart->p_reg->CR1 &= ~USART_CR1_RXNEIE;
+            //Disable PE interrupt
+            usart->p_reg->SR &= ~USART_SR_PE;
+            //Disable FE, ORE and NF interrupts
+            usart->p_reg->CR3 &= ~USART_CR3_EIE;
+            usart->p_info->xfer_info.rx_cnt = 0UL;
+            usart->p_info->xfer_status.rx_busy = 0UL;
+            return ARM_DRIVER_OK;
+        }
+        case ARM_USART_ABORT_TRANSFER: {
+            //Disable TXE and TC interrupts
+            usart->p_reg->CR1 &= ~(USART_CR1_TXEIE | USART_CR1_TCIE);
+            //Disable RXNE interrupt
+            usart->p_reg->CR1 &= ~USART_CR1_RXNEIE;
+            //Disable PE interrupt
+            usart->p_reg->SR &= ~USART_SR_PE;
+            //Disable FE, ORE and NF interrupts
+            usart->p_reg->CR3 &= ~USART_CR3_EIE;
+            usart->p_info->xfer_info.tx_cnt = 0UL;
+            usart->p_info->xfer_info.rx_cnt = 0UL;
+            usart->p_info->xfer_status.tx_busy = 0UL;
+            usart->p_info->xfer_status.rx_busy = 0UL;
+            return ARM_DRIVER_OK;
+        }
+        default: {
+            break;
+        }
+    }
+
+//USART Mode
+    uint8_t mode = 0U;
     switch(control & ARM_USART_CONTROL_Msk) {
         case ARM_USART_MODE_ASYNCHRONOUS: {
-            mode = ARM_USART_MODE_ASYNCHRONOUS;
+            if(usart->capabilities.asynchronous) {
+                mode = ARM_USART_MODE_ASYNCHRONOUS;
+                if(ARM_USART_SetBaudrate(arg) == -1) {
+                    return ARM_USART_ERROR_BAUDRATE;
+                }
+            } else {
+                return ARM_USART_ERROR_MODE;
+            }
             break;
         }
         case ARM_USART_MODE_SYNCHRONOUS_MASTER: {
-            //unsupported in Version 1.0
-            return ARM_DRIVER_ERROR_UNSUPPORTED;
+            if(usart->capabilities.synchronous_master) {
+                //the mode is unsupported in Version 1.0
+                return ARM_DRIVER_ERROR_UNSUPPORTED;
+            } else {
+                return ARM_USART_ERROR_MODE;
+            }
         }
         case ARM_USART_MODE_SYNCHRONOUS_SLAVE: {
-            //unsupported in STM32F407
-            return ARM_USART_ERROR_MODE;
+            //the mode is unsupported in STM32F407
+            return ARM_DRIVER_ERROR_UNSUPPORTED;
         }
         case ARM_USART_MODE_SINGLE_WIRE: {
-            //unsupported in Version 1.0
-            return ARM_DRIVER_ERROR_UNSUPPORTED;
+            if(usart->capabilities.single_wire) {
+                //the mode is unsupported in Version 1.0
+                return ARM_DRIVER_ERROR_UNSUPPORTED;
+            } else {
+                return ARM_USART_ERROR_MODE;
+            }
         }
         case ARM_USART_MODE_IRDA: {
-            // unsupported in Version 1.0
-            return ARM_DRIVER_ERROR_UNSUPPORTED;
+            if(usart->capabilities.irda) {
+                //the mode is unsupported in Version 1.0
+                return ARM_DRIVER_ERROR_UNSUPPORTED;
+            } else {
+                return ARM_USART_ERROR_MODE;
+            }
         }
         case ARM_USART_MODE_SMART_CARD: {
-            // unsupported in Version 1.0
-            return ARM_DRIVER_ERROR_UNSUPPORTED;
+            if(usart->capabilities.smart_card) {
+                //the mode is unsupported in Version 1.0
+                return ARM_DRIVER_ERROR_UNSUPPORTED;
+            } else {
+                return ARM_USART_ERROR_MODE;
+            }
         }
+        //unsupported commands
         default: {
-            break;
+            return ARM_DRIVER_ERROR_UNSUPPORTED;
         }
     }
 
-    //USART Data Bits
+//USART Data Bits
+    usart->p_reg->CR1 &= ~USART_CR1_M_Msk;
     switch(control & ARM_USART_DATA_BITS_Msk) {
         case ARM_USART_DATA_BITS_5: {
-            break;
+            return ARM_USART_ERROR_DATA_BITS;
         }
         case ARM_USART_DATA_BITS_6: {
-            break;
+            return ARM_USART_ERROR_DATA_BITS;
         }
         case ARM_USART_DATA_BITS_7: {
-            break;
+            return ARM_USART_ERROR_DATA_BITS;
         }
         case ARM_USART_DATA_BITS_8: {
+            usart->p_reg->CR1 &= ~USART_CR1_M;
             break;
         }
         case ARM_USART_DATA_BITS_9: {
+            usart->p_reg->CR1 |= USART_CR1_M;
             break;
         }
         default: {
-            break;
+            return ARM_USART_ERROR_DATA_BITS;
         }
     }
 
-    //USART Parity
+//USART Parity
+    usart->p_reg->CR1 &= ~USART_CR1_PCE_Msk;
+    usart->p_reg->CR1 &= ~USART_CR1_PS_Msk;
     switch(control & ARM_USART_PARITY_Msk) {
         case ARM_USART_PARITY_NONE: {
+            usart->p_reg->CR1 &= ~USART_CR1_PCE;
             break;
         }
         case ARM_USART_PARITY_EVEN: {
+            usart->p_reg->CR1 |= USART_CR1_PCE;
+            usart->p_reg->CR1 &= ~USART_CR1_PS;
             break;
         }
         case ARM_USART_PARITY_ODD: {
+            usart->p_reg->CR1 |= USART_CR1_PCE;
+            usart->p_reg->CR1 |= USART_CR1_PS;
             break;
         }
         default: {
-            break;
+            return ARM_USART_ERROR_PARITY;
         }
     }
 
-    //USART Stop Bits
+//USART Stop Bits
+    usart->p_reg->CR2 &= ~USART_CR2_STOP_Msk;
     switch(control & ARM_USART_STOP_BITS_Msk) {
         case ARM_USART_STOP_BITS_1: {
+            usart->p_reg->CR2 &= ~(USART_CR2_STOP_0 | USART_CR2_STOP_1);
             break;
         }
         case ARM_USART_STOP_BITS_2: {
+            usart->p_reg->CR2 &= ~USART_CR2_STOP_0;
+            usart->p_reg->CR2 |= USART_CR2_STOP_1;
             break;
         }
         case ARM_USART_STOP_BITS_1_5: {
+            usart->p_reg->CR2 |= (USART_CR2_STOP_0 | USART_CR2_STOP_1);
             break;
         }
         case ARM_USART_STOP_BITS_0_5: {
+            usart->p_reg->CR2 |= USART_CR2_STOP_0;
+            usart->p_reg->CR2 &= ~USART_CR2_STOP_1;
             break;
         }
         default: {
-            break;
+            return ARM_USART_ERROR_STOP_BITS;
         }
     }
 
 //USART Flow Control
+    usart->p_reg->CR3 &= ~(USART_CR3_RTSE_Msk | USART_CR3_CTSE_Msk);
     switch(control & ARM_USART_FLOW_CONTROL_Msk) {
         case ARM_USART_FLOW_CONTROL_NONE: {
             break;
         }
         case ARM_USART_FLOW_CONTROL_RTS: {
+            if(usart->capabilities.flow_control_rts) {
+                usart->p_reg->CR3 |= USART_CR3_RTSE;
+            } else {
+                return ARM_USART_ERROR_FLOW_CONTROL;
+            }
             break;
         }
         case ARM_USART_FLOW_CONTROL_CTS: {
+            if(usart->capabilities.flow_control_cts) {
+                usart->p_reg->CR3 |= USART_CR3_CTSE;
+            } else {
+                return ARM_USART_ERROR_FLOW_CONTROL;
+            }
             break;
         }
         case ARM_USART_FLOW_CONTROL_RTS_CTS: {
-            break;
-        }
-        default: {
-            break;
-        }
-    }
-
-    switch(control & ARM_USART_CPOL_Msk) {
-//USART Clock Polarity (Synchronous mode)
-        case ARM_USART_CPOL0: {
-            break;
-        }
-        case ARM_USART_CPOL1: {
-            break;
-        }
-    }
-
-    switch(control & ARM_USART_CPHA_Msk) {
-//USART Clock Phase (Synchronous mode)
-        case ARM_USART_CPHA0: {
-            break;
-        }
-        case ARM_USART_CPHA1: {
-            break;
-        }
-        default: {
-            break;
-        }
-    }
-
-//Miscellaneous Controls
-    switch(control & ARM_USART_CONTROL_Msk) {
-        case ARM_USART_SET_DEFAULT_TX_VALUE: {
-            break;
-        }
-        case ARM_USART_SET_IRDA_PULSE: {
-            break;
-        }
-        case ARM_USART_SET_SMART_CARD_GUARD_TIME: {
-            break;
-        }
-        case ARM_USART_SET_SMART_CARD_CLOCK: {
-            break;
-        }
-        case ARM_USART_CONTROL_SMART_CARD_NACK: {
-            break;
-        }
-        case ARM_USART_CONTROL_TX: {
-            //Check if pin configure available
-            if(usart->p_pin == NULL) {
-                return ARM_DRIVER_ERROR;
-            }
-            if(arg) {
-                if(usart->p_info->mode != ARM_USART_MODE_SMART_CARD) {
-                    // USART TX pin function selected
-                    GPIO_SetData(usart-> p_pin[TX_PIN].GPIOx, usart-> p_pin[TX_PIN].pin,
-                                 ARM_GPIO_IO_MODE_INPUT, ARM_GPIO_IO_TYPE_OPEN_DRAIN , ARM_GPIO_IO_HI_Z, ARM_GPIO_IO_SPEED_FREQ_LOW,
-                                 usart-> p_pin[TX_PIN].alt_func);
-                    usart->p_reg->CR1 |= USART_CR1_TE;
-                    usart->p_info->drv_status |= ARM_USART_FLAG_TX_ENABLED;
-                }
+            if(usart->capabilities.flow_control_rts &&
+               usart->capabilities.flow_control_cts) {
+                usart->p_reg->CR3 |= (USART_CR3_RTSE | USART_CR3_CTSE);
             } else {
-                usart->p_reg->CR1 &= ~USART_CR1_TE;
-                if(usart->p_info->mode != ARM_USART_MODE_SMART_CARD) {
-                    // SPIO default pin function selected
-                    GPIO_SetData(usart-> p_pin[TX_PIN].GPIOx, usart-> p_pin[TX_PIN].pin,
-                                 0U, 0U, 0U, 0U, 0U);
-                }
-                usart->p_info->drv_status &= ~ARM_USART_FLAG_TX_ENABLED;
-
+                return ARM_USART_ERROR_FLOW_CONTROL;
             }
-            //to do
-            break;
-        }
-        case ARM_USART_CONTROL_RX: {
-            break;
-        }
-        case ARM_USART_CONTROL_BREAK: {
-            break;
-        }
-        case ARM_USART_ABORT_SEND: {
-            break;
-        }
-        case ARM_USART_ABORT_RECEIVE: {
-            break;
-        }
-        case ARM_USART_ABORT_TRANSFER: {
             break;
         }
         default: {
-            break;
+            return ARM_USART_ERROR_FLOW_CONTROL;
         }
     }
 
-    /*
-    // Control TX
-    case  ARM_USART_CONTROL_TX:
-    {
-        //Check if pin configure available
-        if(usart->p_pin == NULL) {
-            return ARM_DRIVER_ERROR;
+// Clock setting for synchronous mode
+//USART Clock Polarity (Synchronous mode)
+    usart->p_reg->CR2 &= ~(USART_CR2_CPOL_Msk);
+    switch(control & ARM_USART_CPOL_Msk) {
+        case ARM_USART_CPOL0:
+            if((mode == ARM_USART_MODE_SYNCHRONOUS_MASTER) ||
+               (mode == ARM_USART_MODE_SYNCHRONOUS_SLAVE)) {
+                usart->p_reg->CR2 &= ~(USART_CR2_CPOL);
+                break;
+            } else {
+                return ARM_USART_ERROR_CPOL;
+            }
+        case ARM_USART_CPOL1: {
+            if((mode == ARM_USART_MODE_SYNCHRONOUS_MASTER) ||
+               (mode == ARM_USART_MODE_SYNCHRONOUS_SLAVE)) {
+                usart->p_reg->CR2 |= USART_CR2_CPOL;
+                break;
+            } else {
+                return ARM_USART_ERROR_CPOL;
+            }
         }
-        if(arg) {
-            if(usart->p_info->mode != ARM_USART_MODE_SMART_CARD) {
-                // USART TX pin function selected
-                GPIO_SetData(usart-> p_pin[TX_PIN].GPIOx, usart-> p_pin[TX_PIN].pin,
-                             ARM_GPIO_IO_MODE_INPUT, ARM_GPIO_IO_TYPE_OPEN_DRAIN , ARM_GPIO_IO_HI_Z, ARM_GPIO_IO_SPEED_FREQ_LOW,
-                             usart-> p_pin[TX_PIN].alt_func);
-                usart->p_reg->CR1 |= USART_CR1_TE;
-                usart->p_info->drv_status |= ARM_USART_FLAG_TX_ENABLED;
-            }
-        } else {
-            usart->p_reg->CR1 &= ~USART_CR1_TE;
-            if(usart->p_info->mode != ARM_USART_MODE_SMART_CARD) {
-                // SPIO default pin function selected
-                GPIO_SetData(usart-> p_pin[TX_PIN].GPIOx, usart-> p_pin[TX_PIN].pin,
-                             0U, 0U, 0U, 0U, 0U);
-            }
-            usart->p_info->drv_status &= ~ARM_USART_FLAG_TX_ENABLED;
-
+        default: {
+            return ARM_USART_ERROR_CPOL;
         }
     }
-    //to do
-    */
+
+//USART Clock Phase (Synchronous mode)
+    usart->p_reg->CR2 &= ~(USART_CR2_CPHA_Msk);
+    switch(control & ARM_USART_CPHA_Msk) {
+        case ARM_USART_CPHA0:
+            if((mode == ARM_USART_MODE_SYNCHRONOUS_MASTER) ||
+               (mode == ARM_USART_MODE_SYNCHRONOUS_SLAVE)) {
+                usart->p_reg->CR2 &= ~(USART_CR2_CPHA);
+                break;
+            } else {
+                return ARM_USART_ERROR_CPHA;
+            }
+        case ARM_USART_CPHA1: {
+            if((mode == ARM_USART_MODE_SYNCHRONOUS_MASTER) ||
+               (mode == ARM_USART_MODE_SYNCHRONOUS_SLAVE)) {
+                usart->p_reg->CR2 |= USART_CR2_CPHA;
+                break;
+            } else {
+                return ARM_USART_ERROR_CPHA;
+            }
+        }
+        default: {
+            return ARM_USART_ERROR_CPHA;
+        }
+    }
+
+// Configuration is successful - mode id valid
+    usart->p_info->mode = mode;
+
+// Set configured flag
+    usart->p_info->flags |= ARM_USART_FLAG_CONFIGURED;
     return ARM_DRIVER_OK;
+}
+
+static int32_t ARM_USART_SetBaudrate(uint32_t arg)
+{
+    //to do
+    return 0;
 }
 
 static ARM_USART_STATUS ARM_USART_GetStatus(ARM_USART_Resources_t *usart)
 {
     ARM_USART_STATUS status;
-// to do
+    status.tx_busy = usart->p_info->xfer_status.tx_busy; //Transmitter busy flag
+    status.rx_busy = usart->p_info->xfer_status.rx_busy; //Receiver busy flag
+    status.tx_underflow = usart->p_info->xfer_status.tx_underflow; //Transmit data underflow detected (cleared on start of next send operation)
+    status.rx_overflow = usart->p_info->xfer_status.rx_overflow; //Receive data overflow detected (cleared on start of next receive operation)
+    status.rx_break = usart->p_info->xfer_status.rx_break; //Break detected on receive (cleared on start of next receive operation)
+    status.rx_framing_error = usart->p_info->xfer_status.rx_framing_error; //Framing error detected on receive (cleared on start of next receive operation)
+    status.rx_parity_error = usart->p_info->xfer_status.rx_parity_error; //Parity error detected on receive (cleared on start of next receive operation)
+    status.reserved = usart->p_info->xfer_status.reserved;
     return status;
 }
 
@@ -572,9 +752,13 @@ static int32_t ARM_USART_SetModemControl(ARM_USART_MODEM_CONTROL control, ARM_US
 
 static ARM_USART_MODEM_STATUS ARM_USART_GetModemStatus(ARM_USART_Resources_t *usart)
 {
-    ARM_USART_MODEM_STATUS modem_status;
-//to do
-    return modem_status;
+    ARM_USART_MODEM_STATUS status;
+    status.cts = usart->p_info->modem_status.cts; //CTS state: 1=Active, 0=Inactive
+    status.dsr = usart->p_info->modem_status.dsr; //DSR state: 1=Active, 0=Inactive
+    status.dcd = usart->p_info->modem_status.dcd; //DCD state: 1=Active, 0=Inactive
+    status.ri = usart->p_info->modem_status.ri; //RI  state: 1=Active, 0=Inactive
+    status.reserved = usart->p_info->modem_status.reserved;
+    return status;
 }
 
 static void USART_IRQHandler(ARM_USART_Resources_t *usart)
@@ -591,7 +775,7 @@ similar to USART1 driver capabilities.
 static void ARM_USART1_Resources_Struct_Init(void)
 {
     ARM_USART_Resources_t *p_str = &ARM_USART1_Resources;
-    ARM_USART1_Resources.capabilities.asynchronous = 1;// supports UART (Asynchronous) mode
+    p_str->capabilities.asynchronous = 1;               // supports UART (Asynchronous) mode
 
 #if (RTE_USART1_CK_ID > 0)
     p_str->capabilities.synchronous_master = 1;         // supports Synchronous Master mode
@@ -617,7 +801,7 @@ static void ARM_USART1_Resources_Struct_Init(void)
     p_str->capabilities.flow_control_rts =  0;          // RTS Flow Control available
 #endif //(RTE_USART1_CTS_ID > 0) 
 
-#if RTE_USART1_CTS_ID
+#if RTE_USART1_CTS_ID > 0
     p_str->capabilities.flow_control_cts =  1;          // CTS Flow Control available
 #else
     p_str->capabilities.flow_control_cts =  0;          // CTS Flow Control available
@@ -764,7 +948,7 @@ similar to UART4 driver capabilities.
 static void ARM_UART4_Resources_Struct_Init(void)
 {
     ARM_USART_Resources_t *p_str = &ARM_UART4_Resources;
-    ARM_USART1_Resources.capabilities.asynchronous = 1;// supports UART (Asynchronous) mode
+    p_str->capabilities.asynchronous = 1;               // supports UART (Asynchronous) mode
     p_str->capabilities.synchronous_master = 0;         // supports Synchronous Master mode
     p_str->capabilities.synchronous_slave = 0;          // supports Synchronous Slave mode
     p_str->capabilities.single_wire = 1;                // supports UART Single-wire mode
