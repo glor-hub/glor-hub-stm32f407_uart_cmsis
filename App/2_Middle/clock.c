@@ -45,11 +45,12 @@ bool Clock_Init(void)
 {
     uint32_t status = ARM_RCC_Reset();
     status |= ARM_RCC_SetSysClockTo168();
-    status |= ARM_RCC_AHBClockConfig();
-    status |= ARM_RCC_APBxClockConfig();
     status |= ARM_RCC_NMI_HandlerErrCheck();
 
     SystemCoreClockUpdate();
+
+    status |= ARM_RCC_AHBClockConfig();
+    status |= ARM_RCC_APBxClockConfig();
 
 #ifdef _CLOCK_DEBUG_
     ASSERT(ARM_RCC_isReady(status));

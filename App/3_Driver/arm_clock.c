@@ -50,6 +50,7 @@ typedef enum {
 //Variables
 //********************************************************************************
 static uint32_t ARM_RCC_NMI_HandlerFlag;
+static uint32_t ARM_RCC_AHBClockFreq, ARM_RCC_APB1ClockFreq, ARM_RCC_APB2ClockFreq;
 //********************************************************************************
 //Prototypes
 //********************************************************************************
@@ -407,6 +408,7 @@ uint32_t ARM_RCC_AHBClockConfig(void)
 //Set clock frequency for AHB 168 MHz (the maximum possible)
     RCC->CFGR &= ~RCC_CFGR_HPRE_Msk;
     RCC->CFGR |= RCC_CFGR_HPRE_DIV1;
+    ARM_RCC_AHBClockFreq = SystemCoreClock;
     return drv_status;
 }
 
@@ -420,12 +422,35 @@ uint32_t ARM_RCC_APBxClockConfig(void)
 //Set clock frequency for APB1 42 MHz (the maximum possible)
     RCC->CFGR &= ~RCC_CFGR_PPRE1_Msk;
     RCC->CFGR |= RCC_CFGR_PPRE1_DIV4;
+    ARM_RCC_APB1ClockFreq = ARM_RCC_AHBClockFreq / 4;
 
 //Set clock frequency for APB1 84 MHz (the maximum possible)
     RCC->CFGR &= ~RCC_CFGR_PPRE2_Msk;
     RCC->CFGR |= RCC_CFGR_PPRE2_DIV2;
+    ARM_RCC_APB2ClockFreq = ARM_RCC_AHBClockFreq / 2;
     return drv_status;
 }
+
+uint32_t ARM_RCC_GetPeriphClock(ePeriphTypes periph)
+{
+    switch(periph) {
+        case USART_1:
+        case USART_6: {
+            return ARM_RCC_APB2ClockFreq;
+        }
+        case USART_2:
+        case USART_3:
+        case UART_4:
+        case UART_5: {
+            return ARM_RCC_APB1ClockFreq;
+        }
+
+        default: {
+            return -1;
+        }
+    }
+}
+
 //================================================================================
 //Private
 //================================================================================
@@ -551,7 +576,6 @@ static void ARM_RCC_HSEClockDetectorCmd(ePeriphCmd cmd)
 //disable CSS
         RCC->CR &= ~RCC_CR_CSSON;
     }
-
 }
 
 static void ARM_RCC_PLLConfig(void)
