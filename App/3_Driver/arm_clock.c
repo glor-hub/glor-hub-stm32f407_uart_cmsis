@@ -398,6 +398,34 @@ void ARM_RCC_ConfigMCO2(void)
     RCC->CFGR &= ~RCC_CFGR_MCO2_Msk;
 }
 
+uint32_t ARM_RCC_AHBClockConfig(void)
+{
+    uint32_t drv_status = ARM_RCC_STA_READY;
+
+//SYSCK=168MHz
+
+//Set clock frequency for AHB 168 MHz (the maximum possible)
+    RCC->CFGR &= ~RCC_CFGR_HPRE_Msk;
+    RCC->CFGR |= RCC_CFGR_HPRE_DIV1;
+    return drv_status;
+}
+
+uint32_t ARM_RCC_APBxClockConfig(void)
+{
+    uint32_t drv_status = ARM_RCC_STA_READY;
+
+//SYSCK=168MHz
+//AHBCK=168MHz
+
+//Set clock frequency for APB1 42 MHz (the maximum possible)
+    RCC->CFGR &= ~RCC_CFGR_PPRE1_Msk;
+    RCC->CFGR |= RCC_CFGR_PPRE1_DIV4;
+
+//Set clock frequency for APB1 84 MHz (the maximum possible)
+    RCC->CFGR &= ~RCC_CFGR_PPRE2_Msk;
+    RCC->CFGR |= RCC_CFGR_PPRE2_DIV2;
+    return drv_status;
+}
 //================================================================================
 //Private
 //================================================================================
