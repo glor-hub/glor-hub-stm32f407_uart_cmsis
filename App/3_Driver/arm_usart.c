@@ -738,8 +738,9 @@ static int32_t ARM_USART_Control(uint32_t control, uint32_t arg,
     usart->p_info->mode = mode;
     if(ARM_USART_SetBaudrate(arg, usart) == -1) {
         return ARM_USART_ERROR_BAUDRATE;
+    } else {
+        usart->p_info->baudrate = arg;
     }
-
 // Set configured flag
     usart->p_info->flags |= ARM_USART_FLAG_CONFIGURED;
     return ARM_DRIVER_OK;
