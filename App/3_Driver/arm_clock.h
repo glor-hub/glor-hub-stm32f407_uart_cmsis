@@ -17,5 +17,6 @@ void ARM_RCC_Periph_ResetCmd(ePeriphTypes periph, ePeriphCmd cmd);
 void ARM_RCC_Periph_ClockCmd(ePeriphTypes periph, ePeriphCmd cmd);
 uint32_t ARM_RCC_AHBClockConfig(void);
 uint32_t ARM_RCC_APBxClockConfig(void);
+uint32_t ARM_RCC_GetPeriphClock(ePeriphTypes periph);
 
 #endif //_ARM_CLOCK_H_

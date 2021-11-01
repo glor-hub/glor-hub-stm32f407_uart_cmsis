@@ -444,9 +444,8 @@ uint32_t ARM_RCC_GetPeriphClock(ePeriphTypes periph)
         case UART_5: {
             return ARM_RCC_APB1ClockFreq;
         }
-
         default: {
-            return -1;
+            return 0;
         }
     }
 }

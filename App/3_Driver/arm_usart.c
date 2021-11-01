@@ -31,6 +31,12 @@
 #define ARM_USART_FLAG_TX_ENABLED        (uint16_t)(1U << 3)
 #define ARM_USART_FLAG_RX_ENABLED        (uint16_t)(1U << 4)
 
+// USART Baudrate Register Divider Masks
+#define ARM_USART_DIVIDER_MANTISSA_FOR_OVER16_MASK USART_BRR_DIV_Mantissa_Msk
+#define ARM_USART_DIVIDER_FRACTION_FOR_OVER16_MASK USART_BRR_DIV_Fraction_Msk
+#define ARM_USART_DIVIDER_MANTISSA_FOR_OVER8_MASK  (uint32_t)(ARM_USART_DIVIDER_MANTISSA_FOR_OVER16_MASK >> 1)
+#define ARM_USART_DIVIDER_FRACTION_FOR_OVER8_MASK  (uint32_t)(ARM_USART_DIVIDER_FRACTION_FOR_OVER16_MASK >> 1)
+
 //********************************************************************************
 //Enums
 //********************************************************************************
@@ -111,7 +117,7 @@ static uint32_t ARM_USART_GetTxCount(ARM_USART_Resources_t *usart);
 static uint32_t ARM_USART_GetRxCount(ARM_USART_Resources_t *usart);
 static int32_t ARM_USART_Control(uint32_t control, uint32_t arg,
                                  ARM_USART_Resources_t *usart);
-static int32_t ARM_USART_SetBaudrate(uint32_t arg);
+static int32_t ARM_USART_SetBaudrate(uint32_t arg, ARM_USART_Resources_t *usart);
 static ARM_USART_STATUS ARM_USART_GetStatus(ARM_USART_Resources_t *usart);
 static int32_t ARM_USART_SetModemControl(ARM_USART_MODEM_CONTROL control, ARM_USART_Resources_t *usart);
 static ARM_USART_MODEM_STATUS ARM_USART_GetModemStatus(ARM_USART_Resources_t *usart);
@@ -136,6 +142,7 @@ static ARM_USART_MODEM_STATUS ARM_USART1_GetModemStatus(void);
 
 #if (RTE_UART4)
 static void ARM_UART4_Resources_Struct_Init(void);
+R
 #endif //(RTE_UART4)
 
 //================================================================================
@@ -339,8 +346,15 @@ static int32_t ARM_USART_Control(uint32_t control, uint32_t arg,
        (usart->p_info->xfer_status.rx_busy != 0U)) {
         return ARM_DRIVER_ERROR_BUSY;
     }
-//Miscellaneous Controls
-//Attention!!! - Miscellaneous Controls Operations cannot be ORed!
+
+    /*************************************************************************
+    Miscellaneous Controls Section
+
+    Attention!!! - Miscellaneous Controls Operations cannot be ORed!
+
+    **************************************************************************/
+
+
     switch(control & ARM_USART_CONTROL_Msk) {
         //Synchronous Receive only
         case ARM_USART_SET_DEFAULT_TX_VALUE: {
@@ -499,15 +513,18 @@ static int32_t ARM_USART_Control(uint32_t control, uint32_t arg,
         }
     }
 
-//USART Mode
+    /*************************************************************************
+
+      End of Miscellaneous Controls Section
+
+    **************************************************************************/
+
+    //USART Mode
     uint8_t mode = 0U;
     switch(control & ARM_USART_CONTROL_Msk) {
         case ARM_USART_MODE_ASYNCHRONOUS: {
             if(usart->capabilities.asynchronous) {
                 mode = ARM_USART_MODE_ASYNCHRONOUS;
-                if(ARM_USART_SetBaudrate(arg) == -1) {
-                    return ARM_USART_ERROR_BAUDRATE;
-                }
             } else {
                 return ARM_USART_ERROR_MODE;
             }
@@ -555,8 +572,7 @@ static int32_t ARM_USART_Control(uint32_t control, uint32_t arg,
         }
     }
 
-//USART Data Bits
-    usart->p_reg->CR1 &= ~USART_CR1_M_Msk;
+    //USART Data Bits
     switch(control & ARM_USART_DATA_BITS_Msk) {
         case ARM_USART_DATA_BITS_5: {
             return ARM_USART_ERROR_DATA_BITS;
@@ -568,10 +584,12 @@ static int32_t ARM_USART_Control(uint32_t control, uint32_t arg,
             return ARM_USART_ERROR_DATA_BITS;
         }
         case ARM_USART_DATA_BITS_8: {
+            usart->p_reg->CR1 &= ~USART_CR1_M_Msk;
             usart->p_reg->CR1 &= ~USART_CR1_M;
             break;
         }
         case ARM_USART_DATA_BITS_9: {
+            usart->p_reg->CR1 &= ~USART_CR1_M_Msk;
             usart->p_reg->CR1 |= USART_CR1_M;
             break;
         }
@@ -580,20 +598,24 @@ static int32_t ARM_USART_Control(uint32_t control, uint32_t arg,
         }
     }
 
-//USART Parity
-    usart->p_reg->CR1 &= ~USART_CR1_PCE_Msk;
-    usart->p_reg->CR1 &= ~USART_CR1_PS_Msk;
+    //USART Parity
     switch(control & ARM_USART_PARITY_Msk) {
         case ARM_USART_PARITY_NONE: {
+            usart->p_reg->CR1 &= ~USART_CR1_PCE_Msk;
+            usart->p_reg->CR1 &= ~USART_CR1_PS_Msk;
             usart->p_reg->CR1 &= ~USART_CR1_PCE;
             break;
         }
         case ARM_USART_PARITY_EVEN: {
+            usart->p_reg->CR1 &= ~USART_CR1_PCE_Msk;
+            usart->p_reg->CR1 &= ~USART_CR1_PS_Msk;
             usart->p_reg->CR1 |= USART_CR1_PCE;
             usart->p_reg->CR1 &= ~USART_CR1_PS;
             break;
         }
         case ARM_USART_PARITY_ODD: {
+            usart->p_reg->CR1 &= ~USART_CR1_PCE_Msk;
+            usart->p_reg->CR1 &= ~USART_CR1_PS_Msk;
             usart->p_reg->CR1 |= USART_CR1_PCE;
             usart->p_reg->CR1 |= USART_CR1_PS;
             break;
@@ -603,23 +625,26 @@ static int32_t ARM_USART_Control(uint32_t control, uint32_t arg,
         }
     }
 
-//USART Stop Bits
-    usart->p_reg->CR2 &= ~USART_CR2_STOP_Msk;
+    //USART Stop Bits
     switch(control & ARM_USART_STOP_BITS_Msk) {
         case ARM_USART_STOP_BITS_1: {
+            usart->p_reg->CR2 &= ~USART_CR2_STOP_Msk;
             usart->p_reg->CR2 &= ~(USART_CR2_STOP_0 | USART_CR2_STOP_1);
             break;
         }
         case ARM_USART_STOP_BITS_2: {
+            usart->p_reg->CR2 &= ~USART_CR2_STOP_Msk;
             usart->p_reg->CR2 &= ~USART_CR2_STOP_0;
             usart->p_reg->CR2 |= USART_CR2_STOP_1;
             break;
         }
         case ARM_USART_STOP_BITS_1_5: {
+            usart->p_reg->CR2 &= ~USART_CR2_STOP_Msk;
             usart->p_reg->CR2 |= (USART_CR2_STOP_0 | USART_CR2_STOP_1);
             break;
         }
         case ARM_USART_STOP_BITS_0_5: {
+            usart->p_reg->CR2 &= ~USART_CR2_STOP_Msk;
             usart->p_reg->CR2 |= USART_CR2_STOP_0;
             usart->p_reg->CR2 &= ~USART_CR2_STOP_1;
             break;
@@ -629,14 +654,15 @@ static int32_t ARM_USART_Control(uint32_t control, uint32_t arg,
         }
     }
 
-//USART Flow Control
-    usart->p_reg->CR3 &= ~(USART_CR3_RTSE_Msk | USART_CR3_CTSE_Msk);
+    //USART Flow Control
     switch(control & ARM_USART_FLOW_CONTROL_Msk) {
         case ARM_USART_FLOW_CONTROL_NONE: {
+            usart->p_reg->CR3 &= ~(USART_CR3_RTSE_Msk | USART_CR3_CTSE_Msk);
             break;
         }
         case ARM_USART_FLOW_CONTROL_RTS: {
             if(usart->capabilities.flow_control_rts) {
+                usart->p_reg->CR3 &= ~(USART_CR3_RTSE_Msk | USART_CR3_CTSE_Msk);
                 usart->p_reg->CR3 |= USART_CR3_RTSE;
             } else {
                 return ARM_USART_ERROR_FLOW_CONTROL;
@@ -645,6 +671,7 @@ static int32_t ARM_USART_Control(uint32_t control, uint32_t arg,
         }
         case ARM_USART_FLOW_CONTROL_CTS: {
             if(usart->capabilities.flow_control_cts) {
+                usart->p_reg->CR3 &= ~(USART_CR3_RTSE_Msk | USART_CR3_CTSE_Msk);
                 usart->p_reg->CR3 |= USART_CR3_CTSE;
             } else {
                 return ARM_USART_ERROR_FLOW_CONTROL;
@@ -654,6 +681,7 @@ static int32_t ARM_USART_Control(uint32_t control, uint32_t arg,
         case ARM_USART_FLOW_CONTROL_RTS_CTS: {
             if(usart->capabilities.flow_control_rts &&
                usart->capabilities.flow_control_cts) {
+                usart->p_reg->CR3 &= ~(USART_CR3_RTSE_Msk | USART_CR3_CTSE_Msk);
                 usart->p_reg->CR3 |= (USART_CR3_RTSE | USART_CR3_CTSE);
             } else {
                 return ARM_USART_ERROR_FLOW_CONTROL;
@@ -665,69 +693,120 @@ static int32_t ARM_USART_Control(uint32_t control, uint32_t arg,
         }
     }
 
-// Clock setting for synchronous mode
-//USART Clock Polarity (Synchronous mode)
-    usart->p_reg->CR2 &= ~(USART_CR2_CPOL_Msk);
-    switch(control & ARM_USART_CPOL_Msk) {
-        case ARM_USART_CPOL0:
-            if((mode == ARM_USART_MODE_SYNCHRONOUS_MASTER) ||
-               (mode == ARM_USART_MODE_SYNCHRONOUS_SLAVE)) {
+    // Clock setting for synchronous mode
+    //USART Clock Polarity (Synchronous mode)
+    if((mode == ARM_USART_MODE_SYNCHRONOUS_MASTER) ||
+       (mode == ARM_USART_MODE_SYNCHRONOUS_SLAVE)) {
+        switch(control & ARM_USART_CPOL_Msk) {
+            case ARM_USART_CPOL0:
+                usart->p_reg->CR2 &= ~(USART_CR2_CPOL_Msk);
                 usart->p_reg->CR2 &= ~(USART_CR2_CPOL);
                 break;
-            } else {
-                return ARM_USART_ERROR_CPOL;
-            }
-        case ARM_USART_CPOL1: {
-            if((mode == ARM_USART_MODE_SYNCHRONOUS_MASTER) ||
-               (mode == ARM_USART_MODE_SYNCHRONOUS_SLAVE)) {
+            case ARM_USART_CPOL1: {
+                usart->p_reg->CR2 &= ~(USART_CR2_CPOL_Msk);
                 usart->p_reg->CR2 |= USART_CR2_CPOL;
                 break;
-            } else {
+            }
+
+            default: {
                 return ARM_USART_ERROR_CPOL;
             }
-        }
-        default: {
-            return ARM_USART_ERROR_CPOL;
         }
     }
 
 //USART Clock Phase (Synchronous mode)
-    usart->p_reg->CR2 &= ~(USART_CR2_CPHA_Msk);
-    switch(control & ARM_USART_CPHA_Msk) {
-        case ARM_USART_CPHA0:
-            if((mode == ARM_USART_MODE_SYNCHRONOUS_MASTER) ||
-               (mode == ARM_USART_MODE_SYNCHRONOUS_SLAVE)) {
+    if((mode == ARM_USART_MODE_SYNCHRONOUS_MASTER) ||
+       (mode == ARM_USART_MODE_SYNCHRONOUS_SLAVE)) {
+        switch(control & ARM_USART_CPHA_Msk) {
+            case ARM_USART_CPHA0: {
+                usart->p_reg->CR2 &= ~(USART_CR2_CPHA_Msk);
                 usart->p_reg->CR2 &= ~(USART_CR2_CPHA);
-                break;
-            } else {
-                return ARM_USART_ERROR_CPHA;
             }
-        case ARM_USART_CPHA1: {
-            if((mode == ARM_USART_MODE_SYNCHRONOUS_MASTER) ||
-               (mode == ARM_USART_MODE_SYNCHRONOUS_SLAVE)) {
+            break;
+            case ARM_USART_CPHA1: {
+                usart->p_reg->CR2 &= ~(USART_CR2_CPHA_Msk);
                 usart->p_reg->CR2 |= USART_CR2_CPHA;
                 break;
-            } else {
+            }
+            default: {
                 return ARM_USART_ERROR_CPHA;
             }
-        }
-        default: {
-            return ARM_USART_ERROR_CPHA;
         }
     }
 
 // Configuration is successful - mode id valid
     usart->p_info->mode = mode;
+    if(ARM_USART_SetBaudrate(arg, usart) == -1) {
+        return ARM_USART_ERROR_BAUDRATE;
+    }
 
 // Set configured flag
     usart->p_info->flags |= ARM_USART_FLAG_CONFIGURED;
     return ARM_DRIVER_OK;
 }
 
-static int32_t ARM_USART_SetBaudrate(uint32_t arg)
+static int32_t ARM_USART_SetBaudrate(uint32_t arg, ARM_USART_Resources_t *usart)
 {
-    //to do
-    return 0;
+    /*
+    baudrate = clock_freq/(8*(2-oversampl8)*div)
+    */
+    uint32_t div = 0UL;
+    uint32_t div_mantissa = 0UL;
+    uint32_t div_fraction = 0UL;
+    uint32_t oversampl8 = 0UL;
+    uint32_t baudrate = arg;
+
+    uint32_t clock_freq = ARM_RCC_GetPeriphClock(usart->usart_name);
+    if(clock_freq == 0) {
+        return ARM_USART_ERROR_BAUDRATE;
+    }
+    if(arg == 0) {
+        return ARM_USART_ERROR_BAUDRATE;
+    }
+
+    uint32_t mode = usart->p_info->mode;
+    switch(mode) {
+        case ARM_USART_MODE_ASYNCHRONOUS:
+        case ARM_USART_MODE_SYNCHRONOUS_MASTER:
+        case ARM_USART_MODE_SYNCHRONOUS_SLAVE: {
+            oversampl8 = (usart->p_reg->CR1 & USART_CR1_OVER8_Msk) ? 1UL : 0UL;
+            break;
+        }
+        case ARM_USART_MODE_SINGLE_WIRE:
+        case ARM_USART_MODE_IRDA:
+        case ARM_USART_MODE_SMART_CARD: {
+            oversampl8 = 0;
+            break;
+        }
+        default: {
+            return ARM_USART_ERROR_BAUDRATE;
+        }
+    }
+    if(oversampl8) {
+        /*
+        for oversampling by 8
+        */
+        //for rounding in the least significant bit, multiply by 2,
+        //add 1 and shift to the right by 1
+        div = (clock_freq * 8 * 2 / (baudrate * 8 * (2 - oversampl8)));
+        div |= 1;
+        div >>= 1;
+        div_mantissa = (uint32_t)((div & ARM_USART_DIVIDER_MANTISSA_FOR_OVER8_MASK) << 1);
+        div_fraction = (uint32_t)(div & ARM_USART_DIVIDER_FRACTION_FOR_OVER8_MASK);
+    } else {
+        /*
+        for oversampling by 16
+        */
+        //for rounding in the least significant bit, multiply by 2,
+        //add 1 and shift to the right by 1
+        div = (clock_freq * 16 * 2 / (baudrate * 8 * (2 - oversampl8)));
+        div |= 1;
+        div >>= 1;
+        div_mantissa = (uint32_t)(div & ARM_USART_DIVIDER_MANTISSA_FOR_OVER16_MASK);
+        div_fraction = (uint32_t)(div & ARM_USART_DIVIDER_FRACTION_FOR_OVER16_MASK);
+    }
+    usart->p_reg->BRR = (div_mantissa | div_fraction);
+    return ARM_DRIVER_OK;
 }
 
 static ARM_USART_STATUS ARM_USART_GetStatus(ARM_USART_Resources_t *usart)
@@ -997,6 +1076,9 @@ int32_t ARM_USART_Init(void)
     int32_t status = ARM_DRIVER_OK;
     status |= p_drv->Initialize(&USART1_cb);
     status |= p_drv->PowerControl(ARM_POWER_FULL);
+    status |= p_drv->Control(ARM_USART_MODE_ASYNCHRONOUS | ARM_USART_DATA_BITS_8 |
+                             ARM_USART_PARITY_NONE | ARM_USART_STOP_BITS_1 |
+                             ARM_USART_FLOW_CONTROL_NONE, ARM_USART_BAUDRATE_57600);
     return status;
 
 #endif //(RTE_USART1)
