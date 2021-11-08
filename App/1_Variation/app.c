@@ -79,5 +79,8 @@ static void App_CorePeripherialTest(void)
 
 static void App_ExtPeripherialTest(void)
 {
+#ifdef HARDWARE_TESTING_MODE
+    USART_Test();
     LED_Test();
+#endif//HARDWARE_TESTING_MODE   
 }

@@ -187,14 +187,14 @@ static int32_t ARM_USART_Initialize(ARM_USART_SignalEvent_t  cb_event,
     if(usart->capabilities.cts) {
         ARM_RCC_Periph_ClockCmd(usart-> p_pin[CTS_PIN].port, ENABLE_CMD);
         GPIO_SetData(usart-> p_pin[CTS_PIN].GPIOx, usart-> p_pin[CTS_PIN].pin,
-                     ARM_GPIO_IO_MODE_INPUT, ARM_GPIO_IO_TYPE_OPEN_DRAIN , ARM_GPIO_IO_HI_Z, ARM_GPIO_IO_SPEED_FREQ_LOW,
+                     ARM_GPIO_IO_MODE_ALT_FUNC, ARM_GPIO_IO_TYPE_OPEN_DRAIN , ARM_GPIO_IO_HI_Z, ARM_GPIO_IO_SPEED_FREQ_LOW,
                      usart-> p_pin[CTS_PIN].alt_func);
     }
 // Configure RTS pin
     if(usart->capabilities.rts) {
         ARM_RCC_Periph_ClockCmd(usart-> p_pin[RTS_PIN].port, ENABLE_CMD);
         GPIO_SetData(usart-> p_pin[RTS_PIN].GPIOx, usart-> p_pin[RTS_PIN].pin,
-                     ARM_GPIO_IO_MODE_OUTPUT, ARM_GPIO_IO_TYPE_PUSH_PULL, ARM_GPIO_IO_HI_Z, ARM_GPIO_IO_SPEED_FREQ_LOW,
+                     ARM_GPIO_IO_MODE_ALT_FUNC, ARM_GPIO_IO_TYPE_PUSH_PULL, ARM_GPIO_IO_HI_Z, ARM_GPIO_IO_SPEED_FREQ_LOW,
                      usart-> p_pin[RTS_PIN].alt_func);
     }
 
@@ -287,7 +287,7 @@ static int32_t ARM_USART_PowerControl(ARM_POWER_STATE  state,
             usart->p_info->flags |= ARM_USART_FLAG_POWERED;
             // Clear and Enable USART IRQ
             NVIC_ClearPendingIRQ(usart->irq_num);
-            NVIC_EnableIRQ(usart->irq_num);
+//            NVIC_EnableIRQ(usart->irq_num);
             break;
         }
         default: {
@@ -300,7 +300,30 @@ static int32_t ARM_USART_PowerControl(ARM_POWER_STATE  state,
 static int32_t ARM_USART_Send(const void *data, uint32_t num,
                               ARM_USART_Resources_t *usart)
 {
-//to do
+    if(data == NULL || num == 0U) {
+        // Invalid parameters
+        return ARM_DRIVER_ERROR_PARAMETER;
+    }
+    if((usart->p_info->flags & ARM_USART_FLAG_CONFIGURED) == 0U) {
+        // USART is not configured (mode not selected)
+        return ARM_DRIVER_ERROR;
+    }
+    if(usart->p_info->xfer_status.tx_busy != 0U) {
+        // Send is not completed yet
+        return ARM_DRIVER_ERROR_BUSY;
+    }
+    usart->p_info->xfer_status.tx_busy = 1U;
+    usart->p_info->xfer_info.p_tx_buf = (uint8_t *)data;
+    usart->p_info->xfer_info.tx_num = num;
+    usart->p_info->xfer_info.tx_cnt = 0U;
+    while(usart->p_info->xfer_info.tx_cnt != usart->p_info->xfer_info.tx_num) {
+        if(usart->p_reg->SR & USART_SR_TXE) {
+            usart->p_reg->DR = usart->p_info->xfer_info.p_tx_buf[usart->p_info->xfer_info.tx_cnt];
+            usart->p_info->xfer_info.tx_cnt++;
+        }
+    }
+    // Enable transmit holding register empty interrupt
+//    usart->p_reg->CR1 |= (USART_CR1_TXEIE | USART_CR1_TCIE);
     return ARM_DRIVER_OK;
 }
 
@@ -311,25 +334,42 @@ static int32_t ARM_USART_Receive(void *data, uint32_t num,
     return ARM_DRIVER_OK;
 }
 
+// Only in synchronous mode
 static int32_t ARM_USART_Transfer(const void *data_out, void *data_in,
                                   uint32_t num, ARM_USART_Resources_t *usart)
 {
-//to do
-    return ARM_DRIVER_OK;
+    if(data_out == NULL || data_in == NULL || num == 0U) {
+        // Invalid parameters
+        return ARM_DRIVER_ERROR_PARAMETER;
+    }
+
+    if((usart->p_info->flags & ARM_USART_FLAG_CONFIGURED) == 0U) {
+        // USART is not configured
+        return ARM_DRIVER_ERROR;
+    }
+
+    if((usart->p_info->mode == ARM_USART_MODE_SYNCHRONOUS_MASTER) ||
+       (usart->p_info->mode == ARM_USART_MODE_SYNCHRONOUS_SLAVE)) {
+        //the mode is unsupported in Version 1.0
+        return ARM_DRIVER_ERROR_UNSUPPORTED;
+    } else {
+        // Only in synchronous mode
+        return ARM_DRIVER_ERROR;
+    }
 }
 
 static uint32_t ARM_USART_GetTxCount(ARM_USART_Resources_t *usart)
 {
-    uint32_t cnt;
-// to do
+    uint32_t cnt = 0UL;
+    cnt = usart->p_info->xfer_info.tx_cnt;
     return cnt;
 }
 
 static uint32_t ARM_USART_GetRxCount(ARM_USART_Resources_t *usart)
 
 {
-    uint32_t cnt;
-// to do
+    uint32_t cnt = 0UL;
+    cnt = usart->p_info->xfer_info.rx_cnt;
     return cnt;
 }
 
@@ -353,7 +393,6 @@ static int32_t ARM_USART_Control(uint32_t control, uint32_t arg,
     Attention!!! - Miscellaneous Controls Operations cannot be ORed!
 
     **************************************************************************/
-
 
     switch(control & ARM_USART_CONTROL_Msk) {
         //Synchronous Receive only
@@ -409,13 +448,13 @@ static int32_t ARM_USART_Control(uint32_t control, uint32_t arg,
                     if(usart->p_info->mode != ARM_USART_MODE_SMART_CARD) {
                         ARM_RCC_Periph_ClockCmd(usart-> p_pin[TX_PIN].port, ENABLE_CMD);
                         GPIO_SetData(usart-> p_pin[TX_PIN].GPIOx, usart-> p_pin[TX_PIN].pin,
-                                     ARM_GPIO_IO_MODE_OUTPUT, ARM_GPIO_IO_TYPE_PUSH_PULL ,
+                                     ARM_GPIO_IO_MODE_ALT_FUNC, ARM_GPIO_IO_TYPE_PUSH_PULL ,
                                      ARM_GPIO_IO_HI_Z, ARM_GPIO_IO_SPEED_FREQ_LOW,
                                      usart-> p_pin[TX_PIN].alt_func);
                     } else {
                         ARM_RCC_Periph_ClockCmd(usart-> p_pin[TX_PIN].port, ENABLE_CMD);
                         GPIO_SetData(usart-> p_pin[TX_PIN].GPIOx, usart-> p_pin[TX_PIN].pin,
-                                     ARM_GPIO_IO_MODE_OUTPUT, ARM_GPIO_IO_TYPE_OPEN_DRAIN ,
+                                     ARM_GPIO_IO_MODE_ALT_FUNC, ARM_GPIO_IO_TYPE_OPEN_DRAIN ,
                                      ARM_GPIO_IO_PULL_UP, ARM_GPIO_IO_SPEED_FREQ_LOW,
                                      usart-> p_pin[TX_PIN].alt_func);
                     }
@@ -439,7 +478,7 @@ static int32_t ARM_USART_Control(uint32_t control, uint32_t arg,
                    (usart->p_info->mode != ARM_USART_MODE_SINGLE_WIRE)) {
                     ARM_RCC_Periph_ClockCmd(usart-> p_pin[RX_PIN].port, ENABLE_CMD);
                     GPIO_SetData(usart-> p_pin[RX_PIN].GPIOx, usart-> p_pin[RX_PIN].pin,
-                                 ARM_GPIO_IO_MODE_INPUT, ARM_GPIO_IO_TYPE_OPEN_DRAIN ,
+                                 ARM_GPIO_IO_MODE_ALT_FUNC, ARM_GPIO_IO_TYPE_OPEN_DRAIN ,
                                  ARM_GPIO_IO_HI_Z, ARM_GPIO_IO_SPEED_FREQ_LOW,
                                  usart-> p_pin[RX_PIN].alt_func);
                 } else {
@@ -741,6 +780,8 @@ static int32_t ARM_USART_Control(uint32_t control, uint32_t arg,
     } else {
         usart->p_info->baudrate = arg;
     }
+    // Enable USART block
+    usart->p_reg->CR1 |= USART_CR1_UE;
 // Set configured flag
     usart->p_info->flags |= ARM_USART_FLAG_CONFIGURED;
     return ARM_DRIVER_OK;
@@ -924,13 +965,6 @@ static void ARM_USART1_Resources_Struct_Init(void)
     p_str->p_info = &USART1_Info;
 }
 
-/*
-    void USART1_IRQHandler(void) {
-        USART_IRQHandler(&ARM_USART1_Resources);
-    }
-
-*/
-
 static ARM_USART_CAPABILITIES ARM_USART1_GetCapabilities(void)
 {
     return ARM_USART_GetCapabilities(&ARM_USART1_Resources);
@@ -991,7 +1025,7 @@ static ARM_USART_MODEM_STATUS ARM_USART1_GetModemStatus(void)
     return ARM_USART_GetModemStatus(&ARM_USART1_Resources);
 }
 
-void UART1_IRQHandler(void)
+void USART1_IRQHandler(void)
 {
     USART_IRQHandler(&ARM_USART1_Resources);
 };
@@ -1077,11 +1111,26 @@ int32_t ARM_USART_Init(void)
     int32_t status = ARM_DRIVER_OK;
     status |= p_drv->Initialize(&USART1_cb);
     status |= p_drv->PowerControl(ARM_POWER_FULL);
-    status |= p_drv->Control(ARM_USART_MODE_ASYNCHRONOUS | ARM_USART_DATA_BITS_8 |
-                             ARM_USART_PARITY_NONE | ARM_USART_STOP_BITS_1 |
-                             ARM_USART_FLOW_CONTROL_NONE, ARM_USART_BAUDRATE_57600);
+    status |= p_drv->Control(ARM_USART_MODE_ASYNCHRONOUS |
+                             ARM_USART_DATA_BITS_8 |
+                             ARM_USART_PARITY_NONE |
+                             ARM_USART_STOP_BITS_1 |
+                             ARM_USART_FLOW_CONTROL_NONE,
+                             57600);
+    status |= p_drv->Control(ARM_USART_CONTROL_TX, TRUE);
+    //status |= p_drv->Control(ARM_USART_CONTROL_RX, TRUE);
     return status;
 
+#endif //(RTE_USART1)
+}
+
+void ARM_USART_Test(void)
+{
+
+#if (RTE_USART1)
+    ARM_DRIVER_USART *p_drv = &ARM_USART1_Driver;
+    unsigned char buff[] = "Hello, World!\n";
+    p_drv->Send(buff, sizeof(buff));
 #endif //(RTE_USART1)
 
 }

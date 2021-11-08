@@ -19,6 +19,11 @@ typedef struct {
 } USART_PinCfg_t;
 
 bool USART_Init(void);
+
+#ifdef HARDWARE_TESTING_MODE
+void USART_Test(void);
+#endif //HARDWARE_TESTING_MODE
+
 USART_PinCfg_t *USART_GetPinCfg(ePeriphTypes usart_name);
 
 #if (RTE_USART1==1)

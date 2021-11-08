@@ -96,10 +96,7 @@ USART_PinCfg_t *USART_GetPinCfg(ePeriphTypes usart_name)
 }
 
 #if (RTE_USART1)
-void USART1_IRQHandler(void)
-{
-//    USART_IRQHandler(&USART1_Resources);
-}
+
 void USART1_cb(uint32_t event)
 {
 
@@ -107,15 +104,17 @@ void USART1_cb(uint32_t event)
 #endif //(RTE_USART1)
 
 #if (RTE_UART4)
-void UART4_IRQHandler(void)
-{
-//    USART_IRQHandler(&UART4_Resources);
-}
+
 void UART4_cb(uint32_t event)
 {
 
 }
 #endif //(RTE_UART4)
+
+void USART_Test(void)
+{
+    ARM_USART_Test();
+}
 
 //================================================================================
 //Private

@@ -12,5 +12,6 @@
 
 int32_t ARM_USART_Init(void);
 bool ARM_USART_isReady(int32_t status);
+void ARM_USART_Test(void);
 
 #endif //_ARM_USART_H_
