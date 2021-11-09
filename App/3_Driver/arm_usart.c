@@ -122,6 +122,7 @@ static ARM_USART_STATUS ARM_USART_GetStatus(ARM_USART_Resources_t *usart);
 static int32_t ARM_USART_SetModemControl(ARM_USART_MODEM_CONTROL control, ARM_USART_Resources_t *usart);
 static ARM_USART_MODEM_STATUS ARM_USART_GetModemStatus(ARM_USART_Resources_t *usart);
 static void USART_IRQHandler(ARM_USART_Resources_t *usart);
+static void USART_cb(uint32_t event, ARM_USART_Resources_t *usart);
 
 #if (RTE_USART1)
 static void ARM_USART1_Resources_Struct_Init(void);
@@ -138,6 +139,8 @@ static int32_t ARM_USART1_Control(uint32_t control, uint32_t arg);;
 static ARM_USART_STATUS ARM_USART1_GetStatus(void);
 static int32_t ARM_USART1_SetModemControl(ARM_USART_MODEM_CONTROL control);
 static ARM_USART_MODEM_STATUS ARM_USART1_GetModemStatus(void);
+static void USART1_cb(uint32_t event);
+
 #endif //(RTE_USART1)
 
 #if (RTE_UART4)
@@ -300,7 +303,7 @@ static int32_t ARM_USART_PowerControl(ARM_POWER_STATE  state,
 static int32_t ARM_USART_Send(const void *data, uint32_t num,
                               ARM_USART_Resources_t *usart)
 {
-    if(data == NULL || num == 0U) {
+    if(num == 0U) {
         // Invalid parameters
         return ARM_DRIVER_ERROR_PARAMETER;
     }
@@ -322,8 +325,8 @@ static int32_t ARM_USART_Send(const void *data, uint32_t num,
             usart->p_info->xfer_info.tx_cnt++;
         }
     }
-    // Enable transmit holding register empty interrupt
-//    usart->p_reg->CR1 |= (USART_CR1_TXEIE | USART_CR1_TCIE);
+    // Enable transmition complete interrupt
+    usart->p_reg->CR1 |= USART_CR1_TCIE;
     return ARM_DRIVER_OK;
 }
 
@@ -338,7 +341,7 @@ static int32_t ARM_USART_Receive(void *data, uint32_t num,
 static int32_t ARM_USART_Transfer(const void *data_out, void *data_in,
                                   uint32_t num, ARM_USART_Resources_t *usart)
 {
-    if(data_out == NULL || data_in == NULL || num == 0U) {
+    if(num == 0U) {
         // Invalid parameters
         return ARM_DRIVER_ERROR_PARAMETER;
     }
@@ -884,7 +887,28 @@ static ARM_USART_MODEM_STATUS ARM_USART_GetModemStatus(ARM_USART_Resources_t *us
 
 static void USART_IRQHandler(ARM_USART_Resources_t *usart)
 {
-//to do
+    uint32_t flag = usart->p_reg->SR;
+    uint32_t event = 0;
+    if(flag & USART_SR_TC) {
+        if(usart->p_info->xfer_info.tx_cnt == usart->p_info->xfer_info.tx_num)
+            // Disable transmition complete interrupt
+        {
+            usart->p_reg->CR1 &= ~USART_CR1_TCIE;
+            event |= ARM_USART_EVENT_TX_COMPLETE;
+        }
+        if(event != 0U) {
+            usart->p_info->cb_event(event);
+        }
+    }
+}
+static void USART_cb(uint32_t event, ARM_USART_Resources_t *usart)
+{
+    if(event & ARM_USART_EVENT_TX_COMPLETE) {
+        // Clear TX busy flag
+        usart->p_info->xfer_status.tx_busy = 0L;
+        usart->p_info->xfer_info.tx_num = 0L;
+        usart->p_info->xfer_info.tx_cnt = 0L;
+    }
 }
 
 /*************************************************
@@ -1016,10 +1040,12 @@ static ARM_USART_STATUS ARM_USART1_GetStatus(void)
 {
     return ARM_USART_GetStatus(&ARM_USART1_Resources);
 }
+
 static int32_t ARM_USART1_SetModemControl(ARM_USART_MODEM_CONTROL control)
 {
     return ARM_USART_SetModemControl(control, &ARM_USART1_Resources);
 }
+
 static ARM_USART_MODEM_STATUS ARM_USART1_GetModemStatus(void)
 {
     return ARM_USART_GetModemStatus(&ARM_USART1_Resources);
@@ -1028,7 +1054,12 @@ static ARM_USART_MODEM_STATUS ARM_USART1_GetModemStatus(void)
 void USART1_IRQHandler(void)
 {
     USART_IRQHandler(&ARM_USART1_Resources);
-};
+}
+
+static void USART1_cb(uint32_t event)
+{
+    USART_cb(event, &ARM_USART1_Resources);
+}
 
 //********************************************************************************
 //Variables (continuation)

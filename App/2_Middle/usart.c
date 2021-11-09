@@ -95,22 +95,6 @@ USART_PinCfg_t *USART_GetPinCfg(ePeriphTypes usart_name)
     return pUSART_PinCfg;
 }
 
-#if (RTE_USART1)
-
-void USART1_cb(uint32_t event)
-{
-
-}
-#endif //(RTE_USART1)
-
-#if (RTE_UART4)
-
-void UART4_cb(uint32_t event)
-{
-
-}
-#endif //(RTE_UART4)
-
 void USART_Test(void)
 {
     ARM_USART_Test();

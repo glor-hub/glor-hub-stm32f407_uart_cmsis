@@ -26,12 +26,4 @@ void USART_Test(void);
 
 USART_PinCfg_t *USART_GetPinCfg(ePeriphTypes usart_name);
 
-#if (RTE_USART1==1)
-void USART1_cb(uint32_t event);
-#endif //(RTE_USART1==1)
-
-#if (RTE_UART4==1)
-void UART4_cb(uint32_t event);
-#endif //(RTE_UART4==1)
-
 #endif //_USART_H_
