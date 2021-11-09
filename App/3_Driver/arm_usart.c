@@ -290,7 +290,7 @@ static int32_t ARM_USART_PowerControl(ARM_POWER_STATE  state,
             usart->p_info->flags |= ARM_USART_FLAG_POWERED;
             // Clear and Enable USART IRQ
             NVIC_ClearPendingIRQ(usart->irq_num);
-//            NVIC_EnableIRQ(usart->irq_num);
+            NVIC_EnableIRQ(usart->irq_num);
             break;
         }
         default: {
@@ -894,6 +894,8 @@ static void USART_IRQHandler(ARM_USART_Resources_t *usart)
             // Disable transmition complete interrupt
         {
             usart->p_reg->CR1 &= ~USART_CR1_TCIE;
+            // Clear TX busy flag
+            usart->p_info->xfer_status.tx_busy = 0L;
             event |= ARM_USART_EVENT_TX_COMPLETE;
         }
         if(event != 0U) {
@@ -904,8 +906,6 @@ static void USART_IRQHandler(ARM_USART_Resources_t *usart)
 static void USART_cb(uint32_t event, ARM_USART_Resources_t *usart)
 {
     if(event & ARM_USART_EVENT_TX_COMPLETE) {
-        // Clear TX busy flag
-        usart->p_info->xfer_status.tx_busy = 0L;
         usart->p_info->xfer_info.tx_num = 0L;
         usart->p_info->xfer_info.tx_cnt = 0L;
     }
@@ -1160,8 +1160,10 @@ void ARM_USART_Test(void)
 
 #if (RTE_USART1)
     ARM_DRIVER_USART *p_drv = &ARM_USART1_Driver;
-    unsigned char buff[] = "Hello, World!\n";
+    unsigned char buff[] = "Hello, World!\r\n";
+    unsigned char buff1[] = "USART is very usefull!\r\n";
     p_drv->Send(buff, sizeof(buff));
+    p_drv->Send(buff1, sizeof(buff1));
 #endif //(RTE_USART1)
 
 }
