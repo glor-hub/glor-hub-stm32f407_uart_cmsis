@@ -325,8 +325,11 @@ static int32_t ARM_USART_Send(const void *data, uint32_t num,
             usart->p_info->xfer_info.tx_cnt++;
         }
     }
-    // Enable transmition complete interrupt
-    usart->p_reg->CR1 |= USART_CR1_TCIE;
+    //wait for transmission complete
+    while(usart->p_reg->SR & USART_SR_TC == 0L);
+    usart->p_info->xfer_status.tx_busy = 0L;
+    usart->p_info->xfer_info.tx_num = 0L;
+    usart->p_info->xfer_info.tx_cnt = 0L;
     return ARM_DRIVER_OK;
 }
 
@@ -889,26 +892,14 @@ static void USART_IRQHandler(ARM_USART_Resources_t *usart)
 {
     uint32_t flag = usart->p_reg->SR;
     uint32_t event = 0;
-    if(flag & USART_SR_TC) {
-        if(usart->p_info->xfer_info.tx_cnt == usart->p_info->xfer_info.tx_num)
-            // Disable transmition complete interrupt
-        {
-            usart->p_reg->CR1 &= ~USART_CR1_TCIE;
-            // Clear TX busy flag
-            usart->p_info->xfer_status.tx_busy = 0L;
-            event |= ARM_USART_EVENT_TX_COMPLETE;
-        }
-        if(event != 0U) {
-            usart->p_info->cb_event(event);
-        }
+    if(event != 0U) {
+        usart->p_info->cb_event(event);
     }
 }
+
 static void USART_cb(uint32_t event, ARM_USART_Resources_t *usart)
 {
-    if(event & ARM_USART_EVENT_TX_COMPLETE) {
-        usart->p_info->xfer_info.tx_num = 0L;
-        usart->p_info->xfer_info.tx_cnt = 0L;
-    }
+
 }
 
 /*************************************************
@@ -1161,7 +1152,7 @@ void ARM_USART_Test(void)
 #if (RTE_USART1)
     ARM_DRIVER_USART *p_drv = &ARM_USART1_Driver;
     unsigned char buff[] = "Hello, World!\r\n";
-    unsigned char buff1[] = "USART is very usefull!\r\n";
+    unsigned char buff1[] = "USART is very useful!\r\n";
     p_drv->Send(buff, sizeof(buff));
     p_drv->Send(buff1, sizeof(buff1));
 #endif //(RTE_USART1)
