@@ -123,6 +123,7 @@ static int32_t ARM_USART_SetModemControl(ARM_USART_MODEM_CONTROL control, ARM_US
 static ARM_USART_MODEM_STATUS ARM_USART_GetModemStatus(ARM_USART_Resources_t *usart);
 static void USART_IRQHandler(ARM_USART_Resources_t *usart);
 static void USART_cb(uint32_t event, ARM_USART_Resources_t *usart);
+static int32_t ARM_USART_PutChar(uint8_t ch, ARM_USART_Resources_t *usart);
 
 #if (RTE_USART1)
 static void ARM_USART1_Resources_Struct_Init(void);
@@ -300,10 +301,22 @@ static int32_t ARM_USART_PowerControl(ARM_POWER_STATE  state,
     return ARM_DRIVER_OK;
 }
 
-static int32_t ARM_USART_Send(const void *data, uint32_t num,
+static int32_t ARM_USART_PutChar(uint8_t ch, ARM_USART_Resources_t *usart)
+{
+    if(usart->p_reg->SR & USART_SR_TXE) {
+        usart->p_reg->DR = ch;
+        return ARM_DRIVER_OK;
+    } else {
+        return ARM_DRIVER_ERROR_BUSY;
+    }
+}
+
+
+static int32_t ARM_USART_Send(const void *data, uint32_t data_size,
                               ARM_USART_Resources_t *usart)
 {
-    if(num == 0U) {
+    ARM_USART_TransferInfo_t *p_str = &(usart->p_info->xfer_info);
+    if(data_size == 0U) {
         // Invalid parameters
         return ARM_DRIVER_ERROR_PARAMETER;
     }
@@ -316,20 +329,19 @@ static int32_t ARM_USART_Send(const void *data, uint32_t num,
         return ARM_DRIVER_ERROR_BUSY;
     }
     usart->p_info->xfer_status.tx_busy = 1U;
-    usart->p_info->xfer_info.p_tx_buf = (uint8_t *)data;
-    usart->p_info->xfer_info.tx_num = num;
-    usart->p_info->xfer_info.tx_cnt = 0U;
-    while(usart->p_info->xfer_info.tx_cnt != usart->p_info->xfer_info.tx_num) {
-        if(usart->p_reg->SR & USART_SR_TXE) {
-            usart->p_reg->DR = usart->p_info->xfer_info.p_tx_buf[usart->p_info->xfer_info.tx_cnt];
-            usart->p_info->xfer_info.tx_cnt++;
+    p_str->p_tx_buf = (uint8_t *)data;
+    p_str->tx_num = data_size;
+    p_str->tx_cnt = 0U;
+    while(p_str->tx_cnt != p_str->tx_num) {
+        if(ARM_USART_PutChar(p_str->p_tx_buf[p_str->tx_cnt], usart) == ARM_DRIVER_OK) {
+            p_str->tx_cnt++;
         }
     }
-    //wait for transmission complete
-    while(usart->p_reg->SR & USART_SR_TC == 0L);
-    usart->p_info->xfer_status.tx_busy = 0L;
-    usart->p_info->xfer_info.tx_num = 0L;
-    usart->p_info->xfer_info.tx_cnt = 0L;
+// Wait for transmission complete
+    while(usart->p_reg->SR & USART_SR_TC == 0U);
+    usart->p_info->xfer_status.tx_busy = 0U;
+    p_str->tx_num = 0U;
+    p_str->tx_cnt = 0U;
     return ARM_DRIVER_OK;
 }
 
