@@ -145,8 +145,9 @@ static void USART1_cb(uint32_t event);
 #endif //(RTE_USART1)
 
 #if (RTE_UART4)
+
 static void ARM_UART4_Resources_Struct_Init(void);
-R
+
 #endif //(RTE_UART4)
 
 //================================================================================
@@ -311,10 +312,10 @@ static int32_t ARM_USART_PutChar(uint8_t ch, ARM_USART_Resources_t *usart)
     }
 }
 
-
-static int32_t ARM_USART_Send(const void *data, uint32_t data_size,
+static int32_t ARM_USART_Send(const void *pdata, uint32_t data_size,
                               ARM_USART_Resources_t *usart)
 {
+    uint32_t event = 0;
     ARM_USART_TransferInfo_t *p_str = &(usart->p_info->xfer_info);
     if(data_size == 0U) {
         // Invalid parameters
@@ -329,7 +330,7 @@ static int32_t ARM_USART_Send(const void *data, uint32_t data_size,
         return ARM_DRIVER_ERROR_BUSY;
     }
     usart->p_info->xfer_status.tx_busy = 1U;
-    p_str->p_tx_buf = (uint8_t *)data;
+    p_str->p_tx_buf = (uint8_t *)pdata;
     p_str->tx_num = data_size;
     p_str->tx_cnt = 0U;
     while(p_str->tx_cnt != p_str->tx_num) {
@@ -342,6 +343,10 @@ static int32_t ARM_USART_Send(const void *data, uint32_t data_size,
     usart->p_info->xfer_status.tx_busy = 0U;
     p_str->tx_num = 0U;
     p_str->tx_cnt = 0U;
+    event |= ARM_USART_EVENT_TX_COMPLETE;
+    if(event) {
+        usart->p_info->cb_event(event);
+    }
     return ARM_DRIVER_OK;
 }
 
@@ -911,7 +916,9 @@ static void USART_IRQHandler(ARM_USART_Resources_t *usart)
 
 static void USART_cb(uint32_t event, ARM_USART_Resources_t *usart)
 {
+    if(event & ARM_USART_EVENT_TX_COMPLETE) {
 
+    }
 }
 
 /*************************************************
@@ -1068,7 +1075,7 @@ static void USART1_cb(uint32_t event)
 //Variables (continuation)
 //********************************************************************************
 
-static ARM_DRIVER_USART ARM_USART1_Driver = {
+ARM_DRIVER_USART ARM_USART1_Driver = {
     ARM_USARTx_GetVersion,
     ARM_USART1_GetCapabilities,
     ARM_USART1_Initialize,
@@ -1085,6 +1092,7 @@ static ARM_DRIVER_USART ARM_USART1_Driver = {
     ARM_USART1_GetModemStatus
 
 };
+
 #endif //(RTE_USART1)
 
 /*************************************************
@@ -1163,10 +1171,12 @@ void ARM_USART_Test(void)
 
 #if (RTE_USART1)
     ARM_DRIVER_USART *p_drv = &ARM_USART1_Driver;
-    unsigned char buff[] = "Hello, World!\r\n";
-    unsigned char buff1[] = "USART is very useful!\r\n";
-    p_drv->Send(buff, sizeof(buff));
-    p_drv->Send(buff1, sizeof(buff1));
+    char buff[] = "Hello, World!\r\n";
+    char buff1[] = "USART is very useful!\r\n";
+    p_drv->Send(buff, (sizeof(buff) - 1));
+    p_drv->Send(buff1, (sizeof(buff1) - 1));
 #endif //(RTE_USART1)
 
 }
+
+

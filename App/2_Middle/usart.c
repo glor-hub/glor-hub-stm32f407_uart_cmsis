@@ -4,6 +4,8 @@
 #include "stm32f4xx.h"
 #include <stdbool.h>
 #include <stdio.h>
+#include <string.h>
+#include <stdarg.h>
 #include "common.h"
 #include "RTE_Device.h"
 #include "Driver_USART.h"
@@ -16,6 +18,8 @@
 #ifdef _USART_DEBUG_
 #include "assert.h"
 #endif//_USART_DEBUG_
+
+#define MAX_BUFF_LENGTH 256
 
 //********************************************************************************
 //Macros
@@ -32,6 +36,7 @@
 //********************************************************************************
 //Variables
 //********************************************************************************
+extern ARM_DRIVER_USART ARM_USART1_Driver;
 
 static USART_PinCfg_t USART1_PinCfg[MAX_USART_PIN_NAMES] = {0};
 static USART_PinCfg_t USART2_PinCfg[MAX_USART_PIN_NAMES] = {0};
@@ -47,8 +52,6 @@ static void USART_SetPinCfg(void);
 //================================================================================
 //Public
 //================================================================================
-
-
 
 bool USART_Init(void)
 {
@@ -98,6 +101,20 @@ USART_PinCfg_t *USART_GetPinCfg(ePeriphTypes usart_name)
 void USART_Test(void)
 {
     ARM_USART_Test();
+    USART_Printf("%x\n\r", 1000);
+}
+
+int32_t USART_Printf(char *fmt, ...)
+{
+    ARM_DRIVER_USART *p_drv = &ARM_USART1_Driver;
+    uint32_t ret;
+    char buff[MAX_BUFF_LENGTH];
+    va_list arg;
+    va_start(arg, fmt);
+    ret = vsnprintf(buff, MAX_BUFF_LENGTH, fmt, arg);
+    p_drv->Send(buff, strlen(buff));
+    va_end(arg);
+    return ret;
 }
 
 //================================================================================

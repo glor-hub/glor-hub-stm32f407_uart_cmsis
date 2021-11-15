@@ -19,6 +19,7 @@ typedef struct {
 } USART_PinCfg_t;
 
 bool USART_Init(void);
+int32_t USART_Printf(char *fmt, ...);
 
 #ifdef HARDWARE_TESTING_MODE
 void USART_Test(void);
