@@ -344,7 +344,7 @@ static int32_t ARM_USART_Send(const void *pdata, uint32_t data_size,
     p_str->tx_num = 0U;
     p_str->tx_cnt = 0U;
     event |= ARM_USART_EVENT_TX_COMPLETE;
-    if(event) {
+    if(!event) {
         usart->p_info->cb_event(event);
     }
     return ARM_DRIVER_OK;
