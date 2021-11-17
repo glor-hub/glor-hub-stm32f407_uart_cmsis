@@ -1228,14 +1228,11 @@ void ARM_USART_Test(void)
 #if (RTE_USART1)
 
     ARM_DRIVER_USART *p_drv = &ARM_USART1_Driver;
-    ARM_USART_Resources_t *usart = &ARM_USART1_Resources;
-    char buff[] = "Hello, World!\r\n";
     char buff1[256] = {0};
-    //p_drv->Send(buff, (sizeof(buff) - 1));
-    //p_drv->Send(buff1, (sizeof(buff1) - 1));
-    p_drv->Receive(buff1, 1);
-    while(usart->p_info->xfer_status.rx_busy);
-    p_drv->Send(buff1, 1);
+    uint32_t num_char = 15;
+    p_drv->Receive(buff1, num_char);
+    while(p_drv->GetStatus().rx_busy);
+    p_drv->Send(buff1, num_char);
 
 #endif //(RTE_USART1)
 

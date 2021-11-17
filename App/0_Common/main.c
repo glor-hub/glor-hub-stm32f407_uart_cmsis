@@ -57,12 +57,11 @@ int main(void)
         while(1);
     }
 
-    while(1) {
-
 #ifdef HARDWARE_TESTING_MODE
-        App_Test();
+    App_Test();
 #endif//HARDWARE_TESTING_MODE
 
+    while(1) {
         App_IdleTask();
     }
 }
