@@ -305,12 +305,8 @@ static int32_t ARM_USART_PowerControl(ARM_POWER_STATE  state,
 
 static int32_t ARM_USART_PutChar(uint8_t ch, ARM_USART_Resources_t *usart)
 {
-    if(usart->p_reg->SR & USART_SR_TXE) {
-        usart->p_reg->DR = ch;
-        return ARM_DRIVER_OK;
-    } else {
-        return ARM_DRIVER_ERROR_BUSY;
-    }
+    usart->p_reg->DR = ch;
+    return ARM_DRIVER_OK;
 }
 
 static uint8_t ARM_USART_GetChar(ARM_USART_Resources_t *usart)
@@ -323,7 +319,6 @@ static uint8_t ARM_USART_GetChar(ARM_USART_Resources_t *usart)
 static int32_t ARM_USART_Send(const void *pdata, uint32_t num,
                               ARM_USART_Resources_t *usart)
 {
-    uint32_t event = 0;
     ARM_USART_TransferInfo_t *p_str = &(usart->p_info->xfer_info);
     if(num == 0U) {
         // Invalid parameters
@@ -341,20 +336,8 @@ static int32_t ARM_USART_Send(const void *pdata, uint32_t num,
     p_str->p_tx_buf = (uint8_t *)pdata;
     p_str->tx_num = num;
     p_str->tx_cnt = 0U;
-    while(p_str->tx_cnt != p_str->tx_num) {
-        if(ARM_USART_PutChar(p_str->p_tx_buf[p_str->tx_cnt], usart) == ARM_DRIVER_OK) {
-            p_str->tx_cnt++;
-        }
-    }
-// Wait for transmission complete
-    while((usart->p_reg->SR & USART_SR_TC) == 0U);
-    usart->p_info->xfer_status.tx_busy = 0U;
-    p_str->tx_num = 0U;
-    p_str->tx_cnt = 0U;
-    event |= ARM_USART_EVENT_TX_COMPLETE;
-    if(!event) {
-        usart->p_info->cb_event(event);
-    }
+// Transmit data register empty and Transmission complete interrupts enable
+    usart->p_reg->CR1 |= (USART_CR1_TXEIE);
     return ARM_DRIVER_OK;
 }
 
@@ -387,9 +370,9 @@ static int32_t ARM_USART_Receive(void *pdata, uint32_t num, ARM_USART_Resources_
     usart->p_info->xfer_status.rx_framing_error = 0U;
     usart->p_info->xfer_status.rx_parity_error = 0U;
 
+    usart->p_info->xfer_info.p_rx_buf = (uint8_t *)pdata;
     usart->p_info->xfer_info.rx_num = num;
     usart->p_info->xfer_info.rx_cnt = 0U;
-    usart->p_info->xfer_info.p_rx_buf = pdata;
 
     // Read data register not empty interrupt enable
     usart->p_reg->CR1 |= USART_CR1_RXNEIE;
@@ -962,6 +945,20 @@ static void USART_IRQHandler(ARM_USART_Resources_t *usart)
             event |= ARM_USART_EVENT_RECEIVE_COMPLETE;
         }
     }
+    if((flag & USART_SR_TXE) && (usart->p_info->xfer_status.tx_busy == 1)) {
+        if(ARM_USART_PutChar(p_str->p_tx_buf[p_str->tx_cnt], usart) == ARM_DRIVER_OK) {
+            p_str->tx_cnt++;
+            if(ARM_USART_GetTxCount(usart) == p_str->tx_num) {
+                // Wait for transmission complete
+                while((usart->p_reg->SR & USART_SR_TC) == 0U);
+                usart->p_reg->CR1 &= ~USART_CR1_TXEIE;
+                usart->p_info->xfer_status.tx_busy = 0U;
+                p_str->tx_num = 0U;
+                p_str->tx_cnt = 0U;
+                event |= ARM_USART_EVENT_TX_COMPLETE;
+            }
+        }
+    }
     if(event != 0U) {
         usart->p_info->cb_event(event);
     }
@@ -971,6 +968,9 @@ static void USART_IRQHandler(ARM_USART_Resources_t *usart)
 static void USART_cb(uint32_t event, ARM_USART_Resources_t *usart)
 {
     if(event & ARM_USART_EVENT_TX_COMPLETE) {
+
+    }
+    if(event & ARM_USART_EVENT_RECEIVE_COMPLETE) {
 
     }
 }
@@ -1233,9 +1233,9 @@ void ARM_USART_Test(void)
     char buff1[256] = {0};
     //p_drv->Send(buff, (sizeof(buff) - 1));
     //p_drv->Send(buff1, (sizeof(buff1) - 1));
-    p_drv->Receive(buff1, 3);
+    p_drv->Receive(buff1, 1);
     while(usart->p_info->xfer_status.rx_busy);
-    p_drv->Send(buff1, 5);
+    p_drv->Send(buff1, 1);
 
 #endif //(RTE_USART1)
 
