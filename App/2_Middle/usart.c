@@ -101,7 +101,7 @@ USART_PinCfg_t *USART_GetPinCfg(ePeriphTypes usart_name)
 void USART_Test(void)
 {
     ARM_USART_Test();
-    USART_Printf("%x\n\r", 1000);
+//    USART_Printf("%x\n\r", 1000);
 }
 
 int32_t USART_Printf(char *fmt, ...)

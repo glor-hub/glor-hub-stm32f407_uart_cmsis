@@ -47,7 +47,7 @@ using STM32F4DISCOVERY kit.
 int main(void)
 {
 
-	bool init_result = App_Init();
+    bool init_result = App_Init();
 
 #ifdef _APP_DEBUG_
     ASSERT(init_result == PASSED);
@@ -58,6 +58,11 @@ int main(void)
     }
 
     while(1) {
+
+#ifdef HARDWARE_TESTING_MODE
+        App_Test();
+#endif//HARDWARE_TESTING_MODE
+
         App_IdleTask();
     }
 }

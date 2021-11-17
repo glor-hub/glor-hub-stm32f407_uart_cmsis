@@ -47,14 +47,14 @@
 
 // ARM USART Transfer Information (Run-Time)
 typedef struct {
-    uint32_t                rx_num;        // Total number of data to be received
-    uint32_t                tx_num;        // Total number of data to be send
+    volatile uint32_t      rx_num;        // Total number of data to be received
+    volatile uint32_t      tx_num;        // Total number of data to be send
     uint8_t                *p_rx_buf;      // Pointer to in data buffer
     uint8_t                *p_tx_buf;      // Pointer to out data buffer
-    uint32_t                rx_cnt;        // Number of data received
-    uint32_t                tx_cnt;        // Number of data sent
-    uint8_t                 tx_def_val;    // Transmit default value (used in USART_SYNC_MASTER_MODE_RX)
-    uint8_t                 rx_dump_val;   // Receive dump value (used in USART_SYNC_MASTER_MODE_TX)
+    volatile uint32_t      rx_cnt;        // Number of data received
+    volatile uint32_t      tx_cnt;        // Number of data sent
+    uint8_t                tx_def_val;    // Transmit default value (used in USART_SYNC_MASTER_MODE_RX)
+    uint8_t                rx_dump_val;   // Receive dump value (used in USART_SYNC_MASTER_MODE_TX)
 } ARM_USART_TransferInfo_t;
 
 // ARM USART Information (Run-Time)
@@ -124,6 +124,7 @@ static ARM_USART_MODEM_STATUS ARM_USART_GetModemStatus(ARM_USART_Resources_t *us
 static void USART_IRQHandler(ARM_USART_Resources_t *usart);
 static void USART_cb(uint32_t event, ARM_USART_Resources_t *usart);
 static int32_t ARM_USART_PutChar(uint8_t ch, ARM_USART_Resources_t *usart);
+static uint8_t ARM_USART_GetChar(ARM_USART_Resources_t *usart);
 
 #if (RTE_USART1)
 static void ARM_USART1_Resources_Struct_Init(void);
@@ -312,12 +313,19 @@ static int32_t ARM_USART_PutChar(uint8_t ch, ARM_USART_Resources_t *usart)
     }
 }
 
-static int32_t ARM_USART_Send(const void *pdata, uint32_t data_size,
+static uint8_t ARM_USART_GetChar(ARM_USART_Resources_t *usart)
+{
+    uint8_t ch = 0;
+    ch = usart->p_reg->DR;
+    return ch;
+}
+
+static int32_t ARM_USART_Send(const void *pdata, uint32_t num,
                               ARM_USART_Resources_t *usart)
 {
     uint32_t event = 0;
     ARM_USART_TransferInfo_t *p_str = &(usart->p_info->xfer_info);
-    if(data_size == 0U) {
+    if(num == 0U) {
         // Invalid parameters
         return ARM_DRIVER_ERROR_PARAMETER;
     }
@@ -331,7 +339,7 @@ static int32_t ARM_USART_Send(const void *pdata, uint32_t data_size,
     }
     usart->p_info->xfer_status.tx_busy = 1U;
     p_str->p_tx_buf = (uint8_t *)pdata;
-    p_str->tx_num = data_size;
+    p_str->tx_num = num;
     p_str->tx_cnt = 0U;
     while(p_str->tx_cnt != p_str->tx_num) {
         if(ARM_USART_PutChar(p_str->p_tx_buf[p_str->tx_cnt], usart) == ARM_DRIVER_OK) {
@@ -339,7 +347,7 @@ static int32_t ARM_USART_Send(const void *pdata, uint32_t data_size,
         }
     }
 // Wait for transmission complete
-    while(usart->p_reg->SR & USART_SR_TC == 0U);
+    while((usart->p_reg->SR & USART_SR_TC) == 0U);
     usart->p_info->xfer_status.tx_busy = 0U;
     p_str->tx_num = 0U;
     p_str->tx_cnt = 0U;
@@ -350,10 +358,42 @@ static int32_t ARM_USART_Send(const void *pdata, uint32_t data_size,
     return ARM_DRIVER_OK;
 }
 
-static int32_t ARM_USART_Receive(void *data, uint32_t num,
-                                 ARM_USART_Resources_t *usart)
+
+// Used in asynchronous mode
+
+// Can also be used in synchronous mode when receiving data only
+//(transmits the default value ARM_USART_SET_DEFAULT_TX_VALUE as control parameter)
+static int32_t ARM_USART_Receive(void *pdata, uint32_t num, ARM_USART_Resources_t *usart)
 {
-//to do
+    if(num == 0U) {
+        // Invalid parameters
+        return ARM_DRIVER_ERROR_PARAMETER;
+    }
+    if((usart->p_info->flags & ARM_USART_FLAG_CONFIGURED) == 0U) {
+        // USART is not configured (mode not selected)
+        return ARM_DRIVER_ERROR;
+    }
+
+    // Check reciver buzy
+    if(usart->p_info->xfer_status.rx_busy != 0U) {
+        return ARM_DRIVER_ERROR_BUSY;
+    }
+
+    // Set RX busy flag
+    usart->p_info->xfer_status.rx_busy = 1U;
+
+    usart->p_info->xfer_status.rx_overflow = 0U;
+    usart->p_info->xfer_status.rx_break = 0U;
+    usart->p_info->xfer_status.rx_framing_error = 0U;
+    usart->p_info->xfer_status.rx_parity_error = 0U;
+
+    usart->p_info->xfer_info.rx_num = num;
+    usart->p_info->xfer_info.rx_cnt = 0U;
+    usart->p_info->xfer_info.p_rx_buf = pdata;
+
+    // Read data register not empty interrupt enable
+    usart->p_reg->CR1 |= USART_CR1_RXNEIE;
+
     return ARM_DRIVER_OK;
 }
 
@@ -909,9 +949,23 @@ static void USART_IRQHandler(ARM_USART_Resources_t *usart)
 {
     uint32_t flag = usart->p_reg->SR;
     uint32_t event = 0;
+    ARM_USART_TransferInfo_t *p_str = &(usart->p_info->xfer_info);
+    if(flag & USART_SR_RXNE) {
+        p_str->p_rx_buf[p_str->rx_cnt] = ARM_USART_GetChar(usart);
+        p_str->rx_cnt++;
+        usart->p_reg->SR &= ~USART_SR_RXNE;
+        if(ARM_USART_GetRxCount(usart) == p_str->rx_num) {
+            usart->p_reg->CR1 &= ~USART_CR1_RXNEIE;
+            usart->p_info->xfer_status.rx_busy = 0U;
+            p_str->rx_num = 0U;
+            p_str->rx_cnt = 0U;
+            event |= ARM_USART_EVENT_RECEIVE_COMPLETE;
+        }
+    }
     if(event != 0U) {
         usart->p_info->cb_event(event);
     }
+
 }
 
 static void USART_cb(uint32_t event, ARM_USART_Resources_t *usart)
@@ -1149,6 +1203,7 @@ int32_t ARM_USART_Init(void)
 #if (RTE_USART1)
 
     ARM_DRIVER_USART *p_drv = &ARM_USART1_Driver;
+    ARM_USART_Resources_t *usart = &ARM_USART1_Resources;
     ARM_USART1_Resources_Struct_Init();
     int32_t status = ARM_DRIVER_OK;
     status |= p_drv->Initialize(&USART1_cb);
@@ -1160,7 +1215,8 @@ int32_t ARM_USART_Init(void)
                              ARM_USART_FLOW_CONTROL_NONE,
                              57600);
     status |= p_drv->Control(ARM_USART_CONTROL_TX, TRUE);
-    //status |= p_drv->Control(ARM_USART_CONTROL_RX, TRUE);
+    status |= p_drv->Control(ARM_USART_CONTROL_RX, TRUE);
+    usart->p_reg->CR1 |= USART_CR1_RXNEIE;
     return status;
 
 #endif //(RTE_USART1)
@@ -1170,11 +1226,17 @@ void ARM_USART_Test(void)
 {
 
 #if (RTE_USART1)
+
     ARM_DRIVER_USART *p_drv = &ARM_USART1_Driver;
+    ARM_USART_Resources_t *usart = &ARM_USART1_Resources;
     char buff[] = "Hello, World!\r\n";
-    char buff1[] = "USART is very useful!\r\n";
-    p_drv->Send(buff, (sizeof(buff) - 1));
-    p_drv->Send(buff1, (sizeof(buff1) - 1));
+    char buff1[256] = {0};
+    //p_drv->Send(buff, (sizeof(buff) - 1));
+    //p_drv->Send(buff1, (sizeof(buff1) - 1));
+    p_drv->Receive(buff1, 3);
+    while(usart->p_info->xfer_status.rx_busy);
+    p_drv->Send(buff1, 5);
+
 #endif //(RTE_USART1)
 
 }
