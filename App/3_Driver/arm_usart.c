@@ -12,6 +12,7 @@
 #include "arm_clock.h"
 #include "gpio.h"
 #include "usart.h"
+#include "ringbuffer.h"
 
 
 //********************************************************************************
@@ -92,6 +93,9 @@ static const ARM_DRIVER_VERSION ARM_USART_Driver_Version =
 #if (RTE_USART1)
 static ARM_USART_Resources_t ARM_USART1_Resources;
 static ARM_USART_Info_t USART1_Info = {0};
+static RingBuffer_t USART1_TxBuff, USART1_RxBuff;
+static uint8_t USART1_TxBuffer[RING_BUFF_SIZE] = {0};
+static uint8_t USART1_RxBuffer[RING_BUFF_SIZE] = {0};
 #endif //(RTE_USART1)
 
 #if (RTE_UART4)
@@ -931,12 +935,17 @@ static ARM_USART_MODEM_STATUS ARM_USART_GetModemStatus(ARM_USART_Resources_t *us
 static void USART_IRQHandler(ARM_USART_Resources_t *usart)
 {
     uint32_t flag = usart->p_reg->SR;
-    uint32_t event = 0;
+    uint32_t event = 0U;
+    uint8_t ch = 0U;
     ARM_USART_TransferInfo_t *p_str = &(usart->p_info->xfer_info);
     if(flag & USART_SR_RXNE) {
-        p_str->p_rx_buf[p_str->rx_cnt] = ARM_USART_GetChar(usart);
-        p_str->rx_cnt++;
-        usart->p_reg->SR &= ~USART_SR_RXNE;
+        ch = ARM_USART_GetChar(usart);
+        if(!RingBuffer_WriteChar(&USART1_RxBuff, &ch)) {
+            p_str->rx_cnt++;
+            usart->p_reg->SR &= ~USART_SR_RXNE;
+        } else {
+
+        }
         if(ARM_USART_GetRxCount(usart) == p_str->rx_num) {
             usart->p_reg->CR1 &= ~USART_CR1_RXNEIE;
             usart->p_info->xfer_status.rx_busy = 0U;
@@ -946,7 +955,8 @@ static void USART_IRQHandler(ARM_USART_Resources_t *usart)
         }
     }
     if((flag & USART_SR_TXE) && (usart->p_info->xfer_status.tx_busy == 1)) {
-        if(ARM_USART_PutChar(p_str->p_tx_buf[p_str->tx_cnt], usart) == ARM_DRIVER_OK) {
+        RingBuffer_ReadChar(&USART1_TxBuff, &ch);
+        if(ARM_USART_PutChar(ch, usart) == ARM_DRIVER_OK) {
             p_str->tx_cnt++;
             if(ARM_USART_GetTxCount(usart) == p_str->tx_num) {
                 // Wait for transmission complete
@@ -1216,6 +1226,9 @@ int32_t ARM_USART_Init(void)
                              57600);
     status |= p_drv->Control(ARM_USART_CONTROL_TX, TRUE);
     status |= p_drv->Control(ARM_USART_CONTROL_RX, TRUE);
+    RingBuffer_Init(&USART1_TxBuff, USART1_TxBuffer);
+    RingBuffer_Init(&USART1_RxBuff, USART1_RxBuffer);
+
     usart->p_reg->CR1 |= USART_CR1_RXNEIE;
     return status;
 
@@ -1228,11 +1241,16 @@ void ARM_USART_Test(void)
 #if (RTE_USART1)
 
     ARM_DRIVER_USART *p_drv = &ARM_USART1_Driver;
-    char buff1[256] = {0};
-    uint32_t num_char = 15;
-    p_drv->Receive(buff1, num_char);
-    while(p_drv->GetStatus().rx_busy);
-    p_drv->Send(buff1, num_char);
+    volatile uint8_t num_char = 16;
+    uint8_t test_str[] = "Hello, World!\r\n";
+    for(uint32_t i = 0; i < num_char; i++) {
+        if(!RingBuffer_WriteChar(&USART1_TxBuff, &test_str[i]));
+    }
+    num_char = RingBuffer_GetCount(&USART1_TxBuff);
+    p_drv->Send(USART1_TxBuffer, num_char);
+//  p_drv->Receive(USART1_RxBuffer, num_char);
+//    while(p_drv->GetStatus().rx_busy);
+//    p_drv->Send(USART1_TxBuffer, num_char);
 
 #endif //(RTE_USART1)
 
