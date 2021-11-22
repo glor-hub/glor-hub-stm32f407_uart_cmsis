@@ -3,6 +3,8 @@
 //********************************************************************************
 #include "stm32f4xx.h"
 #include <stdbool.h>
+#include <stdio.h>
+#include <string.h>
 #include "common.h"
 #include "RTE_Device.h"
 #include "RTE_Components.h"
@@ -37,6 +39,12 @@
 #define ARM_USART_DIVIDER_FRACTION_FOR_OVER16_MASK USART_BRR_DIV_Fraction_Msk
 #define ARM_USART_DIVIDER_MANTISSA_FOR_OVER8_MASK  (uint32_t)(ARM_USART_DIVIDER_MANTISSA_FOR_OVER16_MASK >> 1)
 #define ARM_USART_DIVIDER_FRACTION_FOR_OVER8_MASK  (uint32_t)(ARM_USART_DIVIDER_FRACTION_FOR_OVER16_MASK >> 1)
+
+#define _ARM_USART_DEBUG_
+
+#ifdef _ARM_USART_DEBUG_
+#include "assert.h"
+#endif//_ARM_USART_DEBUG_
 
 //********************************************************************************
 //Enums
@@ -93,9 +101,9 @@ static const ARM_DRIVER_VERSION ARM_USART_Driver_Version =
 #if (RTE_USART1)
 static ARM_USART_Resources_t ARM_USART1_Resources;
 static ARM_USART_Info_t USART1_Info = {0};
-static RingBuffer_t USART1_TxBuff, USART1_RxBuff;
-static uint8_t USART1_TxBuffer[RING_BUFF_SIZE] = {0};
-static uint8_t USART1_RxBuffer[RING_BUFF_SIZE] = {0};
+static RingBuffer_t USART1_TxRBuff, USART1_RxRBuff;
+static uint8_t USART1_TxRingBuffer[RING_BUFF_SIZE] = {0};
+static uint8_t USART1_RxRingBuffer[RING_BUFF_SIZE] = {0};
 #endif //(RTE_USART1)
 
 #if (RTE_UART4)
@@ -940,32 +948,35 @@ static void USART_IRQHandler(ARM_USART_Resources_t *usart)
     ARM_USART_TransferInfo_t *p_str = &(usart->p_info->xfer_info);
     if(flag & USART_SR_RXNE) {
         ch = ARM_USART_GetChar(usart);
-        if(!RingBuffer_WriteChar(&USART1_RxBuff, &ch)) {
-            p_str->rx_cnt++;
-            usart->p_reg->SR &= ~USART_SR_RXNE;
+        if(RingBuffer_WriteChar(&USART1_RxRBuff, &ch)) {
+            event |= ARM_USART_RING_BUFFER_OVERFLOW;
         } else {
-
-        }
-        if(ARM_USART_GetRxCount(usart) == p_str->rx_num) {
-            usart->p_reg->CR1 &= ~USART_CR1_RXNEIE;
-            usart->p_info->xfer_status.rx_busy = 0U;
-            p_str->rx_num = 0U;
-            p_str->rx_cnt = 0U;
-            event |= ARM_USART_EVENT_RECEIVE_COMPLETE;
+            p_str->rx_cnt++;
+            usart->p_reg ->SR &= ~USART_SR_RXNE;
+            if(ARM_USART_GetRxCount(usart) == p_str->rx_num) {
+                usart->p_reg->CR1 &= ~USART_CR1_RXNEIE;
+                usart->p_info->xfer_status.rx_busy = 0U;
+                p_str->rx_num = 0U;
+                p_str->rx_cnt = 0U;
+                event |= ARM_USART_EVENT_RECEIVE_COMPLETE;
+            }
         }
     }
     if((flag & USART_SR_TXE) && (usart->p_info->xfer_status.tx_busy == 1)) {
-        RingBuffer_ReadChar(&USART1_TxBuff, &ch);
-        if(ARM_USART_PutChar(ch, usart) == ARM_DRIVER_OK) {
-            p_str->tx_cnt++;
-            if(ARM_USART_GetTxCount(usart) == p_str->tx_num) {
-                // Wait for transmission complete
-                while((usart->p_reg->SR & USART_SR_TC) == 0U);
-                usart->p_reg->CR1 &= ~USART_CR1_TXEIE;
-                usart->p_info->xfer_status.tx_busy = 0U;
-                p_str->tx_num = 0U;
-                p_str->tx_cnt = 0U;
-                event |= ARM_USART_EVENT_TX_COMPLETE;
+        if(RingBuffer_ReadChar(&USART1_TxRBuff, &ch)) {
+            event |= ARM_USART_RING_BUFFER_UNDERFLOW;
+        } else {
+            if(ARM_USART_PutChar(ch, usart) == ARM_DRIVER_OK) {
+                p_str->tx_cnt++;
+                if(ARM_USART_GetTxCount(usart) == p_str->tx_num) {
+                    // Wait for transmission complete
+                    while((usart->p_reg->SR & USART_SR_TC) == 0U);
+                    usart->p_reg->CR1 &= ~USART_CR1_TXEIE;
+                    usart->p_info->xfer_status.tx_busy = 0U;
+                    p_str->tx_num = 0U;
+                    p_str->tx_cnt = 0U;
+                    event |= ARM_USART_EVENT_TX_COMPLETE;
+                }
             }
         }
     }
@@ -982,6 +993,16 @@ static void USART_cb(uint32_t event, ARM_USART_Resources_t *usart)
     }
     if(event & ARM_USART_EVENT_RECEIVE_COMPLETE) {
 
+    }
+    if(event & ARM_USART_RING_BUFFER_OVERFLOW) {
+#ifdef _ARM_USART_DEBUG_
+        LOG("Warning! Ring buffer overflow");
+#endif //_ARM_USART_DEBUG_
+    }
+    if(event & ARM_USART_RING_BUFFER_UNDERFLOW) {
+#ifdef _ARM_USART_DEBUG_
+        LOG("Warning! Ring buffer underflow");
+#endif //_ARM_USART_DEBUG_
     }
 }
 
@@ -1154,7 +1175,6 @@ ARM_DRIVER_USART ARM_USART1_Driver = {
     ARM_USART1_GetStatus,
     ARM_USART1_SetModemControl,
     ARM_USART1_GetModemStatus
-
 };
 
 #endif //(RTE_USART1)
@@ -1226,9 +1246,8 @@ int32_t ARM_USART_Init(void)
                              57600);
     status |= p_drv->Control(ARM_USART_CONTROL_TX, TRUE);
     status |= p_drv->Control(ARM_USART_CONTROL_RX, TRUE);
-    RingBuffer_Init(&USART1_TxBuff, USART1_TxBuffer);
-    RingBuffer_Init(&USART1_RxBuff, USART1_RxBuffer);
-
+    RingBuffer_Init(&USART1_TxRBuff, USART1_TxRingBuffer);
+    RingBuffer_Init(&USART1_RxRBuff, USART1_RxRingBuffer);
     usart->p_reg->CR1 |= USART_CR1_RXNEIE;
     return status;
 
@@ -1242,18 +1261,16 @@ void ARM_USART_Test(void)
 
     ARM_DRIVER_USART *p_drv = &ARM_USART1_Driver;
     volatile uint8_t num_char = 16;
-    uint8_t test_str[] = "Hello, World!\r\n";
-    for(uint32_t i = 0; i < num_char; i++) {
-        if(!RingBuffer_WriteChar(&USART1_TxBuff, &test_str[i]));
+    uint8_t ch = 0;
+    p_drv->Receive(USART1_RxRBuff.p_buff, num_char);
+    while(p_drv->GetStatus().rx_busy);
+    num_char = RingBuffer_GetCount(&USART1_RxRBuff);
+    while(RingBuffer_GetCount(&USART1_RxRBuff)) {
+        RingBuffer_ReadChar(&USART1_RxRBuff, &ch);
+        RingBuffer_WriteChar(&USART1_TxRBuff, &ch);
     }
-    num_char = RingBuffer_GetCount(&USART1_TxBuff);
-    p_drv->Send(USART1_TxBuffer, num_char);
-//  p_drv->Receive(USART1_RxBuffer, num_char);
-//    while(p_drv->GetStatus().rx_busy);
-//    p_drv->Send(USART1_TxBuffer, num_char);
+    p_drv->Send(USART1_TxRBuff.p_buff, num_char);
+    while(1);
 
 #endif //(RTE_USART1)
-
 }
-
-

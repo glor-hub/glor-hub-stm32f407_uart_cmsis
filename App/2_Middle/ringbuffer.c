@@ -45,10 +45,10 @@ void RingBuffer_Init(RingBuffer_t *p_struct,  uint8_t *p_buffer)
     p_struct->p_buff = p_buffer;
 }
 
-uint8_t RingBuffer_WriteChar(RingBuffer_t *p_struct,  uint8_t *p_char)
+int8_t RingBuffer_WriteChar(RingBuffer_t *p_struct,  uint8_t *p_char)
 {
     if(RingBuffer_isFull(p_struct)) {
-        return RING_BUFF_OVERLOAD_FLAG;
+        return RING_BUFF_OVERFLOW_ERR;
     } else {
         p_struct->p_buff[p_struct->in++] = *p_char;
         p_struct->in %= RING_BUFF_SIZE;
@@ -58,10 +58,10 @@ uint8_t RingBuffer_WriteChar(RingBuffer_t *p_struct,  uint8_t *p_char)
 }
 
 
-uint8_t RingBuffer_ReadChar(RingBuffer_t *p_struct,  uint8_t *p_char)
+int8_t RingBuffer_ReadChar(RingBuffer_t *p_struct,  uint8_t *p_char)
 {
     if(RingBuffer_isEmpty(p_struct)) {
-        return RING_BUFF_EMPTY_FLAG;
+        return RING_BUFF_UNDERFLOW_ERR;
     } else {
         *p_char = p_struct->p_buff[p_struct->out++];
         p_struct->out %= RING_BUFF_SIZE;
