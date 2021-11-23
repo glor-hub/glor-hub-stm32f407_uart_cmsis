@@ -94,5 +94,3 @@ static bool RingBuffer_isFull(RingBuffer_t *p_struct)
 {
     return p_struct->count == RING_BUFF_SIZE;
 }
-
-

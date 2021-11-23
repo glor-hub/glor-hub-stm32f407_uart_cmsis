@@ -10,8 +10,12 @@
 
 #define ARM_USART_BAUDRATE_DEFAULT ARM_USART_BAUDRATE_57600
 
-#define ARM_USART_RING_BUFFER_OVERFLOW   (1UL << 14)
-#define ARM_USART_RING_BUFFER_UNDERFLOW  (1UL << 15)
+
+/****** USART Event(continuation) *****/
+
+#define ARM_USART_EVENT_RX_IDLE                (1UL << 14)
+#define ARM_USART_EVENT_RING_BUFFER_OVERFLOW   (1UL << 15)
+#define ARM_USART_EVENT_RING_BUFFER_UNDERFLOW  (1UL << 16)
 
 int32_t ARM_USART_Init(void);
 bool ARM_USART_isReady(int32_t status);

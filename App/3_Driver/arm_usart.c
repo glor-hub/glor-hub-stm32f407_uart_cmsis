@@ -946,25 +946,11 @@ static void USART_IRQHandler(ARM_USART_Resources_t *usart)
     uint32_t event = 0U;
     uint8_t ch = 0U;
     ARM_USART_TransferInfo_t *p_str = &(usart->p_info->xfer_info);
-    if(flag & USART_SR_RXNE) {
-        ch = ARM_USART_GetChar(usart);
-        if(RingBuffer_WriteChar(&USART1_RxRBuff, &ch)) {
-            event |= ARM_USART_RING_BUFFER_OVERFLOW;
-        } else {
-            p_str->rx_cnt++;
-            usart->p_reg ->SR &= ~USART_SR_RXNE;
-            if(ARM_USART_GetRxCount(usart) == p_str->rx_num) {
-                usart->p_reg->CR1 &= ~USART_CR1_RXNEIE;
-                usart->p_info->xfer_status.rx_busy = 0U;
-                p_str->rx_num = 0U;
-                p_str->rx_cnt = 0U;
-                event |= ARM_USART_EVENT_RECEIVE_COMPLETE;
-            }
-        }
-    }
+
+// Transmit Data Register Empty
     if((flag & USART_SR_TXE) && (usart->p_info->xfer_status.tx_busy == 1)) {
         if(RingBuffer_ReadChar(&USART1_TxRBuff, &ch)) {
-            event |= ARM_USART_RING_BUFFER_UNDERFLOW;
+            event |= ARM_USART_EVENT_RING_BUFFER_UNDERFLOW;
         } else {
             if(ARM_USART_PutChar(ch, usart) == ARM_DRIVER_OK) {
                 p_str->tx_cnt++;
@@ -980,6 +966,51 @@ static void USART_IRQHandler(ARM_USART_Resources_t *usart)
             }
         }
     }
+// OverRun Error
+    if(flag & USART_SR_ORE) {
+        usart->p_info->xfer_status.rx_overflow = 1U;
+        event |= ARM_USART_EVENT_RX_OVERFLOW;
+    }
+
+    // Noise Error or
+    // Framing Error (de-synchronization, excessive noise
+    // a break character is detected)
+    if(flag & (USART_SR_NE | USART_SR_FE)) {
+        usart->p_info->xfer_status.rx_framing_error = 1U;
+        event |= ARM_USART_EVENT_RX_FRAMING_ERROR;
+    }
+
+// Parity Error
+    if(flag & USART_SR_PE) {
+        if(flag & USART_SR_RXNE) {
+            usart->p_info->xfer_status.rx_parity_error = 1U;
+            event |= ARM_USART_EVENT_RX_PARITY_ERROR;
+        }
+    }
+
+// IDLE line detected
+    if(flag & ARM_USART_EVENT_RX_IDLE) {
+        event |= ARM_USART_EVENT_RX_OVERFLOW;
+    }
+
+// Read Data Register Not Empty
+    if(flag & USART_SR_RXNE) {
+        ch = ARM_USART_GetChar(usart);
+        if(RingBuffer_WriteChar(&USART1_RxRBuff, &ch)) {
+            event |= ARM_USART_EVENT_RING_BUFFER_OVERFLOW;
+        } else {
+            p_str->rx_cnt++;
+            usart->p_reg ->SR &= ~USART_SR_RXNE;
+            if(ARM_USART_GetRxCount(usart) == p_str->rx_num) {
+                usart->p_reg->CR1 &= ~USART_CR1_RXNEIE;
+                usart->p_info->xfer_status.rx_busy = 0U;
+                p_str->rx_num = 0U;
+                p_str->rx_cnt = 0U;
+                event |= ARM_USART_EVENT_RECEIVE_COMPLETE;
+            }
+        }
+    }
+
     if(event != 0U) {
         usart->p_info->cb_event(event);
     }
@@ -991,18 +1022,45 @@ static void USART_cb(uint32_t event, ARM_USART_Resources_t *usart)
     if(event & ARM_USART_EVENT_TX_COMPLETE) {
 
     }
+
     if(event & ARM_USART_EVENT_RECEIVE_COMPLETE) {
 
     }
-    if(event & ARM_USART_RING_BUFFER_OVERFLOW) {
+
+    if(event & ARM_USART_EVENT_RING_BUFFER_OVERFLOW) {
 #ifdef _ARM_USART_DEBUG_
         LOG("Warning! Ring buffer overflow");
 #endif //_ARM_USART_DEBUG_
     }
-    if(event & ARM_USART_RING_BUFFER_UNDERFLOW) {
+
+    if(event & ARM_USART_EVENT_RING_BUFFER_UNDERFLOW) {
 #ifdef _ARM_USART_DEBUG_
         LOG("Warning! Ring buffer underflow");
 #endif //_ARM_USART_DEBUG_
+    }
+
+    if(event & ARM_USART_EVENT_RX_OVERFLOW) {
+        // to do
+#ifdef _ARM_USART_DEBUG_
+        LOG("Warning! At least 1 data has been lost in shift register.");
+#endif //_ARM_USART_DEBUG_
+        usart->p_info->xfer_status.rx_overflow = 0U;
+    }
+
+    if(event & ARM_USART_EVENT_RX_FRAMING_ERROR) {
+        // to do
+#ifdef _ARM_USART_DEBUG_
+        LOG("Warning! The invalid data or a break character is transferred from the Shift register to the USART_DR register.");
+#endif //_ARM_USART_DEBUG_
+        usart->p_info->xfer_status.rx_framing_error = 0U;
+    }
+
+    if(event & ARM_USART_EVENT_RX_PARITY_ERROR) {
+        // to do
+#ifdef _ARM_USART_DEBUG_
+        LOG("Warning! The parity check failed.");
+#endif //_ARM_USART_DEBUG_
+        usart->p_info->xfer_status.rx_parity_error = 0U;
     }
 }
 
