@@ -475,6 +475,11 @@
               <FileType>1</FileType>
               <FilePath>.\App\3_Driver\arm_usart.c</FilePath>
             </File>
+            <File>
+              <FileName>arm_dma.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\App\3_Driver\arm_dma.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

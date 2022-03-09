@@ -19,6 +19,12 @@
 #include "assert.h"
 #endif//_USART_DEBUG_
 
+#define USE_RING_BUFFER
+
+#ifndef USE_RING_BUFFER
+#define USE_DMA
+#endif //USE_RING_BUFFER
+
 #define MAX_BUFF_LENGTH 256
 
 //********************************************************************************

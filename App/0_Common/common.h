@@ -12,7 +12,7 @@
 typedef enum {
     ENABLE_CMD = 0,
     DISABLE_CMD,
-    NUM_PERIPH_STATES
+    NUM_PERIPH_COMMANDS
 } ePeriphCmd;
 
 typedef enum {
@@ -31,6 +31,8 @@ typedef enum {
     UART_4,
     UART_5,
     USART_6,
+    DMA_1,
+    DMA_2
 } ePeriphTypes;
 
 #endif //_COMMON_H_

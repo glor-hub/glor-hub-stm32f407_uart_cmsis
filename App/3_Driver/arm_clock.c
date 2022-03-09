@@ -250,6 +250,22 @@ void ARM_RCC_Periph_ClockCmd(ePeriphTypes periph, ePeriphCmd cmd)
             }
             break;
         }
+        case DMA_1: {
+            if(cmd == ENABLE_CMD) {
+                RCC->AHB1ENR |= RCC_AHB1ENR_DMA1EN;
+            } else {
+                RCC->AHB1ENR &= ~RCC_AHB1ENR_DMA1EN;
+            }
+            break;
+        }
+        case DMA_2: {
+            if(cmd == ENABLE_CMD) {
+                RCC->AHB1ENR |= RCC_AHB1ENR_DMA2EN;
+            } else {
+                RCC->AHB1ENR &= ~RCC_AHB1ENR_DMA2EN;
+            }
+            break;
+        }
         default: {
 #ifdef _ARM_CLOCK_DEBUG_
             LOG("Warning! Undefined switch-case value");
@@ -379,6 +395,22 @@ void ARM_RCC_Periph_ResetCmd(ePeriphTypes periph, ePeriphCmd cmd)
                 RCC->APB2RSTR |= RCC_APB2RSTR_USART6RST;
             } else {
                 RCC->APB2RSTR &= ~RCC_APB2RSTR_USART6RST;
+            }
+            break;
+        }
+        case DMA_1: {
+            if(cmd == ENABLE_CMD) {
+                RCC->AHB1RSTR |= RCC_AHB1RSTR_DMA1RST;
+            } else {
+                RCC->AHB1RSTR &= ~RCC_AHB1RSTR_DMA1RST;
+            }
+            break;
+        }
+        case DMA_2: {
+            if(cmd == ENABLE_CMD) {
+                RCC->AHB1RSTR |= RCC_AHB1RSTR_DMA2RST;
+            } else {
+                RCC->AHB1RSTR &= ~RCC_AHB1RSTR_DMA2RST;
             }
             break;
         }
