@@ -21,7 +21,7 @@
 //Macros
 //********************************************************************************
 
-// Project:      USART Driver for STM32F405.
+// Project:      USART Driver for STM32F407.
 // Configured:   via RTE_Device.h configuration file
 
 /* History:

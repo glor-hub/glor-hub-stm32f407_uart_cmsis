@@ -1,3 +1,14 @@
+
+This project is to test  the possibility of STM32F407VGT6 microcontroller peripherals
+
+using STM32F4DISCOVERY kit.
+
+USART Driver for STM32F407 using CMSIS library is implemented.
+
+If enabled, the USART driver uses the DMA module channels or Ring buffer.
+
+
+
 # CMSIS-Driver configuration
 
 There are multiple ways to configure a CMSIS-Driver.
